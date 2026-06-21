@@ -1,0 +1,7 @@
+{
+    "name": "Duplicate Checker",
+    "purpose": "Checks if the provided ID has already been processed today.",
+    "language": "Python",
+    "inputs": ["qr_data"],
+    "outputs": ["is_duplicate", "processed_id"]
+}

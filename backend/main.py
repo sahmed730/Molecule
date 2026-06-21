@@ -1,0 +1,225 @@
+import os
+import sys
+# Force UTF-8 output on Windows to prevent emoji/unicode chars crashing the server
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
+    sys.stderr = open(sys.stderr.fileno(), mode='w', encoding='utf-8', buffering=1)
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
+from engine.ai_generator import (
+    classify_system_type,
+    suggest_architecture,
+    generate_logic_flowchart,
+    review_single_module,
+    auto_improve_architecture,
+    expand_architecture,
+    batch_expand_architecture,
+    generate_clarifying_questions,
+    suggest_architecture_stream,
+    extract_graph_json,
+    chat_update_module,
+    chat_update_module_stream,
+)
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = FastAPI(title="EasePr Engine", version="0.2.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ── Request Models ──────────────────────────────────────────
+
+class ClassifyRequest(BaseModel):
+    prompt: str
+
+class ClarifyRequest(BaseModel):
+    prompt: str
+    classification: Optional[dict] = None
+
+class ArchitectureRequest(BaseModel):
+    prompt: str
+    classification: Optional[dict] = None
+    answers: Optional[dict] = None
+
+class FlowchartRequest(BaseModel):
+    coreTask: str
+    dataShape: str = ""
+    expectedOutput: str = ""
+    rules: str = ""
+    name: str = ""
+    errorHandling: str = ""
+
+class ModuleReviewRequest(BaseModel):
+    module_data: dict
+
+class AutoImproveRequest(BaseModel):
+    graph_data: dict
+    instruction: Optional[str] = None
+
+class ExpandRequest(BaseModel):
+    graph_data: dict
+    module_name: str
+    reason: str
+
+class BatchExpandRequest(BaseModel):
+    graph_data: dict
+    modules: list
+
+class ExtractGraphRequest(BaseModel):
+    markdown_text: str
+
+class ChatModuleRequest(BaseModel):
+    module_data: dict
+    user_message: str
+
+# ── Endpoints ───────────────────────────────────────────────
+
+@app.get("/")
+def read_root():
+    return {"status": "EasePr Engine is running", "version": "0.2.0"}
+
+
+@app.post("/api/classify-system")
+def api_classify_system(req: ClassifyRequest):
+    """Stage 1: Classify the project into a system archetype."""
+    try:
+        classification = classify_system_type(req.prompt)
+        return {"status": "success", "classification": classification}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/clarify-architecture")
+def api_clarify_architecture(req: ClarifyRequest):
+    """Stage 2: Generate domain-adaptive clarifying questions."""
+    try:
+        result = generate_clarifying_questions(req.prompt, req.classification)
+        return {"status": "success", "data": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/suggest-architecture")
+def api_suggest_architecture(req: ArchitectureRequest):
+    """Stage 3: Reasoning-based architecture generation."""
+    try:
+        suggestion = suggest_architecture(req.prompt, req.classification, req.answers)
+        return {"status": "success", "suggestion": suggestion}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+from fastapi.responses import StreamingResponse
+
+@app.post("/api/suggest-architecture-stream")
+def api_suggest_architecture_stream(req: ArchitectureRequest):
+    """Stage 3 (Streaming): Reasoning-based architecture generation returning pure Markdown."""
+    def event_generator():
+        for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
+            # Format as SSE
+            # Replace newlines in chunk with something SSE safe, or use proper data: payload
+            # Fast way for simple markdown: just send the chunk as a plain string using StreamingResponse text/plain,
+            # or SSE with data. We will use SSE format for better reliability.
+            lines = chunk.split('\n')
+            for line in lines:
+                yield f"data: {line}\n"
+            yield "data: \n\n" # empty line separates events, but chunk might not have them properly.
+            
+            # Actually, standard text/event-stream expects data: payload\n\n
+            # Let's just yield the raw string but we must format it as JSON or proper SSE.
+            # Simple SSE:
+            # yield f"data: {repr(chunk)}\n\n"
+            
+    # Wait, the easiest way to stream markdown directly to frontend without SSE parsing is just streaming text.
+    def text_generator():
+        for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
+            yield chunk
+
+    return StreamingResponse(text_generator(), media_type="text/plain")
+
+@app.post("/api/extract-graph-json")
+def api_extract_graph_json(req: ExtractGraphRequest):
+    """Parses pure Markdown into React Flow Graph JSON."""
+    try:
+        graph = extract_graph_json(req.markdown_text)
+        return {"status": "success", "graph": graph}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat-module")
+def api_chat_module(req: ChatModuleRequest):
+    """Interactive chat for editing a specific module."""
+    try:
+        updated_module = chat_update_module(req.module_data, req.user_message)
+        return {"status": "success", "module": updated_module}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat-module-stream")
+def api_chat_module_stream(req: ChatModuleRequest):
+    """Interactive chat for editing a specific module, streaming markdown."""
+    def text_generator():
+        for chunk in chat_update_module_stream(req.module_data, req.user_message):
+            yield chunk
+
+    return StreamingResponse(text_generator(), media_type="text/plain")
+
+
+@app.post("/api/generate-flowchart")
+def api_generate_flowchart(req: FlowchartRequest):
+    """Generate a Mermaid.js flowchart for a module's internal logic."""
+    try:
+        chart = generate_logic_flowchart(req.dict())
+        return {"status": "success", "chart": chart}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/review-module")
+def api_review_module(req: ModuleReviewRequest):
+    """Stage 4: Localized module review."""
+    try:
+        review = review_single_module(req.module_data)
+        return {"status": "success", "review": review}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/auto-improve-architecture")
+def api_auto_improve_architecture(req: AutoImproveRequest):
+    """Stage 5: Intelligent graph optimization."""
+    try:
+        updated_graph = auto_improve_architecture(req.graph_data, req.instruction)
+        return {"status": "success", "graph": updated_graph}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/expand-architecture")
+def api_expand_architecture(req: ExpandRequest):
+    """Add a single new module to the architecture."""
+    try:
+        result = expand_architecture(req.graph_data, req.module_name, req.reason)
+        return {"status": "success", "result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/batch-expand-architecture")
+async def api_batch_expand_architecture(req: BatchExpandRequest):
+    """Add multiple modules concurrently."""
+    try:
+        result = await batch_expand_architecture(req.graph_data, req.modules)
+        return {"status": "success", "result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

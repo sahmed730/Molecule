@@ -1,0 +1,7 @@
+{
+    "name": "QR Scanner",
+    "purpose": "Simulates scanning a QR code from a camera feed.",
+    "language": "Python",
+    "inputs": [],
+    "outputs": ["qr_data"]
+}
