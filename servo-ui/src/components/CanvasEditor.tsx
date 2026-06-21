@@ -228,7 +228,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     // Auto-review after applying
     try {
-      const reviewResponse = await fetch('http://127.0.0.1:8000/api/review-architecture', {
+      const reviewResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/review-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ graph_data: { nodes: layoutedNodes, edges: layoutedEdges } }),
@@ -495,7 +495,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     setIsReviewing(true);
     setReviewData(null);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/auto-improve-architecture', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/auto-improve-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ graph_data: { nodes, edges, projectCapabilities }, instruction: instruction || null }),
@@ -519,7 +519,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const handleExpandModule = async (moduleName: string, reason: string) => {
     setIsReviewing(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/expand-architecture', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/expand-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ graph_data: { nodes, edges }, module_name: moduleName, reason }),
@@ -574,7 +574,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         onNodesChange(layoutedNodes);
         onEdgesChange(layoutedEdges);
         
-        const reviewResponse = await fetch('http://127.0.0.1:8000/api/review-architecture', {
+        const reviewResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/review-architecture`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ graph_data: { nodes: layoutedNodes, edges: layoutedEdges } }),
@@ -602,7 +602,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     }));
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/batch-expand-architecture', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/batch-expand-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ graph_data: { nodes, edges }, modules: modulesToAdd }),
@@ -661,7 +661,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         onEdgesChange(layoutedEdges);
         
         // Refresh review instead of closing
-        const reviewResponse = await fetch('http://127.0.0.1:8000/api/review-architecture', {
+        const reviewResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/review-architecture`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ graph_data: { nodes: layoutedNodes, edges: layoutedEdges } }),
@@ -684,7 +684,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     setIsClarifyingExpand(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/clarify-architecture', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/clarify-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: expandPrompt }),
@@ -737,7 +737,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
        // Append flow - use batch expand trick
        setIsReviewing(true);
        try {
-         const response = await fetch('http://127.0.0.1:8000/api/batch-expand-architecture', {
+         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/batch-expand-architecture`, {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ 
@@ -797,7 +797,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
            onNodesChange(layoutedNodes);
            onEdgesChange(layoutedEdges);
 
-           const reviewResponse = await fetch('http://127.0.0.1:8000/api/review-architecture', {
+           const reviewResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/review-architecture`, {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify({ graph_data: { nodes: layoutedNodes, edges: layoutedEdges } }),

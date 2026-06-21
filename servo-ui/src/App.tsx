@@ -84,7 +84,7 @@ function App() {
 
     try {
       // Stage 1: Classify the system type
-      const classifyRes = await fetch('http://127.0.0.1:8000/api/classify-system', {
+      const classifyRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/classify-system`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
@@ -101,7 +101,7 @@ function App() {
       setIsClarifying(true);
 
       // Stage 2: Generate domain-adaptive questions
-      const clarifyRes = await fetch('http://127.0.0.1:8000/api/clarify-architecture', {
+      const clarifyRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/clarify-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, classification: classificationResult }),
@@ -160,7 +160,7 @@ function App() {
     setStreamingMarkdown('');
     
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/suggest-architecture-stream', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/suggest-architecture-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -199,7 +199,7 @@ function App() {
     if (!streamingMarkdown) return;
     setIsExtracting(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/extract-graph-json', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/extract-graph-json`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ markdown_text: streamingMarkdown }),

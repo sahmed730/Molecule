@@ -26,7 +26,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
     setIsReviewing(true);
     setReview(null);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/review-module', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/review-module`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ module_data: data }),
@@ -64,7 +64,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
     setIsChatting(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/chat-module-stream', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/chat-module-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ module_data: data, user_message: userMsg }),
