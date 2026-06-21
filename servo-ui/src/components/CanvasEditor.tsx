@@ -98,7 +98,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const [edges, setEdges] = useState<any[]>(initialEdges);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [promptTab, setPromptTab] = useState<'architecture' | 'claude' | 'standard'>('architecture');
   const [copied, setCopied] = useState(false);
@@ -310,12 +310,10 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   );
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: any) => {
-    setSelectedNodeId(node.id);
     openTab(node.id);
   }, [openTab]);
 
   const onPaneClick = useCallback(() => {
-    setSelectedNodeId(null);
   }, []);
 
   const getMetrics = () => {
