@@ -318,13 +318,6 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     setSelectedNodeId(null);
   }, []);
 
-  const handleUpdateNode = (id: string, updatedData: any) => {
-    const newNodes = nodes.map(n => n.id === id ? { ...n, data: updatedData } : n);
-    setNodes(newNodes);
-    onNodesChange(newNodes);
-    setSelectedNodeId(null);
-  };
-
   const getMetrics = () => {
     const numModules = nodes.length;
     const estFiles = numModules * 3 + edges.length;
@@ -814,8 +807,6 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   };
 
   const metrics = getMetrics();
-
-  const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   return (
     <div className="flex-grow h-full relative" ref={reactFlowWrapper}>

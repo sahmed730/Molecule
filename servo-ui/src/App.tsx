@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Zap, Sparkles, LayoutTemplate, Brain, Tag, CheckCircle2 } from 'lucide-react';
+import { Loader2, Zap, LayoutTemplate, Brain, CheckCircle2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import dagre from 'dagre';
