@@ -205,7 +205,8 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
           expectedOutput: m.expectedOutput || '',
           rules: m.rules || '',
           status: 'ready',
-          language: m.language || 'Python',
+          language: m.language || m.platform || '',
+          platform: m.platform || '',
           dependencies: m.dependencies || '',
           errorHandling: m.errorHandling || '',
           testingRequirements: m.testingRequirements || ''
@@ -398,7 +399,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     
     nodes.forEach(node => {
       text += `### ${node.data.label || 'Unnamed Module'}\n\n`;
-      text += `**Language**: ${node.data.language || 'Python'}\n\n`;
+      text += `**Platform**: ${node.data.platform || node.data.language || 'Unknown'}\n\n`;
       
       const fileName = (node.data.label || 'unnamed').toLowerCase().replace(/\s+/g, '_');
       const ext = (node.data.language || '').toLowerCase().includes('node') || (node.data.language || '').toLowerCase().includes('js') ? 'js' : 'py';
@@ -446,7 +447,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const ext = (node.data.language || '').toLowerCase().includes('node') || (node.data.language || '').toLowerCase().includes('js') ? 'js' : 'py';
       text += `  <module>\n`;
       text += `    <name>${node.data.label}</name>\n`;
-      text += `    <language>${node.data.language || 'Python'}</language>\n`;
+      text += `    <platform>${node.data.platform || node.data.language || 'Unknown'}</platform>\n`;
       text += `    <file>modules/${fileName}/implementation.${ext}</file>\n`;
       text += `    <dependencies>${node.data.dependencies || 'None'}</dependencies>\n`;
       text += `    <task>${node.data.coreTask || 'None'}</task>\n`;
@@ -542,7 +543,8 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
             expectedOutput: nm.expectedOutput || '',
             rules: nm.rules || '',
             status: 'ready',
-            language: nm.language || 'Python',
+            language: nm.language || nm.platform || '',
+            platform: nm.platform || '',
             dependencies: nm.dependencies || '',
             errorHandling: nm.errorHandling || '',
             testingRequirements: nm.testingRequirements || ''
@@ -626,7 +628,8 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                 expectedOutput: nm.expectedOutput || '',
                 rules: nm.rules || '',
                 status: 'ready',
-                language: nm.language || 'Python',
+                language: nm.language || nm.platform || '',
+                platform: nm.platform || '',
                 dependencies: nm.dependencies || '',
                 errorHandling: nm.errorHandling || '',
                 testingRequirements: nm.testingRequirements || ''
@@ -764,7 +767,8 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                        expectedOutput: nm.expectedOutput || '',
                        rules: nm.rules || '',
                        status: 'ready',
-                       language: nm.language || 'Python',
+                       language: nm.language || nm.platform || '',
+                       platform: nm.platform || '',
                        dependencies: nm.dependencies || '',
                        errorHandling: nm.errorHandling || '',
                        testingRequirements: nm.testingRequirements || ''

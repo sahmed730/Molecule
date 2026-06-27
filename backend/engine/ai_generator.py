@@ -28,28 +28,34 @@ from .cache import get_cached_response, set_cached_response
 
 def _get_client() -> OpenAI:
     """Returns an OpenAI client pointed at the NVIDIA API."""
-    api_key = os.environ.get("NVIDIA_API_KEY")
-    if not api_key:
-        raise ValueError("NVIDIA_API_KEY environment variable is not set.")
+    api_key = os.environ.get("NVIDIA_API_KEY", "")
+    base_url = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
+    if not base_url.endswith("/v1") and not base_url.endswith("/v1beta/openai"):
+        base_url = f"{base_url}/v1"
+        
     return OpenAI(
-        base_url="https://integrate.api.nvidia.com/v1",
+        base_url=base_url,
         api_key=api_key,
         timeout=120.0,
-        max_retries=1,
+        max_retries=0,
     )
 
 def _async_get_client() -> AsyncOpenAI:
     """Returns an AsyncOpenAI client pointed at the NVIDIA API."""
-    api_key = os.environ.get("NVIDIA_API_KEY")
-    if not api_key:
-        raise ValueError("NVIDIA_API_KEY environment variable is not set.")
+    api_key = os.environ.get("NVIDIA_API_KEY", "")
+    base_url = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
+    if not base_url.endswith("/v1") and not base_url.endswith("/v1beta/openai"):
+        base_url = f"{base_url}/v1"
+        
     return AsyncOpenAI(
-        base_url="https://integrate.api.nvidia.com/v1",
+        base_url=base_url,
         api_key=api_key,
         timeout=120.0,
-        max_retries=1,
+        max_retries=0,
     )
 
+FAST_MODEL = os.environ.get("AI_FAST_MODEL", "minimaxai/minimax-m3")
+THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "z-ai/glm-5.1")
 
 def _call_fast_model(
     system_prompt: str,
@@ -58,39 +64,26 @@ def _call_fast_model(
     max_tokens: int = 8192,
     json_mode: bool = False,
 ) -> str:
-    """z-ai/glm-5.1 — fast structured JSON responses."""
+    """Fast structured responses via Chat API."""
     cached = get_cached_response(system_prompt, user_prompt, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
     if cached is not None:
         return cached
 
     client = _get_client()
     kwargs = {
-        "model": "minimaxai/minimax-m3",
+        "model": FAST_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": user_prompt}
         ],
-        "temperature": temperature,
-        "top_p": 1.0,
-        "max_tokens": max_tokens,
-        "stream": True,
-        "timeout": 90.0,
+        "max_completion_tokens": max_tokens,
     }
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
-    completion = client.chat.completions.create(**kwargs)
-    chunks = []
-    for chunk in completion:
-        if not getattr(chunk, "choices", None):
-            continue
-        if len(chunk.choices) == 0 or getattr(chunk.choices[0], "delta", None) is None:
-            continue
-        delta = chunk.choices[0].delta
-        if getattr(delta, "content", None) is not None:
-            chunks.append(delta.content)
-            
-    final_response = "".join(chunks).strip()
+    response = client.chat.completions.create(**kwargs)
+    final_response = response.choices[0].message.content.strip()
+    
     set_cached_response(system_prompt, user_prompt, final_response, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
     return final_response
 
@@ -101,29 +94,26 @@ async def _async_call_fast_model(
     max_tokens: int = 16384,
     json_mode: bool = False,
 ) -> str:
-    """Async wrapper for fast JSON responses using minimax-m3."""
+    """Async wrapper for fast JSON responses via Chat API."""
     cached = get_cached_response(system_prompt, user_prompt, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
     if cached is not None:
         return cached
 
     client = _async_get_client()
     kwargs = {
-        "model": "minimaxai/minimax-m3",
+        "model": FAST_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": user_prompt}
         ],
-        "temperature": temperature,
-        "top_p": 1.0,
-        "max_tokens": max_tokens,
-        "stream": False,
-        "timeout": 90.0,
+        "max_completion_tokens": max_tokens,
     }
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
-    completion = await client.chat.completions.create(**kwargs)
-    final_response = completion.choices[0].message.content.strip()
+    response = await client.chat.completions.create(**kwargs)
+    final_response = response.choices[0].message.content.strip()
+    
     set_cached_response(system_prompt, user_prompt, final_response, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
     return final_response
 
@@ -133,45 +123,43 @@ def _call_thinking_model(
     user_prompt: str,
     json_mode: bool = False,
 ) -> str:
-    """z-ai/glm-5.1 — deep reasoning."""
+    """Deep reasoning via Chat API."""
     cached = get_cached_response(system_prompt, user_prompt, json_mode=json_mode)
     if cached is not None:
         return cached
 
     client = _get_client()
     kwargs = {
-        "model": "z-ai/glm-5.1",
+        "model": THINKING_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": user_prompt}
         ],
-        "temperature": 1.0,
-        "top_p": 1.0,
-        "max_tokens": 16384,
-        "stream": True,
-        "timeout": 120.0,
+        "max_completion_tokens": 16384,
     }
+    
+    # Enable reasoning for Nemotron/NVIDIA reasoning models
+    if "nemotron" in THINKING_MODEL.lower():
+        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":8192}
+
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
-    completion = client.chat.completions.create(**kwargs)
-    chunks = []
-    for chunk in completion:
-        if not getattr(chunk, "choices", None):
-            continue
-        if len(chunk.choices) == 0 or getattr(chunk.choices[0], "delta", None) is None:
-            continue
-        delta = chunk.choices[0].delta
-        if getattr(delta, "content", None) is not None:
-            chunks.append(delta.content)
-            
-    final_response = "".join(chunks).strip()
+    response = client.chat.completions.create(**kwargs)
+    
+    # Try to extract reasoning content if present
+    message = response.choices[0].message
+    reasoning = getattr(message, "reasoning_content", "") or ""
+    content = message.content or ""
+    
+    final_response = (reasoning + "\n\n" + content).strip() if reasoning else content.strip()
+    
     set_cached_response(system_prompt, user_prompt, final_response, json_mode=json_mode)
     return final_response
 
 
 def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
-    """z-ai/glm-5.1 — deep reasoning, yielding chunks."""
+    """Deep reasoning, yielding chunks via Chat API."""
     cached = get_cached_response(system_prompt, user_prompt)
     if cached is not None:
         # Yield the cached response in chunks so frontend animation looks ok
@@ -181,29 +169,39 @@ def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
         return
 
     client = _get_client()
-    completion = client.chat.completions.create(
-        model="z-ai/glm-5.1",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=1.0,
-        top_p=1.0,
-        max_tokens=16384,
-        stream=True,
-        timeout=120.0,
-    )
     
     accumulated = []
-    for chunk in completion:
-        if not getattr(chunk, "choices", None):
+    
+    kwargs = {
+        "model": THINKING_MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "max_completion_tokens": 16384,
+        "stream": True
+    }
+    
+    if "nemotron" in THINKING_MODEL.lower():
+        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":8192}
+        
+    stream = client.chat.completions.create(**kwargs)
+    
+    for event in stream:
+        if not event.choices:
             continue
-        if len(chunk.choices) == 0 or getattr(chunk.choices[0], "delta", None) is None:
-            continue
-        delta = chunk.choices[0].delta
-        if getattr(delta, "content", None) is not None:
-            accumulated.append(delta.content)
-            yield delta.content
+            
+        delta = event.choices[0].delta
+        
+        reasoning = getattr(delta, "reasoning_content", None)
+        if reasoning:
+            accumulated.append(reasoning)
+            yield reasoning
+            
+        content = getattr(delta, "content", None)
+        if content:
+            accumulated.append(content)
+            yield content
             
     final_response = "".join(accumulated).strip()
     set_cached_response(system_prompt, user_prompt, final_response)
@@ -288,37 +286,30 @@ SYSTEM_ARCHETYPES = [
     "marketplace",        # Two-sided platforms, matching, transactions
 ]
 
-CLASSIFIER_SYSTEM_PROMPT = """You are a system architect classifier.
+CLASSIFIER_SYSTEM_PROMPT = """Role: System Architect Classifier.
+Classify the project into ONE primary archetype (and optional secondary).
+Archetypes:
+- crud_app: Forms, basic APIs
+- saas_platform: Multi-tenant, billing, auth
+- autonomous_agent: AI agents, tools, memory
+- workflow_engine: Orchestration, DAG, state machines
+- embedded_system: IoT, hardware, real-time
+- compiler_toolchain: Parsers, ASTs, code gen
+- data_pipeline: ETL, stream processing
+- cognitive_system: Multi-model AI, RAG
+- realtime_system: WebSocket, chat, live collab
+- marketplace: Two-sided, matching, transactions
 
-Given a user's project description, classify it into EXACTLY ONE primary archetype
-and optionally one secondary archetype.
-
-Available archetypes:
-- crud_app: Simple data management, admin panels, forms, basic APIs
-- saas_platform: Multi-tenant products with billing, auth, user management
-- autonomous_agent: AI agents that use tools, have memory, make decisions, recurse
-- workflow_engine: Orchestration, DAG execution, state machines, approval flows
-- embedded_system: IoT, hardware control, real-time constraints, firmware
-- compiler_toolchain: Parsers, ASTs, transpilers, interpreters, code generators
-- data_pipeline: ETL, stream processing, data transformation, analytics
-- cognitive_system: Multi-model AI, RAG, knowledge graphs, reasoning chains
-- realtime_system: WebSocket, chat, gaming, live collaboration, streaming
-- marketplace: Two-sided platforms, matching, transactions, ratings
-
-Also identify:
-- The CORE DOMAIN (e.g., "healthcare", "fintech", "education", "devtools")
-- The PRIMARY DATA ENTITY (what's the main thing being processed?)
-- The CRITICAL PATH (what's the most important user flow?)
-
+Also identify: Core Domain, Primary Entity, Critical Path.
 Respond with ONLY valid JSON:
 {
   "primary_archetype": "<archetype>",
-  "secondary_archetype": "<archetype or null>",
+  "secondary_archetype": "<archetype|null>",
   "core_domain": "<domain>",
   "primary_entity": "<entity>",
-  "critical_path": "<one-sentence description of the most important flow>",
+  "critical_path": "<1-sentence flow>",
   "complexity_tier": "<simple|moderate|complex|enterprise>",
-  "reasoning": "<2-3 sentences explaining why you chose this classification>"
+  "reasoning": "<1-2 sentences>"
 }"""
 
 
@@ -549,45 +540,39 @@ ARCHETYPE_QUESTION_AXES = {
     },
 }
 
-CLARIFY_SYSTEM_PROMPT_TEMPLATE = """You are a senior architect conducting a requirements interview for a {archetype_display} project in the {domain} domain.
+CLARIFY_SYSTEM_PROMPT_TEMPLATE = """Role: Senior Architect interviewing for {archetype_display} in {domain}.
 
-The system has been classified as:
-- Primary archetype: {primary_archetype}
-- Secondary archetype: {secondary_archetype}
-- Core domain: {domain}
-- Primary entity: {primary_entity}
-- Critical path: {critical_path}
+System Classification:
+- Primary: {primary_archetype}
+- Secondary: {secondary_archetype}
+- Domain: {domain}
+- Entity: {primary_entity}
+- Path: {critical_path}
 - Complexity: {complexity}
 
-Your job: generate 4-6 targeted clarifying questions that probe the dimensions
-that ACTUALLY MATTER for this specific kind of system.
-
-DOMAIN-SPECIFIC DIMENSIONS TO PROBE:
+Generate 4-6 clarifying questions targeting these dimensions:
 {dimension_list}
 
-EXAMPLE QUESTIONS FOR THIS ARCHETYPE:
+Examples:
 {example_questions}
 
 RULES:
-1. Questions must be SPECIFIC to the archetype and domain — not generic.
-2. Each question should unlock a DIFFERENT architectural decision.
-3. DO NOT ask questions the user already answered in their prompt.
-4. Include at least one "open_text" question for nuance the user wants to add.
-5. Options should be CONCRETE and ACTIONABLE, not vague.
+1. Specific to archetype/domain.
+2. Unlocks architectural decisions.
+3. Skip answered questions.
+4. >=1 "open_text" question.
+5. Actionable options.
 
-Question types:
-- "single_select": User picks ONE option.  3-5 concrete options.
-- "multi_select": User picks MULTIPLE.  4-6 options.
-- "open_text": Free-form answer.  Options array must be empty [].
+Types: "single_select" (3-5 options), "multi_select" (4-6 options), "open_text" ([]).
 
-Respond with ONLY valid JSON:
+Respond ONLY with valid JSON:
 {{
   "questions": [
     {{
       "id": "q1",
       "type": "single_select",
-      "question": "Your question?",
-      "options": ["Option A", "Option B", "Option C"]
+      "question": "?",
+      "options": ["A", "B"]
     }}
   ]
 }}"""
@@ -669,103 +654,91 @@ Probe the architectural dimensions that will have the biggest impact on the desi
 #  generating the module list.
 # ═══════════════════════════════════════════════════════════════
 
-REASONING_SYSTEM_PROMPT = """You are a world-class software architect.  You do NOT generate module lists.
-You REASON about architecture and modules emerge from your reasoning.
+REASONING_SYSTEM_PROMPT = """You are an Enterprise Architecture Compiler.
 
-You will receive:
-  1. What the user wants to build
-  2. The system classification (archetype, domain, complexity)
-  3. The user's answers to clarifying questions
+Your job is NOT to generate generic architecture. Your job is to maintain architectural integrity across multiple model handoffs.
 
-YOUR REASONING CHAIN (you MUST follow this order):
+PRIMARY OBJECTIVE:
+Preserve system continuity, execution fidelity, and platform constraints while transforming user intent into deployable modules.
 
-━━━ STEP 1: INTENT ANALYSIS ━━━
-What is the user actually trying to achieve?  Not what they said — what they NEED.
-What is the core value proposition?  What would make this system useless if removed?
+GLOBAL RULES:
 
-━━━ STEP 2: CONSTRAINT IDENTIFICATION ━━━
-What are the hard constraints?
-  - Performance: latency, throughput, concurrency
-  - Data: volume, sensitivity, consistency requirements
-  - Integration: external APIs, databases, third-party services
-  - Deployment: cloud, edge, embedded, serverless
-What trade-offs must be made?  (e.g., consistency vs. availability)
+1. STATE PRESERVATION (MANDATORY)
+Read and preserve the canonical architecture state object. Never reinterpret platform, execution environment, constraints, module boundaries, dependencies, ownership model, or governance model.
 
-━━━ STEP 3: EXECUTION FLOW SIMULATION ━━━
-Mentally walk through the critical path end-to-end:
-  - What happens first?  What triggers the flow?
-  - What data enters the system?  How is it transformed at each step?
-  - Where does data fan out (one-to-many)?  Where does it converge?
-  - What is the terminal output?
-Identify the MINIMUM number of transformations needed.
+2. NO PLATFORM DRIFT
+Do not substitute technologies. If external runtime is introduced, justify it.
 
-━━━ STEP 4: FAILURE MODE ANALYSIS ━━━
-Before finalizing modules, ask:
-  - What can fail at each step?  How does the system recover?
-  - Are there circular dependencies?  Detect and break them.
-  - Are there bottlenecks?  Can any step become a single point of failure?
-  - Are there redundant transformations?  Can two steps be merged?
-  - What happens under 10x load?  100x?
+3. MODULE CONTRACT ENFORCEMENT
+Each module must contain exactly these fields:
+- moduleId: Must follow format M001, M002, etc. (MANDATORY)
+- label
+- coreTask
+- dataShape
+- expectedOutput
+- rules
+- platform
+- dependencies
+- errorHandling
+- testingRequirements
 
-━━━ STEP 5: ARCHITECTURE SYNTHESIS ━━━
-NOW generate modules.  Each module must:
-  - Have a CLEAR reason to exist (derived from your reasoning, not a template)
-  - Be the MINIMUM needed — do not add modules "just in case"
-  - Use the BEST language for its specific task
-  - Connect logically to the data flow you simulated in Step 3
+4. ARCHITECTURAL CONSISTENCY
+Ensure security, observability, governance, and scaling assumptions remain intact.
 
-LANGUAGE SELECTION — choose what FITS:
-  Python → ML/AI, data science, scraping, NLP, scientific computing
-  Node.js → REST APIs, WebSocket servers, BFF layers, real-time
-  Go → High-concurrency microservices, queue workers, CLI, gRPC
-  Rust → Performance-critical computation, stream processing, WASM
-  Java/Kotlin → Enterprise backends, Android, Spring
-  SQL → Stored procedures, ETL, reporting queries
-  C/C++ → Embedded systems, firmware, drivers, performance-critical
-A realistic system uses 2-4 languages.  DO NOT make everything Python.
+5. SECURITY, OBSERVABILITY, GOVERNANCE
+Security (RBAC, Audit Logging), Observability (latency, load times), and Governance (owners) must exist as separate operational layers in the text.
 
-INFRASTRUCTURE IS NOT A MODULE.  These are CAPABILITIES, not nodes:
-  Auth, Logging, Monitoring, Rate Limiting, Caching, Encryption, CORS, Validation
+6. FAILURE MODEL & SCALABILITY
+Address deep failure modes (timeout, schema drift, broken joins) and massive scale (100x data, multi-region).
 
-━━━ OUTPUT FORMAT ━━━
-Respond with pure Markdown. Use the following structure EXACTLY:
+7. OUTPUT DISCIPLINE (Pure Markdown)
+Return strictly in this order:
 
-# System Architecture
+## A. Reasoning
+<Concise intent and constraints>
 
-## Reasoning
-**Intent:** <what the user actually needs>
-**Constraints:** <constraints>
-**Execution Flow:** <flow description>
-**Failure Modes:** <failures>
-**Design Decisions:** <decisions>
-
-## Global Flowchart
+## B. Global Architecture Flow
 ```mermaid
 graph TD
   M001[M001: Name] --> M002[M002: Name]
 ```
 
-## Modules
+## C. Modules
 
-### M001: <Module Name>
-**Core Task:** <what and why>
-**Data Shape (Input):** <type definition>
-**Expected Output:** <type definition>
-**Rules:** <constraints, edge cases>
-**Language:** <best language>
-**Dependencies:** <real packages>
-**Error Handling:** <exception scenarios>
-**Testing Requirements:** <test cases>
+### M001: <label>
+**coreTask:** <desc>
+**dataShape:** <desc>
+**expectedOutput:** <desc>
+**rules:** <desc>
+**platform:** <desc>
+**dependencies:** <desc>
+**errorHandling:** <desc>
+**testingRequirements:** <desc>
 
-### M002: <Module Name>
+### M002: <label>
 ...
 
+## D. Security Layer
+<details>
+
+## E. Governance Layer
+<details>
+
+## F. Observability Layer
+<details>
+
+## G. Failure Modes
+<details>
+
+## H. Scalability Risks
+<details>
+
+## I. Testing Matrix
+<details>
+
 RULES:
-- IDs: "M001", "M002", "M003", etc.
-- Generate 4-8 modules for moderate systems, 3-5 for simple, 6-12 for complex.
-- Every module must justify its existence through the reasoning chain.
-- The graph must be a DAG — NO cycles.
-- Return ONLY the Markdown text."""
+- Module IDs MUST use M001, M002 format.
+- Output ONLY Markdown."""
 
 
 def suggest_architecture(prompt: str, classification: dict = None, answers: dict = None) -> str:
@@ -895,18 +868,26 @@ Generate the minimum modules needed in pure Markdown format."""
 
 def extract_graph_json(markdown_text: str) -> dict:
     """Extracts React Flow JSON out of the raw Markdown text."""
-    system_prompt = """You are a JSON extractor. Read the provided Markdown text which contains a software architecture.
+    system_prompt = """You are a strict JSON extractor. Read the provided Markdown text which contains an Enterprise Architecture.
+
+CRITICAL RULES:
+1. Parse ONLY the `## C. Modules` section.
+2. Completely IGNORE all other sections (Reasoning, Flowchart, Security, Governance, Observability, etc.).
+3. Preserve all mandatory module fields EXACTLY as written.
+4. Enforce deterministic module IDs (M001, M002, etc.). Do not generate arbitrary IDs or rename them.
+5. Edge generation rules: Generate edges ONLY from the explicit sequential ordering of the modules (M001 -> M002 -> M003). Do not infer edges from the reasoning text or create cross-links.
+
 Extract the modules and connections exactly into this JSON schema:
 {
   "modules": [
     {
       "id": "M001",
-      "name": "Module Name",
+      "name": "Label from the markdown (e.g. Ingestion Layer)",
       "coreTask": "Task description",
       "dataShape": "Data shape",
       "expectedOutput": "Expected output",
       "rules": "Rules",
-      "language": "Language",
+      "platform": "Platform",
       "dependencies": "Dependencies",
       "errorHandling": "Error handling",
       "testingRequirements": "Testing requirements"
@@ -924,13 +905,16 @@ Return ONLY valid JSON, no markdown fences."""
         
         # Ensure fields exist
         for mod in result.get("modules", []):
-            mod.setdefault("language", "Python")
-            mod.setdefault("dependencies", "")
-            mod.setdefault("errorHandling", "")
-            mod.setdefault("testingRequirements", "")
-            mod.setdefault("rules", "")
-            mod.setdefault("dataShape", "")
-            mod.setdefault("expectedOutput", "")
+            mod.setdefault("platform", "Unknown")
+            # Backward compatibility alias for the legacy frontend schema
+            if "language" not in mod or not mod["language"]:
+                mod["language"] = mod.get("platform")
+            mod.setdefault("dependencies", "None")
+            mod.setdefault("errorHandling", "None specified")
+            mod.setdefault("testingRequirements", "None specified")
+            mod.setdefault("rules", "None specified")
+            mod.setdefault("dataShape", "Unknown")
+            mod.setdefault("expectedOutput", "Unknown")
             
         return result
     except Exception as e:
@@ -1136,9 +1120,9 @@ Respond with ONLY valid JSON:
 
 def auto_improve_architecture(graph_data: dict, instruction: str = None) -> dict:
     """Stage 5: Intelligent graph optimization."""
-    api_key = os.environ.get("ZAI_API_KEY")
+    api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
-        raise ValueError("ZAI_API_KEY environment variable is not set.")
+        raise ValueError("NVIDIA_API_KEY environment variable is not set.")
 
     existing_nodes = graph_data.get("nodes", [])
     existing_edges = graph_data.get("edges", [])
@@ -1485,7 +1469,7 @@ RULES:
 
 def generate_module_code(module_spec: dict, base_dir: str = "modules"):
     """Generate implementation.py and metadata.json for a module."""
-    api_key = os.environ.get("ZAI_API_KEY")
+    api_key = os.environ.get("NVIDIA_API_KEY")
 
     if not api_key:
         _save_module(module_spec, _mock_code(module_spec), base_dir)
@@ -1524,7 +1508,7 @@ Include validation, processing, error paths.  6-15 nodes."""
 
 def generate_logic_flowchart(module_spec: dict) -> str:
     """Generate Mermaid.js flowchart for a module's logic."""
-    api_key = os.environ.get("ZAI_API_KEY")
+    api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
         return "graph TD\n    Start([Start]) --> Validate{Valid?}\n    Validate -- Yes --> Process[Process]\n    Validate -- No --> Error[Error]\n    Process --> End([End])\n    Error --> End"
 

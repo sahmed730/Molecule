@@ -16,7 +16,8 @@ const Sidebar = () => {
     expectedOutput: 'What should this return?',
     rules: '',
     status: 'ready',
-    language: 'Python',
+    language: '',
+    platform: '',
     dependencies: '',
     errorHandling: '',
     testingRequirements: ''

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Loader2, Save, Send, MessageSquare } from 'lucide-react';
+import { Sparkles, Loader2, Save, Send, MessageSquare, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useAppStore } from '../store';
 
 interface ModuleWorkspaceProps {
   moduleData: any;
@@ -12,6 +13,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
   const [data, setData] = useState(moduleData);
   const [isReviewing, setIsReviewing] = useState(false);
   const [review, setReview] = useState<any>(null);
+  const token = useAppStore(state => state.token);
 
   // Chat state
   const [chatMessage, setChatMessage] = useState('');
@@ -28,7 +30,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/review-module`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ module_data: data }),
       });
       const res = await response.json();
@@ -46,6 +48,11 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
   const handleSave = () => {
     onUpdate(moduleData.moduleId || data.moduleId, data);
     alert('Saved module data!');
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+    alert('Module copied to clipboard!');
   };
 
   const handleChatSubmit = async (e: React.FormEvent) => {
@@ -66,7 +73,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/chat-module-stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ module_data: data, user_message: userMsg }),
       });
       
@@ -139,6 +146,13 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
             Module: <span className="text-blue-600">{data.label || 'Unnamed Module'}</span>
           </h2>
           <div className="flex items-center gap-3">
+            <button 
+              onClick={handleCopy}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded shadow-sm transition-colors"
+            >
+              <Copy className="w-4 h-4" />
+              Copy
+            </button>
             <button 
               onClick={handleReview}
               disabled={isReviewing}

@@ -1,16 +1,13 @@
-import os
+﻿import os
 import sys
-import tempfile
-import shutil
 # Force UTF-8 output on Windows to prevent emoji/unicode chars crashing the server
 if sys.stdout.encoding != 'utf-8':
     sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf-8', buffering=1)
     sys.stderr = open(sys.stderr.fileno(), mode='w', encoding='utf-8', buffering=1)
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-from markitdown import MarkItDown
 from engine.ai_generator import (
     classify_system_type,
     suggest_architecture,
@@ -29,9 +26,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import Depends, status
-import auth
-
 app = FastAPI(title="EasePr Engine", version="0.2.0")
 
 app.add_middleware(
@@ -43,7 +37,7 @@ app.add_middleware(
 )
 
 
-# ── Request Models ──────────────────────────────────────────
+# â”€â”€ Request Models â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class ClassifyRequest(BaseModel):
     prompt: str
@@ -88,44 +82,15 @@ class ChatModuleRequest(BaseModel):
     module_data: dict
     user_message: str
 
-
-# ── Auth & Project Endpoints ────────────────────────────────
-# Moved to Firebase/Firestore on the frontend.
-
-# ── Endpoints ───────────────────────────────────────────────
+# â”€â”€ Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @app.get("/")
 def read_root():
     return {"status": "EasePr Engine is running", "version": "0.2.0"}
 
 
-@app.post("/api/upload-context")
-async def api_upload_context(file: UploadFile = File(...)):
-    """Uploads a document, converts it to Markdown via MarkItDown, and safely deletes it."""
-    temp_file_path = None
-    try:
-        # Create a secure temporary file
-        temp_dir = tempfile.gettempdir()
-        temp_file_path = os.path.join(temp_dir, file.filename)
-        
-        with open(temp_file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-            
-        md = MarkItDown()
-        result = md.convert(temp_file_path)
-        markdown_text = result.text_content
-        
-        return {"status": "success", "markdown": markdown_text}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        # Guarantee the original file is deleted from the backend system
-        if temp_file_path and os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-
-
 @app.post("/api/classify-system")
-def api_classify_system(req:  ClassifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_classify_system(req: ClassifyRequest):
     """Stage 1: Classify the project into a system archetype."""
     try:
         classification = classify_system_type(req.prompt)
@@ -135,7 +100,7 @@ def api_classify_system(req:  ClassifyRequest, current_user: auth.User = Depends
 
 
 @app.post("/api/clarify-architecture")
-def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_clarify_architecture(req: ClarifyRequest):
     """Stage 2: Generate domain-adaptive clarifying questions."""
     try:
         result = generate_clarifying_questions(req.prompt, req.classification)
@@ -145,7 +110,7 @@ def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Dep
 
 
 @app.post("/api/suggest-architecture")
-def api_suggest_architecture(req:  ArchitectureRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_suggest_architecture(req: ArchitectureRequest):
     """Stage 3: Reasoning-based architecture generation."""
     try:
         suggestion = suggest_architecture(req.prompt, req.classification, req.answers)
@@ -157,7 +122,7 @@ def api_suggest_architecture(req:  ArchitectureRequest, current_user: auth.User 
 from fastapi.responses import StreamingResponse
 
 @app.post("/api/suggest-architecture-stream")
-def api_suggest_architecture_stream(req:  ArchitectureRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_suggest_architecture_stream(req: ArchitectureRequest):
     """Stage 3 (Streaming): Reasoning-based architecture generation returning pure Markdown."""
     def event_generator():
         for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
@@ -183,7 +148,7 @@ def api_suggest_architecture_stream(req:  ArchitectureRequest, current_user: aut
     return StreamingResponse(text_generator(), media_type="text/plain")
 
 @app.post("/api/extract-graph-json")
-def api_extract_graph_json(req:  ExtractGraphRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_extract_graph_json(req: ExtractGraphRequest):
     """Parses pure Markdown into React Flow Graph JSON."""
     try:
         graph = extract_graph_json(req.markdown_text)
@@ -192,7 +157,7 @@ def api_extract_graph_json(req:  ExtractGraphRequest, current_user: auth.User = 
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/chat-module")
-def api_chat_module(req:  ChatModuleRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_chat_module(req: ChatModuleRequest):
     """Interactive chat for editing a specific module."""
     try:
         updated_module = chat_update_module(req.module_data, req.user_message)
@@ -201,7 +166,7 @@ def api_chat_module(req:  ChatModuleRequest, current_user: auth.User = Depends(a
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/chat-module-stream")
-def api_chat_module_stream(req:  ChatModuleRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_chat_module_stream(req: ChatModuleRequest):
     """Interactive chat for editing a specific module, streaming markdown."""
     def text_generator():
         for chunk in chat_update_module_stream(req.module_data, req.user_message):
@@ -211,7 +176,7 @@ def api_chat_module_stream(req:  ChatModuleRequest, current_user: auth.User = De
 
 
 @app.post("/api/generate-flowchart")
-def api_generate_flowchart(req:  FlowchartRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_generate_flowchart(req: FlowchartRequest):
     """Generate a Mermaid.js flowchart for a module's internal logic."""
     try:
         chart = generate_logic_flowchart(req.dict())
@@ -221,7 +186,7 @@ def api_generate_flowchart(req:  FlowchartRequest, current_user: auth.User = Dep
 
 
 @app.post("/api/review-module")
-def api_review_module(req:  ModuleReviewRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_review_module(req: ModuleReviewRequest):
     """Stage 4: Localized module review."""
     try:
         review = review_single_module(req.module_data)
@@ -231,7 +196,7 @@ def api_review_module(req:  ModuleReviewRequest, current_user: auth.User = Depen
 
 
 @app.post("/api/auto-improve-architecture")
-def api_auto_improve_architecture(req:  AutoImproveRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_auto_improve_architecture(req: AutoImproveRequest):
     """Stage 5: Intelligent graph optimization."""
     try:
         updated_graph = auto_improve_architecture(req.graph_data, req.instruction)
@@ -241,7 +206,7 @@ def api_auto_improve_architecture(req:  AutoImproveRequest, current_user: auth.U
 
 
 @app.post("/api/expand-architecture")
-def api_expand_architecture(req:  ExpandRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+def api_expand_architecture(req: ExpandRequest):
     """Add a single new module to the architecture."""
     try:
         result = expand_architecture(req.graph_data, req.module_name, req.reason)
@@ -251,7 +216,7 @@ def api_expand_architecture(req:  ExpandRequest, current_user: auth.User = Depen
 
 
 @app.post("/api/batch-expand-architecture")
-async def api_batch_expand_architecture(req:  BatchExpandRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
+async def api_batch_expand_architecture(req: BatchExpandRequest):
     """Add multiple modules concurrently."""
     try:
         result = await batch_expand_architecture(req.graph_data, req.modules)

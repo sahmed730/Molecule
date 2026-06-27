@@ -6,6 +6,14 @@ interface AppState {
   setActiveTabId: (id: string) => void;
   openTab: (id: string) => void;
   closeTab: (id: string) => void;
+  
+  // Auth & Project State
+  user: { id: string, email: string } | null;
+  token: string | null;
+  projectId: string | null;
+  setAuth: (user: { id: string, email: string }, token: string) => void;
+  logout: () => void;
+  setProjectId: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -26,4 +34,20 @@ export const useAppStore = create<AppState>((set) => ({
     }
     return { openedTabs: newTabs, activeTabId: nextActiveId };
   }),
+
+  // Auth & Project Implementation
+  user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string) : null,
+  token: localStorage.getItem('token') || null,
+  projectId: null,
+  setAuth: (user, token) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', token);
+    set({ user, token });
+  },
+  logout: () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    set({ user: null, token: null, projectId: null, activeTabId: 'canvas', openedTabs: [] });
+  },
+  setProjectId: (id) => set({ projectId: id })
 }));
