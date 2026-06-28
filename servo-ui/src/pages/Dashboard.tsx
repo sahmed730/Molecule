@@ -10,7 +10,7 @@ import { useAppStore } from '../store';
 import { collection, addDoc, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
-const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://127.0.0.1:8000');
+const API_BASE = 'https://ali7277-molecule-engine.hf.space';
 
 // Archetype display config
 const ARCHETYPE_META: Record<string, { label: string; color: string; icon: string }> = {
