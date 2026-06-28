@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from markitdown import MarkItDown
-from backend.engine.ai_generator import (
+from engine.ai_generator import (
     classify_system_type,
     suggest_architecture,
     generate_logic_flowchart,
@@ -30,7 +30,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import Depends, status
-from backend import auth
+import auth
 
 app = FastAPI(title="EasePr Engine", version="0.2.0")
 

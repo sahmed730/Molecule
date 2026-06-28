@@ -34,9 +34,9 @@ def set_cached_response(system_prompt: str, user_prompt: str, response: str, **k
     if not _is_cache_enabled():
         return
 
-    os.makedirs(CACHE_DIR, exist_ok=True)
     path = _get_cache_path(system_prompt, user_prompt, kwargs)
     try:
+        os.makedirs(CACHE_DIR, exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump({
                 "system_prompt": system_prompt,
