@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd servo-ui && npm install && npm run build",
+  "outputDirectory": "servo-ui/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
+}
