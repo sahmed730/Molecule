@@ -10,11 +10,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
-class MarkItDown:
-    def convert_stream(self, file_stream):
-        class MockResult:
-            text_content = "Document converted successfully. (Mocked for Vercel deployment)"
-        return MockResult()
+from markitdown import MarkItDown
 from engine.ai_generator import (
     classify_system_type,
     suggest_architecture,
