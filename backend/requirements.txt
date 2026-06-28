@@ -3,7 +3,7 @@ uvicorn
 pydantic
 python-dotenv
 openai
-markitdown
+markitdown[all]
 requests
 python-jose[cryptography]
 python-multipart
