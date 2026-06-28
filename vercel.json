@@ -1,15 +1,5 @@
 {
   "buildCommand": "cd servo-ui && npm install && npm run build",
   "outputDirectory": "servo-ui/dist",
-  "framework": "vite",
-  "builds": [
-    { "src": "package.json", "use": "@vercel/static-build" },
-    { "src": "backend/main.py", "use": "@vercel/python" }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/backend/main.py"
-    }
-  ]
+  "framework": "vite"
 }
