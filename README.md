@@ -1,3 +1,12 @@
+---
+title: Molecule Engine
+emoji: 🚀
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+---
 # EasyPR / Software Servo
 
 An AI-powered software architecture visualizer and builder. It allows developers to input a high-level product goal, automatically generating a visual node-based dependency graph of the required system modules, data contracts, and implementation plans.
