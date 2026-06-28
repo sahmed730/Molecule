@@ -1,0 +1,7 @@
+{
+  "name": "softwereservo",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd servo-ui && npm install && npm run build"
+  }
+}

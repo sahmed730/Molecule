@@ -10,6 +10,8 @@ import { useAppStore } from '../store';
 import { collection, addDoc, getDocs, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://127.0.0.1:8000');
+
 // Archetype display config
 const ARCHETYPE_META: Record<string, { label: string; color: string; icon: string }> = {
   crud_app:           { label: 'CRUD Application',    color: 'bg-emerald-100 text-emerald-800 border-emerald-300', icon: '📋' },
@@ -88,7 +90,7 @@ function Dashboard() {
       const formData = new FormData();
       formData.append('file', file);
       
-      const res = await fetch('http://127.0.0.1:8000/api/upload-context', {
+      const res = await fetch(`${API_BASE}/api/upload-context`, {
         method: 'POST',
         body: formData
       });
@@ -187,7 +189,7 @@ function Dashboard() {
 
     try {
       // Stage 1: Classify the system type
-      const classifyRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/classify-system`, {
+      const classifyRes = await fetch(`${API_BASE}/api/classify-system`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ prompt: finalPrompt }),
@@ -204,7 +206,7 @@ function Dashboard() {
       setIsClarifying(true);
 
       // Stage 2: Generate domain-adaptive questions
-      const clarifyRes = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/clarify-architecture`, {
+      const clarifyRes = await fetch(`${API_BASE}/api/clarify-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ prompt: finalPrompt, classification: classificationResult }),
@@ -267,7 +269,7 @@ function Dashboard() {
     setStreamingMarkdown('');
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/suggest-architecture-stream`, {
+      const response = await fetch(`${API_BASE}/api/suggest-architecture-stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({
@@ -319,7 +321,7 @@ function Dashboard() {
     if (!streamingMarkdown) return;
     setIsExtracting(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/extract-graph-json`, {
+      const response = await fetch(`${API_BASE}/api/extract-graph-json`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({ markdown_text: streamingMarkdown }),
