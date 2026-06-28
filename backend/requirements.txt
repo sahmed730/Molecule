@@ -3,3 +3,6 @@ uvicorn
 pydantic
 python-dotenv
 openai
+markitdown
+requests
+python-jose[cryptography]
