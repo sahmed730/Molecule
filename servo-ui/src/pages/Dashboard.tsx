@@ -311,7 +311,7 @@ function Dashboard() {
       
     } catch (error) {
       console.error('Architecture generation failed:', error);
-      alert('Failed to connect to AI engine.');
+      alert(`Error: ${error instanceof Error ? error.message : 'Failed to connect to AI engine.'}`);
     } finally {
       setIsGenerating(false);
     }
