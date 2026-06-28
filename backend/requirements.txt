@@ -6,3 +6,4 @@ openai
 markitdown
 requests
 python-jose[cryptography]
+python-multipart
