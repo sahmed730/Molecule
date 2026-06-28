@@ -81,7 +81,16 @@ def _call_fast_model(
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
-    response = client.chat.completions.create(**kwargs)
+    try:
+        response = client.chat.completions.create(**kwargs)
+    except Exception as e:
+        if json_mode:
+            # Fallback for models that do not support response_format json_object
+            del kwargs["response_format"]
+            response = client.chat.completions.create(**kwargs)
+        else:
+            raise e
+            
     final_response = response.choices[0].message.content.strip()
     
     set_cached_response(system_prompt, user_prompt, final_response, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
@@ -111,7 +120,15 @@ async def _async_call_fast_model(
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
-    response = await client.chat.completions.create(**kwargs)
+    try:
+        response = await client.chat.completions.create(**kwargs)
+    except Exception as e:
+        if json_mode:
+            del kwargs["response_format"]
+            response = await client.chat.completions.create(**kwargs)
+        else:
+            raise e
+            
     final_response = response.choices[0].message.content.strip()
     
     set_cached_response(system_prompt, user_prompt, final_response, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
