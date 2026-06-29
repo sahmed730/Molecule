@@ -921,7 +921,7 @@ Extract the modules and connections exactly into this JSON schema:
 Return ONLY valid JSON, no markdown fences."""
     
     try:
-        raw = _call_fast_model(system_prompt, markdown_text, temperature=0.1, json_mode=True)
+        raw = _call_thinking_model(system_prompt, markdown_text, json_mode=True)
         result = _extract_json(raw)
         
         # Ensure fields exist
