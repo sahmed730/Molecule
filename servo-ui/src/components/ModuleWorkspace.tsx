@@ -140,10 +140,10 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
   return (
     <div className="flex-1 h-full flex overflow-hidden">
       {/* Left Pane: Module Configuration */}
-      <div className="flex-1 bg-slate-50 flex flex-col p-6 overflow-y-auto border-r border-slate-200">
+      <div className="flex-1 bg-slate-50 dark:bg-slate-900 flex flex-col p-6 overflow-y-auto border-r border-slate-200 dark:border-slate-800">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-            Module: <span className="text-blue-600">{data.label || 'Unnamed Module'}</span>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
+            Module: <span className="text-blue-600 dark:text-blue-400">{data.label || 'Unnamed Module'}</span>
           </h2>
           <div className="flex items-center gap-3">
             <button 
@@ -174,33 +174,33 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Module Name</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Module Name</label>
               <input 
-                className="w-full p-2 border border-slate-200 rounded text-sm" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.label || ''} 
                 onChange={e => setData({...data, label: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Core Task</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Core Task</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.coreTask || ''} 
                 onChange={e => setData({...data, coreTask: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Data Shape (Input)</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Shape (Input)</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24 font-mono text-xs" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 font-mono text-xs focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.dataShape || ''} 
                 onChange={e => setData({...data, dataShape: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Expected Output</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Expected Output</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24 font-mono text-xs" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 font-mono text-xs focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.expectedOutput || ''} 
                 onChange={e => setData({...data, expectedOutput: e.target.value})} 
               />
@@ -209,33 +209,33 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
           
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Rules</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Rules</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.rules || ''} 
                 onChange={e => setData({...data, rules: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Dependencies</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Dependencies</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.dependencies || ''} 
                 onChange={e => setData({...data, dependencies: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Error Handling</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Error Handling</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.errorHandling || ''} 
                 onChange={e => setData({...data, errorHandling: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Testing Requirements</label>
+              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Testing Requirements</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 rounded text-sm h-24" 
+                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
                 value={data.testingRequirements || ''} 
                 onChange={e => setData({...data, testingRequirements: e.target.value})} 
               />
@@ -287,10 +287,10 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
       </div>
 
       {/* Right Pane: Module Chat Assistant */}
-      <div className="w-96 bg-white flex flex-col border-l border-slate-200">
-        <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-blue-600" />
-          <h3 className="font-bold text-slate-800">Module Assistant</h3>
+      <div className="w-96 bg-white dark:bg-slate-900 flex flex-col border-l border-slate-200 dark:border-slate-800">
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="font-bold text-slate-800 dark:text-slate-200">Module Assistant</h3>
         </div>
         
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -305,12 +305,12 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
             chatHistory.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] rounded-xl p-3 text-sm ${
-                  msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-800 border border-slate-200'
+                  msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700'
                 }`}>
                   {msg.role === 'user' ? (
                     msg.content
                   ) : (
-                    <div className="prose prose-sm prose-slate max-w-none prose-p:my-1 prose-pre:my-2 prose-pre:p-2">
+                    <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-pre:p-2">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {msg.content}
                       </ReactMarkdown>
@@ -330,7 +330,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
           )}
         </div>
 
-        <div className="p-4 bg-slate-50 border-t border-slate-200">
+        <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
           <form onSubmit={handleChatSubmit} className="flex gap-2">
             <input
               type="text"
@@ -338,7 +338,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
               onChange={(e) => setChatMessage(e.target.value)}
               placeholder="Suggest an update..."
               disabled={isChatting}
-              className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100"
+              className="flex-1 px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 dark:disabled:bg-slate-900"
             />
             <button
               type="submit"

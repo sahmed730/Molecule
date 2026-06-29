@@ -14,6 +14,10 @@ interface AppState {
   setAuth: (user: { id: string, email: string }, token: string) => void;
   logout: () => void;
   setProjectId: (id: string | null) => void;
+  
+  // Theme State
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -49,5 +53,18 @@ export const useAppStore = create<AppState>((set) => ({
     localStorage.removeItem('token');
     set({ user: null, token: null, projectId: null, activeTabId: 'canvas', openedTabs: [] });
   },
-  setProjectId: (id) => set({ projectId: id })
+  setProjectId: (id) => set({ projectId: id }),
+
+  // Theme Implementation
+  isDarkMode: localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+  toggleDarkMode: () => set((state) => {
+    const newTheme = !state.isDarkMode;
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+    if (newTheme) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    return { isDarkMode: newTheme };
+  })
 }));

@@ -157,7 +157,9 @@ def _call_thinking_model(
     
     # Enable reasoning for Nemotron/NVIDIA reasoning models
     if "nemotron" in THINKING_MODEL.lower():
-        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":8192}
+        kwargs["temperature"] = 1.0
+        kwargs["top_p"] = 0.95
+        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384}
 
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
@@ -200,7 +202,9 @@ def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
     }
     
     if "nemotron" in THINKING_MODEL.lower():
-        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":8192}
+        kwargs["temperature"] = 1.0
+        kwargs["top_p"] = 0.95
+        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384}
         
     stream = client.chat.completions.create(**kwargs)
     

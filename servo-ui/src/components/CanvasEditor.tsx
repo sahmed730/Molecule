@@ -113,7 +113,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const [expandAnswers, setExpandAnswers] = useState<Record<string, any>>({});
   const [showExpandChoice, setShowExpandChoice] = useState(false);
 
-  const { openTab } = useAppStore();
+  const { openTab, isDarkMode } = useAppStore();
 
   const [pendingOptimize, setPendingOptimize] = useState<{delta: any, graph: any} | null>(null);
 
@@ -826,8 +826,8 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         nodeTypes={nodeTypes}
         fitView
       >
-        <Background color="#cbd5e1" gap={20} />
-        <Controls />
+        <Background color={isDarkMode ? "#334155" : "#cbd5e1"} gap={20} />
+        <Controls className={isDarkMode ? 'dark-controls' : ''} />
         
         <Panel position="top-left" className="flex flex-col gap-2 p-2">
           {projectCapabilities.length > 0 && (

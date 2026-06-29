@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, Zap, LayoutTemplate, Brain, CheckCircle2, LogOut, Save, FolderOpen, ArrowLeft, Paperclip, Eye, X } from 'lucide-react';
+import { Loader2, Zap, LayoutTemplate, Brain, CheckCircle2, LogOut, Save, FolderOpen, ArrowLeft, Paperclip, Eye, X, Moon, Sun } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import dagre from 'dagre';
@@ -65,7 +65,7 @@ function Dashboard() {
   const [generatedEdges, setGeneratedEdges] = useState<any[]>([]);
 
   // Global Tab State
-  const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout } = useAppStore();
+  const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout, isDarkMode, toggleDarkMode } = useAppStore();
 
   // Pipeline state
   const [isClassifying, setIsClassifying] = useState(false);
@@ -428,7 +428,7 @@ function Dashboard() {
   return (
     <div className="flex w-full h-screen bg-white">
       {/* App Header */}
-      <div className="fixed top-0 left-0 right-0 h-12 bg-slate-900 border-b border-slate-800 flex items-center px-4 z-50">
+      <div className="fixed top-0 left-0 right-0 h-12 bg-slate-900 dark:bg-slate-950 border-b border-slate-800 flex items-center px-4 z-50">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-blue-500 rounded rotate-45 flex items-center justify-center">
             <div className="w-3 h-3 bg-white rounded-full"></div>
@@ -453,6 +453,12 @@ function Dashboard() {
               {user.email}
             </span>
           )}
+          <button
+            onClick={toggleDarkMode}
+            className="flex items-center justify-center w-8 h-8 rounded-md text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors"
+          >
+            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
           <button 
             onClick={() => logout()} 
             className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-md"
@@ -469,9 +475,9 @@ function Dashboard() {
       {/* Main Content */}
       <div className="flex w-full h-full pt-12">
         {appState === 'home' ? (
-          <div className="flex flex-col items-center justify-center w-full h-full bg-slate-50 p-8">
-            <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
-              <div className="flex border-b border-slate-200">
+          <div className="flex flex-col items-center justify-center w-full h-full bg-slate-50 dark:bg-slate-900 p-8">
+            <div className="max-w-2xl w-full bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <div className="flex border-b border-slate-200 dark:border-slate-700">
                 <button
                   onClick={() => setActiveTab('ai')}
                   className={`flex-1 py-4 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-colors ${activeTab === 'ai' ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600' : 'bg-white text-slate-500 hover:bg-slate-50'}`}
