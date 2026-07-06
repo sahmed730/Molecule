@@ -616,18 +616,18 @@ function Dashboard() {
                     {/* Document Context Modal */}
                     {showDocModal && (
                       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
-                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setShowDocModal(false)}></div>
-                        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
-                          <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                              <Paperclip className="w-5 h-5 text-blue-600" />
+                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowDocModal(false)}></div>
+                        <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+                          <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
+                            <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                              <Paperclip className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                               {attachedDocName}
                             </h2>
-                            <button onClick={() => setShowDocModal(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+                            <button onClick={() => setShowDocModal(false)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
                               <X className="w-5 h-5" />
                             </button>
                           </div>
-                          <div className="p-6 overflow-y-auto flex-grow prose prose-slate max-w-none">
+                          <div className="p-6 overflow-y-auto flex-grow prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-800 dark:prose-headings:text-slate-100 prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-code:text-indigo-600 dark:prose-code:text-indigo-400 prose-code:bg-indigo-50 dark:prose-code:bg-indigo-950/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {attachedContext}
                             </ReactMarkdown>
@@ -639,18 +639,18 @@ function Dashboard() {
                     {/* Clarification Modal */}
                     {questions.length > 0 && (
                       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
 
-                        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                        <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
                           {/* Modal header with classification badge */}
-                          <div className="p-6 border-b border-slate-100 bg-slate-50/50">
+                          <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                                  <Brain className="w-5 h-5 text-blue-600" />
+                                <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+                                  <Brain className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                                   Architecture Interview
                                 </h2>
-                                <p className="text-sm text-slate-500 mt-1">
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                   Domain-specific questions to sharpen the architecture.
                                 </p>
                               </div>
@@ -667,15 +667,15 @@ function Dashboard() {
 
                           <div className="p-6 overflow-y-auto flex-grow space-y-6">
                             {questions.map((q) => (
-                              <div key={q.id} className="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
-                                <label className="block text-base font-bold text-slate-800 mb-3">{q.question}</label>
+                              <div key={q.id} className="bg-slate-50/80 dark:bg-slate-800/40 p-5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
+                                <label className="block text-base font-bold text-slate-800 dark:text-slate-100 mb-3">{q.question}</label>
 
                                 {q.type === 'open_text' ? (
                                   <textarea
                                     value={answers[q.id] || ''}
                                     onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                                     placeholder="Type your answer here..."
-                                    className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none h-24"
+                                    className="w-full p-4 bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-200/80 dark:border-slate-700/80 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none h-24 text-slate-800 dark:text-slate-100 transition-all duration-300 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner outline-none"
                                   />
                                 ) : q.type === 'multi_select' ? (
                                   <div className="flex flex-wrap gap-2">
@@ -695,13 +695,13 @@ function Dashboard() {
                                               };
                                             });
                                           }}
-                                          className={`px-4 py-2 text-sm rounded-lg transition-all border font-medium flex items-center gap-2 ${
+                                          className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 border font-medium flex items-center gap-2 ${
                                             isSelected
-                                              ? 'bg-blue-100 border-blue-400 text-blue-800 shadow-sm'
-                                              : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'
+                                              ? 'bg-indigo-100/80 dark:bg-indigo-500/20 border-indigo-400 dark:border-indigo-500/50 text-indigo-800 dark:text-indigo-300 shadow-sm'
+                                              : 'bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                           }`}
                                         >
-                                          <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-400'}`}>
+                                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-400 dark:border-slate-600'}`}>
                                             {isSelected && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                                           </div>
                                           {opt}
@@ -709,11 +709,11 @@ function Dashboard() {
                                       );
                                     })}
                                     <div className="flex items-center gap-2 w-full mt-2">
-                                      <span className="text-sm text-slate-500 font-medium whitespace-nowrap">Other:</span>
+                                      <span className="text-sm text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Other:</span>
                                       <input
                                         type="text"
                                         placeholder="Specify..."
-                                        className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        className="flex-1 px-4 py-2 text-sm bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-300 dark:border-slate-700/80 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 transition-all outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         onBlur={(e) => {
                                           if (e.target.value.trim()) {
                                             setAnswers(prev => {
@@ -736,10 +736,10 @@ function Dashboard() {
                                       <button
                                         key={opt}
                                         onClick={() => setAnswers(prev => ({ ...prev, [q.id]: opt }))}
-                                        className={`px-4 py-2 text-sm rounded-lg transition-all border font-medium ${
+                                        className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 border font-medium ${
                                           answers[q.id] === opt
-                                            ? 'bg-blue-100 border-blue-400 text-blue-800 shadow-sm'
-                                            : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'
+                                            ? 'bg-indigo-100/80 dark:bg-indigo-500/20 border-indigo-400 dark:border-indigo-500/50 text-indigo-800 dark:text-indigo-300 shadow-sm'
+                                            : 'bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                         }`}
                                       >
                                         {opt}
@@ -748,7 +748,7 @@ function Dashboard() {
                                     <input
                                       type="text"
                                       placeholder="Other (specify)"
-                                      className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                      className="px-4 py-2 text-sm bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-300 dark:border-slate-700/80 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 transition-all outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                       value={!(q.options || []).includes(answers[q.id]) && answers[q.id] ? answers[q.id] : ''}
                                       onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                                     />
@@ -758,19 +758,19 @@ function Dashboard() {
                             ))}
                           </div>
 
-                          <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                          <div className="p-6 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
                             <button
                               onClick={() => {
                                 setQuestions([]);
                                 setAnswers({});
                               }}
                               disabled={isGenerating}
-                              className="text-slate-500 hover:text-slate-800 font-medium text-sm transition-colors px-4 py-2 flex items-center gap-2"
+                              className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold text-sm transition-colors px-4 py-2 flex items-center gap-2 active:scale-95"
                             >
                               <ArrowLeft className="w-4 h-4" /> Back
                             </button>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                               <button
                                 onClick={() => {
                                   setAnswers({});
@@ -778,26 +778,26 @@ function Dashboard() {
                                   handleGenerateArchitecture();
                                 }}
                                 disabled={isGenerating}
-                                className="text-slate-500 hover:text-slate-800 font-medium text-sm transition-colors px-4 py-2"
+                                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold text-sm transition-colors px-4 py-2 active:scale-95"
                               >
                                 Skip & Generate
                               </button>
 
-                            <button
-                              onClick={() => {
-                                handleGenerateArchitecture();
-                                setQuestions([]);
-                              }}
-                              disabled={isGenerating}
-                              className={`flex items-center gap-2 px-8 py-3 text-white rounded-xl font-bold shadow-lg transition-all ${
-                                isGenerating
-                                  ? 'bg-slate-300 cursor-not-allowed'
-                                  : 'bg-blue-600 hover:bg-blue-700 hover:shadow-blue-500/25 hover:-translate-y-0.5'
-                              }`}
-                            >
-                              {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
-                              {isGenerating ? 'Reasoning...' : 'Reason & Generate'}
-                            </button>
+                              <button
+                                onClick={() => {
+                                  handleGenerateArchitecture();
+                                  setQuestions([]);
+                                }}
+                                disabled={isGenerating}
+                                className={`flex items-center gap-2 px-6 py-2.5 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 transition-all duration-300 active:scale-95 ${
+                                  isGenerating
+                                    ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-50 shadow-none'
+                                    : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700'
+                                }`}
+                              >
+                                {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
+                                {isGenerating ? 'Reasoning...' : 'Reason & Generate'}
+                              </button>
                             </div>
                           </div>
                         </div>
