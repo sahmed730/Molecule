@@ -32,22 +32,22 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 transition-colors">
-      <div className="w-full max-w-md bg-white/70 dark:bg-slate-900/50 backdrop-blur-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 dark:border-slate-700/50 transform transition-all">
-        <div className="p-10 text-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-5 backdrop-blur-md shadow-lg border border-white/20 relative z-10 transform rotate-12 hover:rotate-0 transition-all duration-300">
-            <div className="transform -rotate-12 hover:rotate-0 transition-all duration-300">
-              <LogIn className="w-10 h-10 text-white" />
-            </div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Brand radial glow effect */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-softer rounded-full blur-[120px] opacity-50 -z-10 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+      
+      <div className="w-full max-w-md bg-neutral-primary-soft rounded-[12px] shadow-xl border border-default transform transition-all">
+        <div className="p-8 text-center border-b border-default relative overflow-hidden">
+          <div className="w-16 h-16 bg-neutral-primary-strong rounded-[12px] flex items-center justify-center mx-auto mb-5 border border-default-medium">
+            <LogIn className="w-8 h-8 text-fg-brand" />
           </div>
-          <h2 className="text-3xl font-black relative z-10 tracking-tight">Welcome Back</h2>
-          <p className="text-indigo-100 mt-2 font-medium relative z-10">Sign in to EasePr Architecture</p>
+          <h2 className="text-2xl font-semibold text-heading relative z-10 tracking-tight">Welcome Back</h2>
+          <p className="text-body mt-2 text-sm relative z-10">Sign in to EasePr Architecture</p>
         </div>
 
         <form onSubmit={handleLogin} className="p-8 space-y-6">
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-lg flex items-center gap-3 text-sm border border-red-100 dark:border-red-800">
+            <div className="bg-danger-soft text-fg-danger p-4 rounded-[12px] flex items-center gap-3 text-sm border border-danger-subtle">
               <AlertCircle className="w-5 h-5 flex-shrink-0" />
               <p>{error}</p>
             </div>
@@ -55,34 +55,34 @@ const Login = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Email Address</label>
+              <label className="block text-[13px] font-medium text-heading mb-2">Email Address</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-indigo-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors" />
+                  <Mail className="h-5 w-5 text-body-subtle group-focus-within:text-fg-brand transition-colors" />
                 </div>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 w-full px-4 py-3.5 bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-slate-100 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 placeholder:text-slate-400"
+                  className="pl-11 w-full px-4 py-2.5 bg-neutral-primary border border-default text-body rounded-[12px] focus:bg-neutral-primary-soft focus:ring-1 focus:ring-brand-medium focus:border-brand-medium outline-none transition-all duration-300 placeholder:text-body-subtle shadow-xs"
                   placeholder="you@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Password</label>
+              <label className="block text-[13px] font-medium text-heading mb-2">Password</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Key className="h-5 w-5 text-indigo-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors" />
+                  <Key className="h-5 w-5 text-body-subtle group-focus-within:text-fg-brand transition-colors" />
                 </div>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 w-full px-4 py-3.5 bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-slate-100 rounded-xl focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-300 placeholder:text-slate-400"
+                  className="pl-11 w-full px-4 py-2.5 bg-neutral-primary border border-default text-body rounded-[12px] focus:bg-neutral-primary-soft focus:ring-1 focus:ring-brand-medium focus:border-brand-medium outline-none transition-all duration-300 placeholder:text-body-subtle shadow-xs"
                   placeholder="••••••••"
                 />
               </div>
@@ -92,14 +92,14 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-4 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 active:scale-95 disabled:opacity-70 uppercase tracking-wide"
+            className="w-full bg-brand hover:bg-brand-strong text-white font-medium py-[10px] px-4 rounded-[12px] transition-all duration-300 flex items-center justify-center gap-2 shadow-xs disabled:opacity-70 disabled:cursor-not-allowed border border-transparent focus:ring-4 focus:ring-brand-medium focus:outline-none"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
           </button>
 
-          <p className="text-center text-sm font-medium text-slate-600 dark:text-slate-400 mt-8">
+          <p className="text-center text-[13px] text-body-subtle mt-8">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-700 dark:hover:text-indigo-300 hover:underline transition-colors">
+            <Link to="/signup" className="text-fg-brand font-medium hover:text-fg-brand-strong hover:underline transition-colors">
               Sign up
             </Link>
           </p>

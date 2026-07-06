@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, Zap, LayoutTemplate, Brain, CheckCircle2, LogOut, Save, FolderOpen, ArrowLeft, Paperclip, Eye, X, Moon, Sun } from 'lucide-react';
+import { Zap, LogOut, ArrowLeft, CheckCircle2, Loader2, LayoutTemplate, Brain, FolderOpen, Paperclip, Eye, X, Save } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import dagre from 'dagre';
@@ -68,7 +68,7 @@ function Dashboard() {
   const [generatedEdges, setGeneratedEdges] = useState<any[]>([]);
 
   // Global Tab State
-  const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout, isDarkMode, toggleDarkMode } = useAppStore();
+  const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout } = useAppStore();
 
   // Pipeline state
   const [isClassifying, setIsClassifying] = useState(false);
@@ -437,14 +437,14 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex w-full h-screen bg-white dark:bg-[#050505]">
+    <div className="flex w-full h-screen bg-neutral-primary text-body overflow-hidden">
       {/* Top Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 z-50 transition-all duration-300 shadow-sm">
+      <header className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-[1280px] h-16 bg-neutral-primary-soft/80 backdrop-blur-[16px] border border-default rounded-[12px] flex items-center justify-between px-6 z-50 shadow-md">
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setAppState('home')}>
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform shadow-lg shadow-indigo-500/20">
+          <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform shadow-glow">
             <div className="w-3 h-3 bg-white rounded-full" />
           </div>
-          <span className="font-black text-xl tracking-tight text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+          <span className="font-bold text-xl tracking-tight text-heading group-hover:text-white transition-colors">
             EASEPR
           </span>
         </div>
@@ -454,59 +454,55 @@ function Dashboard() {
             <button
               onClick={handleSaveProject}
               disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-all duration-300 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-strong text-white rounded-[12px] font-medium shadow-xs active:scale-95 transition-all text-sm disabled:opacity-70 disabled:cursor-not-allowed border border-transparent focus:ring-4 focus:ring-brand-medium focus:outline-none"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Save Project
             </button>
           )}
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700/50">
+          <span className="text-sm font-medium text-body bg-neutral-primary px-3 py-1.5 rounded-[12px] border border-default">
             {user?.email}
           </span>
           <button
-            onClick={toggleDarkMode}
-            className="p-2 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-all duration-300 active:scale-95"
-            title="Toggle Dark Mode"
-          >
-            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-          <button
             onClick={() => logout()}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all duration-300 active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-body hover:text-fg-danger hover:bg-danger-soft rounded-[12px] transition-all active:scale-95"
           >
             <LogOut className="w-4 h-4" />
             Sign Out
           </button>
-          <div className="px-3 py-1 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 border border-indigo-500/20 rounded-full text-xs font-bold text-indigo-600 dark:text-indigo-400 tracking-wider">
+          <div className="px-3 py-1 bg-brand-softer border border-brand-soft rounded-full text-xs font-bold text-fg-brand tracking-wider">
             V0.2.0-ALPHA
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex w-full h-full pt-16">
+      <div className="flex w-full h-full pt-[104px]"> {/* 104px to account for top-6 + h-16 + spacing */}
         {appState === 'home' ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-transparent">
-            <div className="w-[850px] bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200/50 dark:border-slate-700/50 transition-all duration-300">
+          <div className="flex-1 flex flex-col items-center justify-start p-8 relative overflow-y-auto">
+            {/* Ambient Background Glow */}
+            <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-brand-softer rounded-full blur-[120px] opacity-30 -z-10 pointer-events-none"></div>
+
+            <div className="w-full max-w-[1280px] bg-neutral-primary-soft rounded-[12px] shadow-sm border border-default transition-all duration-300 mb-24">
               {/* Tabs */}
-              <div className="flex border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30">
+              <div className="flex border-b border-default bg-neutral-primary rounded-t-[12px] overflow-hidden">
                 <button
                   onClick={() => setActiveTab('ai')}
-                  className={`flex-1 py-5 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'ai' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+                  className={`flex-1 py-5 font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'ai' ? 'bg-brand-softer text-fg-brand border-b-2 border-brand' : 'text-body-subtle hover:bg-neutral-secondary-medium'}`}
                 >
                   <Brain className="w-4 h-4" />
                   AI Architect
                 </button>
                 <button
                   onClick={() => setActiveTab('blank')}
-                  className={`flex-1 py-5 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'blank' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+                  className={`flex-1 py-5 font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'blank' ? 'bg-brand-softer text-fg-brand border-b-2 border-brand' : 'text-body-subtle hover:bg-neutral-secondary-medium'}`}
                 >
                   <LayoutTemplate className="w-4 h-4" />
                   Blank Canvas
                 </button>
                 <button
                   onClick={() => setActiveTab('projects')}
-                  className={`flex-1 py-5 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'projects' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+                  className={`flex-1 py-5 font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'projects' ? 'bg-brand-softer text-fg-brand border-b-2 border-brand' : 'text-body-subtle hover:bg-neutral-secondary-medium'}`}
                 >
                   <FolderOpen className="w-4 h-4" />
                   My Projects
@@ -516,10 +512,10 @@ function Dashboard() {
               <div className="p-8">
                 {activeTab === 'ai' ? (
                   <>
-                    <h1 className="text-2xl font-black text-slate-800 dark:text-white mb-1 uppercase tracking-tight">
+                    <h1 className="text-2xl font-semibold text-heading mb-1 tracking-tight">
                       Describe Your System
                     </h1>
-                    <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+                    <p className="text-body-subtle mb-6 text-[13px]">
                       The AI will classify your project, ask domain-specific questions, then reason through the architecture.
                     </p>
 
@@ -534,7 +530,7 @@ function Dashboard() {
                         <button
                           key={example}
                           onClick={() => { setPrompt(example); setClassification(null); setQuestions([]); }}
-                          className="text-xs px-3 py-1.5 bg-indigo-50/50 dark:bg-slate-800/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-700/50 rounded-full transition-all duration-300 font-medium active:scale-95"
+                          className="text-xs px-3 py-1.5 bg-neutral-primary hover:bg-neutral-secondary-medium text-body border border-default rounded-[12px] transition-all font-medium active:scale-95"
                         >
                           {example}
                         </button>
@@ -545,7 +541,7 @@ function Dashboard() {
                       value={prompt}
                       onChange={(e) => { setPrompt(e.target.value); setClassification(null); setQuestions([]); }}
                       placeholder="Describe what you want to build in detail..."
-                      className="w-full h-40 p-5 bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-200/80 dark:border-slate-700/80 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none resize-none mb-6 text-slate-800 dark:text-slate-100 transition-all duration-300 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner"
+                      className="w-full h-40 p-5 bg-neutral-primary border border-default rounded-[12px] focus:border-brand-medium focus:ring-1 focus:ring-brand-medium outline-none resize-none mb-6 text-body transition-all placeholder:text-body-subtle shadow-xs"
                     />
 
                     {/* Classification badge */}
@@ -561,23 +557,23 @@ function Dashboard() {
                           accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.json,.html"
                         />
                         {attachedDocName ? (
-                          <div className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex items-center gap-1 px-3 py-1.5 bg-neutral-primary border border-default rounded-[12px]">
                             <button
                               onClick={() => setShowDocModal(true)}
-                              className="flex items-center gap-2 text-blue-700 hover:text-blue-800 text-sm font-medium transition-colors"
+                              className="flex items-center gap-2 text-fg-info hover:text-white text-[13px] font-medium transition-colors"
                               title="View Document Context"
                             >
                               <Paperclip className="w-4 h-4" />
                               <span className="truncate max-w-[150px]">{attachedDocName}</span>
                               <Eye className="w-4 h-4 ml-1 opacity-70" />
                             </button>
-                            <div className="w-px h-4 bg-blue-200 mx-1"></div>
+                            <div className="w-px h-4 bg-border-default mx-1"></div>
                             <button
                               onClick={() => {
                                 setAttachedDocName('');
                                 setAttachedContext('');
                               }}
-                              className="p-1 text-blue-500 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                              className="p-1 text-fg-danger hover:text-white hover:bg-danger rounded transition-colors"
                               title="Remove document"
                             >
                               <X className="w-4 h-4" />
@@ -587,7 +583,7 @@ function Dashboard() {
                           <button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isUploading}
-                            className="flex items-center gap-2 px-4 py-2 text-slate-600 bg-white border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-4 py-[10px] text-body bg-neutral-primary border border-default rounded-[12px] font-medium hover:bg-neutral-secondary-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
                             title="Attach document context"
                           >
                             {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
@@ -599,7 +595,7 @@ function Dashboard() {
                       <button
                         onClick={handleStartPipeline}
                         disabled={isClassifying || isClarifying || isGenerating || !prompt.trim()}
-                        className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold hover:from-indigo-600 hover:to-purple-700 flex items-center gap-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/25 active:scale-95"
+                        className="px-6 py-[10px] bg-brand text-white rounded-[12px] font-medium hover:bg-brand-strong flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xs active:scale-95"
                       >
                         {isClassifying ? (
                           <><Loader2 className="w-5 h-5 animate-spin" /> Classifying System...</>
@@ -615,19 +611,19 @@ function Dashboard() {
 
                     {/* Document Context Modal */}
                     {showDocModal && (
-                      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
-                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowDocModal(false)}></div>
-                        <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
-                          <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                              <Paperclip className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6" role="dialog">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowDocModal(false)}></div>
+                        <div className="relative bg-neutral-primary border border-default rounded-[12px] shadow-xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+                          <div className="p-4 border-b border-default flex justify-between items-center">
+                            <h2 className="text-lg font-semibold text-heading flex items-center gap-2">
+                              <Paperclip className="w-5 h-5 text-fg-brand" />
                               {attachedDocName}
                             </h2>
-                            <button onClick={() => setShowDocModal(false)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                            <button onClick={() => setShowDocModal(false)} className="p-1.5 text-body hover:bg-neutral-secondary-medium rounded-[12px] transition-colors">
                               <X className="w-5 h-5" />
                             </button>
                           </div>
-                          <div className="p-6 overflow-y-auto flex-grow prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-800 dark:prose-headings:text-slate-100 prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-code:text-indigo-600 dark:prose-code:text-indigo-400 prose-code:bg-indigo-50 dark:prose-code:bg-indigo-950/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md">
+                          <div className="p-6 overflow-y-auto flex-grow prose prose-invert max-w-none prose-headings:text-heading prose-a:text-fg-brand prose-code:text-fg-brand prose-code:bg-neutral-primary-strong prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md text-body">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {attachedContext}
                             </ReactMarkdown>
@@ -638,26 +634,26 @@ function Dashboard() {
 
                     {/* Clarification Modal */}
                     {questions.length > 0 && (
-                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-                        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-                        <div className="relative bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                        <div className="relative bg-neutral-primary border border-default rounded-[12px] shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
                           {/* Modal header with classification badge */}
-                          <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30">
+                          <div className="p-6 border-b border-default bg-neutral-primary-soft">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
-                                  <Brain className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                <h2 className="text-xl font-semibold text-heading flex items-center gap-2 tracking-tight">
+                                  <Brain className="w-5 h-5 text-fg-brand" />
                                   Architecture Interview
                                 </h2>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                <p className="text-sm text-body-subtle mt-1">
                                   Domain-specific questions to sharpen the architecture.
                                 </p>
                               </div>
                               {classification && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-lg">{(ARCHETYPE_META[classification.primary_archetype] || {}).icon}</span>
-                                  <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full border ${(ARCHETYPE_META[classification.primary_archetype] || ARCHETYPE_META.crud_app).color}`}>
+                                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${(ARCHETYPE_META[classification.primary_archetype] || ARCHETYPE_META.crud_app).color}`}>
                                     {(ARCHETYPE_META[classification.primary_archetype] || ARCHETYPE_META.crud_app).label}
                                   </span>
                                 </div>
@@ -665,17 +661,17 @@ function Dashboard() {
                             </div>
                           </div>
 
-                          <div className="p-6 overflow-y-auto flex-grow space-y-6">
+                          <div className="p-6 overflow-y-auto flex-grow space-y-6 bg-neutral-primary">
                             {questions.map((q) => (
-                              <div key={q.id} className="bg-slate-50/80 dark:bg-slate-800/40 p-5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm">
-                                <label className="block text-base font-bold text-slate-800 dark:text-slate-100 mb-3">{q.question}</label>
+                              <div key={q.id} className="bg-neutral-primary-soft p-5 rounded-[12px] border border-default shadow-xs">
+                                <label className="block text-base font-semibold text-heading mb-3">{q.question}</label>
 
                                 {q.type === 'open_text' ? (
                                   <textarea
                                     value={answers[q.id] || ''}
                                     onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                                     placeholder="Type your answer here..."
-                                    className="w-full p-4 bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-200/80 dark:border-slate-700/80 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-none h-24 text-slate-800 dark:text-slate-100 transition-all duration-300 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-inner outline-none"
+                                    className="w-full p-4 bg-neutral-primary border border-default rounded-[12px] focus:ring-1 focus:ring-brand-medium focus:border-brand-medium resize-none h-24 text-body transition-all placeholder:text-body-subtle outline-none"
                                   />
                                 ) : q.type === 'multi_select' ? (
                                   <div className="flex flex-wrap gap-2">
@@ -695,13 +691,13 @@ function Dashboard() {
                                               };
                                             });
                                           }}
-                                          className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 border font-medium flex items-center gap-2 ${
+                                          className={`px-4 py-2 text-sm rounded-[12px] transition-all border font-medium flex items-center gap-2 ${
                                             isSelected
-                                              ? 'bg-indigo-100/80 dark:bg-indigo-500/20 border-indigo-400 dark:border-indigo-500/50 text-indigo-800 dark:text-indigo-300 shadow-sm'
-                                              : 'bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                              ? 'bg-brand-softer border-brand text-fg-brand shadow-xs'
+                                              : 'bg-neutral-primary border-default text-body hover:bg-neutral-secondary-medium'
                                           }`}
                                         >
-                                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-400 dark:border-slate-600'}`}>
+                                          <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors ${isSelected ? 'bg-brand border-brand text-white' : 'border-neutral-primary-strong'}`}>
                                             {isSelected && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                                           </div>
                                           {opt}
@@ -709,11 +705,11 @@ function Dashboard() {
                                       );
                                     })}
                                     <div className="flex items-center gap-2 w-full mt-2">
-                                      <span className="text-sm text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Other:</span>
+                                      <span className="text-sm text-body-subtle font-medium whitespace-nowrap">Other:</span>
                                       <input
                                         type="text"
                                         placeholder="Specify..."
-                                        className="flex-1 px-4 py-2 text-sm bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-300 dark:border-slate-700/80 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 transition-all outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                        className="flex-1 px-4 py-2 text-sm bg-neutral-primary border border-default rounded-[12px] focus:ring-1 focus:ring-brand-medium focus:border-brand-medium text-body transition-all outline-none placeholder:text-body-subtle"
                                         onBlur={(e) => {
                                           if (e.target.value.trim()) {
                                             setAnswers(prev => {
@@ -736,10 +732,10 @@ function Dashboard() {
                                       <button
                                         key={opt}
                                         onClick={() => setAnswers(prev => ({ ...prev, [q.id]: opt }))}
-                                        className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 border font-medium ${
+                                        className={`px-4 py-2 text-sm rounded-[12px] transition-all border font-medium ${
                                           answers[q.id] === opt
-                                            ? 'bg-indigo-100/80 dark:bg-indigo-500/20 border-indigo-400 dark:border-indigo-500/50 text-indigo-800 dark:text-indigo-300 shadow-sm'
-                                            : 'bg-white/80 dark:bg-slate-900/50 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                            ? 'bg-brand-softer border-brand text-fg-brand shadow-xs'
+                                            : 'bg-neutral-primary border-default text-body hover:bg-neutral-secondary-medium'
                                         }`}
                                       >
                                         {opt}
@@ -748,7 +744,7 @@ function Dashboard() {
                                     <input
                                       type="text"
                                       placeholder="Other (specify)"
-                                      className="px-4 py-2 text-sm bg-white/50 dark:bg-[#0a0f1c]/50 border border-slate-300 dark:border-slate-700/80 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-slate-800 dark:text-slate-100 transition-all outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                      className="px-4 py-2 text-sm bg-neutral-primary border border-default rounded-[12px] focus:ring-1 focus:ring-brand-medium focus:border-brand-medium text-body transition-all outline-none placeholder:text-body-subtle"
                                       value={!(q.options || []).includes(answers[q.id]) && answers[q.id] ? answers[q.id] : ''}
                                       onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                                     />
@@ -758,14 +754,14 @@ function Dashboard() {
                             ))}
                           </div>
 
-                          <div className="p-6 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/30 flex justify-between items-center">
+                          <div className="p-6 border-t border-default bg-neutral-primary-soft flex justify-between items-center">
                             <button
                               onClick={() => {
                                 setQuestions([]);
                                 setAnswers({});
                               }}
                               disabled={isGenerating}
-                              className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold text-sm transition-colors px-4 py-2 flex items-center gap-2 active:scale-95"
+                              className="text-body-subtle hover:text-heading font-medium text-sm transition-colors px-4 py-2 flex items-center gap-2 active:scale-95 disabled:opacity-50"
                             >
                               <ArrowLeft className="w-4 h-4" /> Back
                             </button>
@@ -778,7 +774,7 @@ function Dashboard() {
                                   handleGenerateArchitecture();
                                 }}
                                 disabled={isGenerating}
-                                className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-bold text-sm transition-colors px-4 py-2 active:scale-95"
+                                className="text-body-subtle hover:text-heading font-medium text-sm transition-colors px-4 py-2 active:scale-95 disabled:opacity-50"
                               >
                                 Skip & Generate
                               </button>
@@ -789,10 +785,10 @@ function Dashboard() {
                                   setQuestions([]);
                                 }}
                                 disabled={isGenerating}
-                                className={`flex items-center gap-2 px-6 py-2.5 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/25 transition-all duration-300 active:scale-95 ${
+                                className={`flex items-center gap-2 px-6 py-[10px] text-white rounded-[12px] font-medium shadow-xs transition-all active:scale-95 ${
                                   isGenerating
-                                    ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-50 shadow-none'
-                                    : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700'
+                                    ? 'bg-neutral-primary-strong cursor-not-allowed opacity-50 shadow-none'
+                                    : 'bg-brand hover:bg-brand-strong'
                                 }`}
                               >
                                 {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
@@ -806,35 +802,35 @@ function Dashboard() {
 
                     {/* Streaming Markdown Viewer */}
                     {streamingMarkdown && (
-                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-                        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
-                          <div className="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                            <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                              <Brain className="w-5 h-5 text-blue-600" />
+                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                        <div className="relative bg-neutral-primary border border-default rounded-[12px] shadow-xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+                          <div className="p-6 border-b border-default bg-neutral-primary-soft flex justify-between items-center">
+                            <h2 className="text-xl font-semibold text-heading tracking-tight flex items-center gap-2">
+                              <Brain className="w-5 h-5 text-fg-brand" />
                               AI Architecture reasoning...
                             </h2>
                             {isGenerating && (
-                              <span className="flex items-center gap-2 text-sm text-blue-600 font-bold">
+                              <span className="flex items-center gap-2 text-sm text-fg-brand font-medium">
                                 <Loader2 className="w-4 h-4 animate-spin" /> Generating...
                               </span>
                             )}
                           </div>
                           
-                          <div className="p-8 overflow-y-auto flex-grow prose prose-slate max-w-none text-sm bg-white">
+                          <div className="p-8 overflow-y-auto flex-grow prose prose-invert max-w-none text-[13px] bg-neutral-primary prose-headings:text-heading prose-a:text-fg-brand prose-code:text-fg-brand">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {streamingMarkdown}
                             </ReactMarkdown>
                           </div>
                           
-                          <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end">
+                          <div className="p-6 border-t border-default bg-neutral-primary-soft flex justify-end">
                             <button
                               onClick={handleExtractGraph}
                               disabled={isGenerating || isExtracting}
-                              className={`flex items-center gap-2 px-8 py-3 text-white rounded-xl font-bold shadow-lg transition-all ${
+                              className={`flex items-center gap-2 px-8 py-[10px] text-white rounded-[12px] font-medium shadow-xs transition-all ${
                                 isGenerating || isExtracting
-                                  ? 'bg-slate-300 cursor-not-allowed'
-                                  : 'bg-green-600 hover:bg-green-700 hover:shadow-green-500/25'
+                                  ? 'bg-neutral-primary-strong cursor-not-allowed text-body-subtle'
+                                  : 'bg-fg-success hover:opacity-90'
                               }`}
                             >
                               {isExtracting ? (
@@ -850,12 +846,12 @@ function Dashboard() {
                   </>
                 ) : activeTab === 'blank' ? (
                   <>
-                    <h1 className="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">Manual Design</h1>
-                    <p className="text-slate-500 mb-6 text-sm">Start from scratch by dragging modules onto the canvas.</p>
+                    <h1 className="text-2xl font-semibold text-heading mb-2 tracking-tight">Manual Design</h1>
+                    <p className="text-body-subtle mb-6 text-[13px]">Start from scratch by dragging modules onto the canvas.</p>
                     <div className="flex justify-center py-8">
                       <button
                         onClick={() => setAppState('canvas')}
-                        className="flex items-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-bold shadow-xl hover:shadow-2xl transition-all"
+                        className="flex items-center gap-2 px-8 py-4 bg-brand hover:bg-brand-strong text-white rounded-[12px] font-medium shadow-xs transition-all"
                       >
                         <LayoutTemplate className="w-5 h-5" />
                         Go to Canvas
@@ -864,24 +860,24 @@ function Dashboard() {
                   </>
                 ) : (
                   <>
-                    <h1 className="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">My Projects</h1>
-                    <p className="text-slate-500 mb-6 text-sm">Load a previously saved project.</p>
+                    <h1 className="text-2xl font-semibold text-heading mb-2 tracking-tight">My Projects</h1>
+                    <p className="text-body-subtle mb-6 text-[13px]">Load a previously saved project.</p>
                     {isLoadingProjects ? (
                       <div className="flex justify-center py-8">
-                        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+                        <Loader2 className="w-8 h-8 animate-spin text-fg-brand" />
                       </div>
                     ) : projects.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500">No projects found. Create one!</div>
+                      <div className="text-center py-8 text-body-subtle">No projects found. Create one!</div>
                     ) : (
-                      <div className="grid gap-4 max-h-[50vh] overflow-y-auto">
+                      <div className="grid gap-4 max-h-[50vh] overflow-y-auto pr-2">
                         {projects.map((proj) => (
-                          <div key={proj.id} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                          <div key={proj.id} className="flex items-center justify-between p-4 bg-neutral-primary-soft border border-default rounded-[12px] shadow-xs hover:border-brand-soft transition-colors">
                             <div>
-                              <h3 className="font-bold text-slate-800 text-lg">{proj.name}</h3>
+                              <h3 className="font-medium text-heading text-lg">{proj.name}</h3>
                             </div>
                             <button
                               onClick={() => loadProject(proj)}
-                              className="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-sm rounded-md transition-colors"
+                              className="px-4 py-2 bg-neutral-primary hover:bg-neutral-secondary-medium text-body border border-default font-medium text-[13px] rounded-[12px] transition-colors"
                             >
                               Load Project
                             </button>
@@ -897,10 +893,10 @@ function Dashboard() {
         ) : (
           <div className="flex flex-col w-full h-full">
             {/* Tab Bar */}
-            <div className="flex bg-slate-100 border-b border-slate-200 px-4 pt-2 gap-2">
+            <div className="flex bg-neutral-primary border-b border-default px-4 pt-2 gap-2 mt-6">
               <button
                 onClick={() => setActiveTabId('canvas')}
-                className={`px-4 py-2 rounded-t-lg font-bold text-sm transition-colors ${activeTabId === 'canvas' ? 'bg-white text-blue-600 shadow-sm border-t border-x border-slate-200' : 'text-slate-500 hover:bg-slate-200'}`}
+                className={`px-4 py-2 rounded-t-[12px] font-medium text-[13px] transition-colors ${activeTabId === 'canvas' ? 'bg-neutral-primary-soft text-heading border-t border-x border-default' : 'text-body-subtle hover:bg-neutral-secondary-medium border-t border-x border-transparent'}`}
               >
                 Canvas
               </button>
@@ -908,16 +904,16 @@ function Dashboard() {
                 const node = generatedNodes.find(n => n.id === tabId);
                 const title = node ? node.data.moduleId : tabId;
                 return (
-                  <div key={tabId} className={`flex items-center rounded-t-lg border-t border-x transition-colors ${activeTabId === tabId ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'bg-transparent text-slate-500 border-transparent hover:bg-slate-200'}`}>
+                  <div key={tabId} className={`flex items-center rounded-t-[12px] border-t border-x transition-colors ${activeTabId === tabId ? 'bg-neutral-primary-soft text-heading border-default' : 'bg-transparent text-body-subtle border-transparent hover:bg-neutral-secondary-medium'}`}>
                     <button
                       onClick={() => setActiveTabId(tabId)}
-                      className="px-4 py-2 font-bold text-sm"
+                      className="px-4 py-2 font-medium text-[13px]"
                     >
                       {title}
                     </button>
                     <button
                       onClick={() => closeTab(tabId)}
-                      className="px-2 py-2 hover:text-red-500 hover:bg-slate-100 rounded-tr-lg"
+                      className="px-2 py-2 hover:text-fg-danger hover:bg-danger rounded-tr-[12px]"
                     >
                       ×
                     </button>

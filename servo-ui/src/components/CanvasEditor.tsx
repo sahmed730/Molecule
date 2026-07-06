@@ -95,7 +95,6 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onRegenerate,
   onExtractGraph
 }) => {
-  const isDarkMode = useAppStore(state => state.isDarkMode);
   const architectureReasoning = useAppStore(state => state.architectureReasoning);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<any[]>(initialNodes);
@@ -832,14 +831,14 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         nodeTypes={nodeTypes}
         fitView
       >
-        <Background color={isDarkMode ? "#334155" : "#cbd5e1"} gap={20} />
-        <Controls className={isDarkMode ? 'dark-controls' : ''} />
+        <Background color="#525252" gap={20} />
+        <Controls className="dark-controls" />
         
         <Panel position="top-left" className="flex flex-col gap-2 p-2">
           {projectCapabilities.length > 0 && (
-            <div className="flex gap-2 flex-wrap max-w-2xl bg-white/50 backdrop-blur-sm p-2 rounded-xl">
+            <div className="flex gap-2 flex-wrap max-w-2xl bg-neutral-primary-soft/80 backdrop-blur-sm p-3 rounded-[12px] border border-default shadow-xs">
               {projectCapabilities.map(cap => (
-                 <div key={cap} className="px-3 py-1.5 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 text-xs font-bold uppercase tracking-wider rounded-md shadow-sm border border-purple-200 flex items-center gap-1.5">
+                 <div key={cap} className="px-3 py-1.5 bg-brand-softer text-fg-brand text-xs font-semibold uppercase tracking-wider rounded-[8px] shadow-xs border border-brand-soft flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5" /> {cap}
                  </div>
               ))}
@@ -847,12 +846,12 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
           )}
         </Panel>
 
-        <Panel position="top-right" className="flex gap-2 items-center">
+        <Panel position="top-right" className="flex gap-2 items-center p-2">
           {history.length > 0 && (
             <button
               onClick={handleUndo}
               title="Undo last AI action"
-              className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-300 text-amber-700 rounded-md shadow-sm text-sm font-bold hover:bg-amber-100 transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 bg-warning-soft border border-warning text-fg-warning rounded-[12px] shadow-xs text-[13px] font-medium hover:bg-warning hover:text-white transition-colors"
             >
               <Undo2 className="w-4 h-4" />
               Undo
@@ -861,7 +860,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
           <button 
             onClick={onNewProject}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-500 text-white rounded-md shadow-lg text-sm font-bold hover:bg-slate-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-neutral-primary hover:bg-neutral-secondary-medium text-body border border-default rounded-[12px] shadow-xs text-[13px] font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Project
@@ -870,7 +869,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
           {nodes.length === 0 && onExtractGraph && (
             <button
               onClick={onExtractGraph}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-md shadow-lg text-sm font-bold hover:bg-green-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand text-white rounded-[12px] shadow-xs text-[13px] font-medium hover:bg-brand-strong transition-colors"
             >
               <Zap className="w-4 h-4" />
               Graph Again
@@ -882,7 +881,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
           <button 
             onClick={() => setIsModalOpen(true)}
             disabled={nodes.length === 0}
-            className={`flex items-center gap-2 px-4 py-2 text-white rounded-md shadow-lg text-sm font-bold transition-colors ${nodes.length === 0 ? 'bg-slate-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+            className={`flex items-center gap-2 px-4 py-2 text-white rounded-[12px] shadow-xs text-[13px] font-medium transition-colors ${nodes.length === 0 ? 'bg-neutral-tertiary text-body-subtle cursor-not-allowed border border-default' : 'bg-success hover:bg-success-strong text-white'}`}
           >
             <FileText className="w-4 h-4" />
             Generate Mega Prompt
@@ -892,81 +891,81 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       {/* Mega Prompt Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
-              <h2 className="text-lg font-black tracking-tight text-slate-800 uppercase flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-500" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-primary rounded-[12px] shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] border border-default overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-default bg-neutral-primary-soft">
+              <h2 className="text-lg font-semibold tracking-tight text-heading flex items-center gap-2">
+                <FileText className="w-5 h-5 text-fg-brand" />
                 Software Architecture Workbench
               </h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold px-3 py-1 bg-white border border-slate-200 rounded shadow-sm"
+                className="text-body-subtle hover:text-heading font-medium px-3 py-1 bg-neutral-primary hover:bg-neutral-secondary border border-default rounded-[8px] shadow-xs transition-colors"
               >
                 Close
               </button>
             </div>
             
             {/* Dashboard */}
-            <div className="grid grid-cols-6 divide-x divide-slate-100 border-b border-slate-100 bg-white">
+            <div className="grid grid-cols-6 divide-x divide-default border-b border-default bg-neutral-primary">
               <div className="p-4 text-center">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Modules</div>
-                <div className="text-2xl font-black text-slate-800">{metrics.numModules}</div>
+                <div className="text-[10px] uppercase font-semibold tracking-widest text-body-subtle">Modules</div>
+                <div className="text-2xl font-black text-heading">{metrics.numModules}</div>
               </div>
               <div className="p-4 text-center">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Est. Files</div>
-                <div className="text-2xl font-black text-blue-600">{metrics.estFiles}</div>
+                <div className="text-[10px] uppercase font-semibold tracking-widest text-body-subtle">Est. Files</div>
+                <div className="text-2xl font-black text-fg-info">{metrics.estFiles}</div>
               </div>
               <div className="p-4 text-center">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">APIs / Edges</div>
-                <div className="text-2xl font-black text-slate-800">{metrics.estApis}</div>
+                <div className="text-[10px] uppercase font-semibold tracking-widest text-body-subtle">APIs / Edges</div>
+                <div className="text-2xl font-black text-heading">{metrics.estApis}</div>
               </div>
               <div className="p-4 text-center">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Dev Time</div>
-                <div className="text-xl font-black text-emerald-600 pt-1">{metrics.estTime}</div>
+                <div className="text-[10px] uppercase font-semibold tracking-widest text-body-subtle">Dev Time</div>
+                <div className="text-xl font-black text-fg-success pt-1">{metrics.estTime}</div>
               </div>
               <div className="p-4 text-center">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-slate-400">Complexity</div>
-                <div className="text-xl font-black text-purple-600 pt-1">{metrics.complexity}</div>
+                <div className="text-[10px] uppercase font-semibold tracking-widest text-body-subtle">Complexity</div>
+                <div className="text-xl font-black text-fg-brand pt-1">{metrics.complexity}</div>
               </div>
-              <div className="p-4 text-center bg-blue-50">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-blue-600">Completeness</div>
-                <div className="text-2xl font-black text-blue-600 pt-1">{metrics.promptCompleteness}%</div>
+              <div className="p-4 text-center bg-info-soft/30">
+                <div className="text-[10px] uppercase font-semibold tracking-widest text-fg-info">Completeness</div>
+                <div className="text-2xl font-black text-fg-info pt-1">{metrics.promptCompleteness}%</div>
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex bg-slate-50 border-b border-slate-200">
+            <div className="flex bg-neutral-primary-soft border-b border-default">
               <button 
                 onClick={() => setPromptTab('architecture')}
-                className={`px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors ${promptTab === 'architecture' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-6 py-3 text-[13px] font-semibold uppercase tracking-wider transition-colors ${promptTab === 'architecture' ? 'bg-neutral-primary text-fg-brand border-b-2 border-brand-medium' : 'text-body-subtle hover:text-heading'}`}
               >
                 1. Architecture Overview
               </button>
               <button 
                 onClick={() => setPromptTab('standard')}
-                className={`px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors ${promptTab === 'standard' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-6 py-3 text-[13px] font-semibold uppercase tracking-wider transition-colors ${promptTab === 'standard' ? 'bg-neutral-primary text-fg-brand border-b-2 border-brand-medium' : 'text-body-subtle hover:text-heading'}`}
               >
                 2. Module Contracts
               </button>
               <button 
                 onClick={() => setPromptTab('claude')}
-                className={`px-6 py-3 text-sm font-bold uppercase tracking-wider transition-colors ${promptTab === 'claude' ? 'bg-white text-blue-600 border-b-2 border-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-6 py-3 text-[13px] font-semibold uppercase tracking-wider transition-colors ${promptTab === 'claude' ? 'bg-neutral-primary text-fg-brand border-b-2 border-brand-medium' : 'text-body-subtle hover:text-heading'}`}
               >
                 3. Claude / Cursor Prompt
               </button>
             </div>
             
-            <div className="p-4 bg-slate-50 overflow-y-auto flex-grow relative">
-              <pre className="text-sm font-mono text-slate-700 whitespace-pre-wrap p-4 bg-white rounded-lg border border-slate-200 shadow-inner">
+            <div className="p-4 bg-neutral-primary-soft overflow-y-auto flex-grow relative">
+              <pre className="text-[13px] font-mono text-body whitespace-pre-wrap p-4 bg-neutral-primary rounded-[12px] border border-default shadow-xs">
                 {getCurrentPrompt()}
               </pre>
             </div>
             
-            <div className="p-4 border-t border-slate-100 bg-white rounded-b-xl flex justify-end">
+            <div className="p-4 border-t border-default bg-neutral-primary flex justify-end">
               <button 
                 onClick={copyToClipboard}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold shadow-lg transition-colors text-white ${copied ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'}`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-[12px] font-medium shadow-xs transition-colors text-white ${copied ? 'bg-success hover:bg-success-strong' : 'bg-brand hover:bg-brand-strong'}`}
               >
                 {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                 {copied ? 'Copied to Clipboard!' : `Copy ${promptTab.charAt(0).toUpperCase() + promptTab.slice(1)} Prompt`}
@@ -977,56 +976,56 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       )}
       {/* Review Modal */}
       {reviewData && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-gradient-to-r from-purple-600 to-blue-600 rounded-t-xl">
-              <h2 className="text-lg font-black tracking-tight text-white uppercase flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-200" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-primary rounded-[12px] shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh] border border-default overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-brand-soft bg-brand-softer">
+              <h2 className="text-lg font-semibold tracking-tight text-fg-brand uppercase flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-fg-brand" />
                 AI Architecture Review
               </h2>
               <button 
                 onClick={() => setReviewData(null)}
-                className="text-white hover:text-slate-200 font-bold px-3 py-1 bg-white/10 rounded shadow-sm"
+                className="text-fg-brand hover:text-white hover:bg-brand font-medium px-3 py-1 bg-white/50 border border-brand-soft rounded-[8px] shadow-xs transition-colors"
               >
                 Close
               </button>
             </div>
 
-            <div className="p-6 bg-slate-50 overflow-y-auto flex-grow flex flex-col gap-6">
-              <div className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <div className="p-6 bg-neutral-primary overflow-y-auto flex-grow flex flex-col gap-6">
+              <div className="flex items-center justify-between bg-neutral-primary-soft p-6 rounded-[12px] shadow-xs border border-default">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Health Score</h3>
-                  <div className={`text-5xl font-black ${reviewData.score >= 90 ? 'text-green-600' : reviewData.score > 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                    {reviewData.score}<span className="text-2xl text-slate-400">/100</span>
+                  <h3 className="text-[13px] font-semibold text-body-subtle uppercase tracking-widest">Health Score</h3>
+                  <div className={`text-5xl font-black ${reviewData.score >= 90 ? 'text-fg-success' : reviewData.score > 60 ? 'text-fg-warning' : 'text-fg-danger'}`}>
+                    {reviewData.score}<span className="text-2xl text-body-subtle">/100</span>
                   </div>
                   {reviewData.complexityPenalty > 0 && (
-                    <div className="mt-2 text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded inline-block">
+                    <div className="mt-2 text-[11px] font-bold text-fg-danger bg-danger-soft border border-danger-soft px-2 py-1 rounded-[6px] inline-block">
                       Complexity Penalty: -{reviewData.complexityPenalty}
                     </div>
                   )}
                 </div>
                 <div className="flex flex-col gap-1 items-end">
-                  <div className="text-sm font-bold text-slate-500 uppercase tracking-widest">Architecture Maturity</div>
-                  <div className={`font-black uppercase tracking-tight text-xl ${reviewData.score >= 90 ? 'text-green-600' : 'text-yellow-600'}`}>
+                  <div className="text-[13px] font-semibold text-body-subtle uppercase tracking-widest">Architecture Maturity</div>
+                  <div className={`font-black uppercase tracking-tight text-xl ${reviewData.score >= 90 ? 'text-fg-success' : 'text-fg-warning'}`}>
                     {reviewData.architectureMaturity || (reviewData.score >= 90 ? 'Production Ready' : 'Draft')}
                   </div>
                 </div>
               </div>
 
               {reviewData.missingCapabilities && reviewData.missingCapabilities.length > 0 && (
-                <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-xl">
+                <div className="bg-info-soft/30 border-l-4 border-fg-info p-4 rounded-r-[12px]">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-purple-800 font-bold uppercase text-sm tracking-wider">Missing Platform Capabilities</h3>
+                    <h3 className="text-fg-info font-semibold uppercase text-[13px] tracking-wider">Missing Platform Capabilities</h3>
                   </div>
                   <div className="space-y-3">
                     {reviewData.missingCapabilities.filter((c: string) => !projectCapabilities.includes(c)).map((cap: string, i: number) => (
-                      <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-purple-100 shadow-sm">
-                        <div className="font-bold text-purple-700 flex items-center gap-2">
+                      <div key={i} className="flex items-center justify-between bg-neutral-primary p-3 rounded-[8px] border border-info-soft shadow-xs">
+                        <div className="font-semibold text-fg-info flex items-center gap-2">
                            <Sparkles className="w-4 h-4" /> {cap}
                         </div>
                         <button 
                           onClick={() => handleApplyCapability(cap)}
-                          className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded shadow transition-colors"
+                          className="px-3 py-1.5 bg-fg-info hover:bg-info-strong text-white text-xs font-semibold rounded-[6px] shadow-xs transition-colors"
                         >
                           Apply Capability
                         </button>
@@ -1037,20 +1036,20 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
               )}
 
               {reviewData.duplicates && reviewData.duplicates.length > 0 && (
-                <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-xl">
+                <div className="bg-warning-soft border-l-4 border-fg-warning p-4 rounded-r-[12px]">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-orange-800 font-bold uppercase text-sm tracking-wider">Architecture Duplicates Found</h3>
+                    <h3 className="text-fg-warning font-semibold uppercase text-[13px] tracking-wider">Architecture Duplicates Found</h3>
                   </div>
                   <div className="space-y-3">
                     {reviewData.duplicates.map((dup: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-orange-200 shadow-sm">
+                      <div key={i} className="flex items-center justify-between bg-neutral-primary p-3 rounded-[8px] border border-warning-soft shadow-xs">
                         <div>
-                          <div className="font-bold text-orange-700">{dup.name || dup.id} <span className="text-orange-400 font-normal ml-1">duplicates {dup.duplicatesId}</span></div>
-                          {dup.reason && <div className="text-xs text-orange-600/80 mt-1">{dup.reason}</div>}
+                          <div className="font-semibold text-fg-warning">{dup.name || dup.id} <span className="text-fg-warning opacity-70 font-normal ml-1">duplicates {dup.duplicatesId}</span></div>
+                          {dup.reason && <div className="text-[11px] text-fg-warning opacity-80 mt-1">{dup.reason}</div>}
                         </div>
                         <button 
                           onClick={() => handleMergeDuplicate(dup.id, dup.duplicatesId)}
-                          className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded shadow transition-colors"
+                          className="px-3 py-1.5 bg-warning hover:bg-warning-strong text-white text-xs font-semibold rounded-[6px] shadow-xs transition-colors"
                         >
                           Merge Duplicate
                         </button>
@@ -1060,53 +1059,53 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                 </div>
               )}
 
-              <div className="grid grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200 text-center">
+              <div className="grid grid-cols-4 gap-4 bg-neutral-primary p-4 rounded-[12px] shadow-xs border border-default text-center">
                 <div className="flex flex-col text-left">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase">Modularity</span>
-                    <span className="font-bold text-slate-700 text-sm">{reviewData.modularity || 0}%</span>
+                    <span className="text-body-subtle text-[10px] font-semibold uppercase">Modularity</span>
+                    <span className="font-semibold text-heading text-[13px]">{reviewData.modularity || 0}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: `${reviewData.modularity || 0}%` }} />
+                  <div className="h-1.5 w-full bg-neutral-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-brand-medium rounded-full" style={{ width: `${reviewData.modularity || 0}%` }} />
                   </div>
                 </div>
                 <div className="flex flex-col text-left">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase">Scalability</span>
-                    <span className="font-bold text-slate-700 text-sm">{reviewData.scalability || 0}%</span>
+                    <span className="text-body-subtle text-[10px] font-semibold uppercase">Scalability</span>
+                    <span className="font-semibold text-heading text-[13px]">{reviewData.scalability || 0}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${reviewData.scalability || 0}%` }} />
+                  <div className="h-1.5 w-full bg-neutral-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-fg-info rounded-full" style={{ width: `${reviewData.scalability || 0}%` }} />
                   </div>
                 </div>
                 <div className="flex flex-col text-left">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase">Security</span>
-                    <span className="font-bold text-slate-700 text-sm">{reviewData.security || 0}%</span>
+                    <span className="text-body-subtle text-[10px] font-semibold uppercase">Security</span>
+                    <span className="font-semibold text-heading text-[13px]">{reviewData.security || 0}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-neutral-secondary rounded-full overflow-hidden">
                     <div className="h-full bg-purple-500 rounded-full" style={{ width: `${reviewData.security || 0}%` }} />
                   </div>
                 </div>
                 <div className="flex flex-col text-left">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase">Maintain</span>
-                    <span className="font-bold text-slate-700 text-sm">{reviewData.maintainability || 0}%</span>
+                    <span className="text-body-subtle text-[10px] font-semibold uppercase">Maintain</span>
+                    <span className="font-semibold text-heading text-[13px]">{reviewData.maintainability || 0}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${reviewData.maintainability || 0}%` }} />
+                  <div className="h-1.5 w-full bg-neutral-secondary rounded-full overflow-hidden">
+                    <div className="h-full bg-fg-success rounded-full" style={{ width: `${reviewData.maintainability || 0}%` }} />
                   </div>
                 </div>
               </div>
 
               {reviewData.critical && reviewData.critical.length > 0 && (
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
+                <div className="bg-danger-soft/50 border-l-4 border-fg-danger p-4 rounded-r-[12px]">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-red-800 font-bold uppercase text-sm tracking-wider">Critical Missing Components</h3>
+                    <h3 className="text-fg-danger font-semibold uppercase text-[13px] tracking-wider">Critical Missing Components</h3>
                     <button 
                       onClick={handleBatchExpandModules}
                       disabled={isReviewing}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow transition-colors flex items-center gap-1 disabled:opacity-50"
+                      className="px-4 py-2 bg-danger hover:bg-danger-strong text-white text-[13px] font-medium rounded-[8px] shadow-xs transition-colors flex items-center gap-1 disabled:opacity-50"
                     >
                       <Zap className="w-3.5 h-3.5" />
                       {isReviewing ? 'Generating...' : 'Generate All Critical'}
@@ -1114,16 +1113,16 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                   </div>
                   <div className="space-y-3">
                     {reviewData.critical.map((m: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-red-100 shadow-sm">
+                      <div key={i} className="flex items-center justify-between bg-neutral-primary p-3 rounded-[8px] border border-danger-soft shadow-xs">
                         <div>
-                          <div className="font-bold text-red-700">{m.name || m}</div>
-                          {m.reason && <div className="text-xs text-red-600/80 mt-1">{m.reason}</div>}
-                          {m.improvementScore && <div className="text-[10px] font-mono bg-red-100 text-red-800 inline-block px-1.5 py-0.5 rounded mt-1">+{m.improvementScore} Score</div>}
+                          <div className="font-semibold text-fg-danger">{m.name || m}</div>
+                          {m.reason && <div className="text-[11px] text-fg-danger opacity-80 mt-1">{m.reason}</div>}
+                          {m.improvementScore && <div className="text-[10px] font-mono bg-danger-soft border border-danger-soft text-fg-danger inline-block px-1.5 py-0.5 rounded-[4px] mt-1">+{m.improvementScore} Score</div>}
                         </div>
                         <button 
                           onClick={() => handleExpandModule(m.name || m, m.reason || 'Missing critical business logic component')}
                           disabled={isReviewing}
-                          className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow transition-colors disabled:opacity-50"
+                          className="px-3 py-1.5 bg-danger hover:bg-danger-strong text-white text-xs font-semibold rounded-[6px] shadow-xs transition-colors disabled:opacity-50"
                         >
                           {isReviewing ? 'Adding...' : 'Generate Module'}
                         </button>
@@ -1134,28 +1133,28 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
               )}
 
               {reviewData.risks && reviewData.risks.length > 0 && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-xl">
-                  <h3 className="text-yellow-800 font-bold uppercase text-sm tracking-wider mb-2">Architecture Risks</h3>
-                  <ul className="list-disc pl-5 text-yellow-700 text-sm space-y-1">
+                <div className="bg-warning-soft border-l-4 border-fg-warning p-4 rounded-r-[12px]">
+                  <h3 className="text-fg-warning font-semibold uppercase text-[13px] tracking-wider mb-2">Architecture Risks</h3>
+                  <ul className="list-disc pl-5 text-fg-warning text-[13px] space-y-1">
                     {reviewData.risks.map((r: string, i: number) => <li key={i}>{r}</li>)}
                   </ul>
                 </div>
               )}
 
               {reviewData.recommended && reviewData.recommended.length > 0 && (
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl">
-                  <h3 className="text-blue-800 font-bold uppercase text-sm tracking-wider mb-4">Recommended Enhancements</h3>
+                <div className="bg-info-soft/30 border-l-4 border-fg-info p-4 rounded-r-[12px]">
+                  <h3 className="text-fg-info font-semibold uppercase text-[13px] tracking-wider mb-4">Recommended Enhancements</h3>
                   <div className="space-y-2">
                     {reviewData.recommended.map((s: any, i: number) => (
-                      <div key={i} className="flex items-start justify-between bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
+                      <div key={i} className="flex items-start justify-between bg-neutral-primary p-3 rounded-[8px] border border-info-soft shadow-xs">
                         <div>
-                          <div className="font-bold text-blue-700 flex items-center gap-2">
-                            <Check className="w-4 h-4 text-blue-500" />
+                          <div className="font-semibold text-fg-info flex items-center gap-2">
+                            <Check className="w-4 h-4 text-fg-info" />
                             {s.name || s.title || s}
                           </div>
-                          {s.reason && <div className="text-xs text-blue-600/80 mt-1 ml-6">{s.reason}</div>}
+                          {s.reason && <div className="text-[11px] text-fg-info opacity-80 mt-1 ml-6">{s.reason}</div>}
                         </div>
-                        {s.improvementScore && <div className="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">+{s.improvementScore} Score</div>}
+                        {s.improvementScore && <div className="text-[10px] font-mono bg-info-soft border border-info-soft text-fg-info px-2 py-1 rounded-[4px]">+{s.improvementScore} Score</div>}
                       </div>
                     ))}
                   </div>
@@ -1163,19 +1162,19 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
               )}
 
               {reviewData.optional && reviewData.optional.length > 0 && (
-                <div className="bg-slate-50 border-l-4 border-slate-300 p-4 rounded-r-xl">
-                  <h3 className="text-slate-600 font-bold uppercase text-sm tracking-wider mb-4">Optional Optimizations</h3>
+                <div className="bg-neutral-primary-soft border-l-4 border-default p-4 rounded-r-[12px]">
+                  <h3 className="text-body font-semibold uppercase text-[13px] tracking-wider mb-4">Optional Optimizations</h3>
                   <div className="space-y-2">
                     {reviewData.optional.map((s: any, i: number) => (
-                      <div key={i} className="flex items-start justify-between bg-white p-3 rounded-lg border border-slate-200 shadow-sm opacity-80">
+                      <div key={i} className="flex items-start justify-between bg-neutral-primary p-3 rounded-[8px] border border-default shadow-xs opacity-80">
                         <div>
-                          <div className="font-bold text-slate-700 flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-slate-400 rounded-full ml-1 mr-2" />
+                          <div className="font-semibold text-heading flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-body-subtle rounded-full ml-1 mr-2" />
                             {s.name || s.title || s}
                           </div>
-                          {s.reason && <div className="text-xs text-slate-500 mt-1 ml-6">{s.reason}</div>}
+                          {s.reason && <div className="text-[11px] text-body-subtle mt-1 ml-6">{s.reason}</div>}
                         </div>
-                        {s.improvementScore && <div className="text-[10px] font-mono bg-slate-100 text-slate-500 px-2 py-1 rounded">+{s.improvementScore} Score</div>}
+                        {s.improvementScore && <div className="text-[10px] font-mono bg-neutral-secondary text-body-subtle px-2 py-1 rounded-[4px]">+{s.improvementScore} Score</div>}
                       </div>
                     ))}
                   </div>
@@ -1184,25 +1183,25 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
               <div className="flex flex-col gap-3 mt-2 pb-4">
                 {reviewData.score >= 90 ? (
-                  <div className="w-full flex items-center justify-center gap-3 py-4 bg-green-50 border-2 border-green-500 text-green-700 font-black text-lg rounded-xl shadow-sm mb-4">
+                  <div className="w-full flex items-center justify-center gap-3 py-4 bg-success-soft/50 border-2 border-fg-success text-fg-success font-black text-lg rounded-[12px] shadow-xs mb-4">
                     <Check className="w-6 h-6" />
                     ARCHITECTURE COMPLETE (NO CLEANUP NEEDED)
                   </div>
                 ) : (
-                  <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Auto-Cleanup</h4>
-                    <p className="text-xs text-slate-500 mb-3">Your score is low. Run auto-cleanup to merge duplicates and optimize layout.</p>
+                  <div className="mb-6 p-4 bg-neutral-primary-soft border border-default rounded-[12px]">
+                    <h4 className="text-[13px] font-semibold text-body-subtle uppercase tracking-wider mb-2">Auto-Cleanup</h4>
+                    <p className="text-[13px] text-body-subtle mb-3">Your score is low. Run auto-cleanup to merge duplicates and optimize layout.</p>
                     <input
                       type="text"
                       value={optimizeInstruction}
                       onChange={e => setOptimizeInstruction(e.target.value)}
                       placeholder="Optional instruction: e.g. 'Keep auth separate'"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-purple-400 mb-2"
+                      className="w-full px-3 py-2 border border-default bg-neutral-primary rounded-[8px] text-[13px] text-body focus:outline-none focus:border-brand-medium focus:ring-1 focus:ring-brand-medium mb-3 shadow-xs"
                     />
                     <button 
                       disabled={isReviewing}
                       onClick={() => handleAutoImprove(optimizeInstruction || undefined)}
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-slate-600 to-slate-800 hover:from-slate-700 hover:to-slate-900 text-white font-bold rounded-lg shadow transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-brand hover:bg-brand-strong text-white font-medium rounded-[12px] shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       {isReviewing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Sparkles className="w-5 h-5" />}
                       {isReviewing ? 'ANALYZING...' : 'RUN AUTO-CLEANUP'}
@@ -1210,20 +1209,20 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                   </div>
                 )}
 
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <h4 className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2 flex items-center gap-1"><Zap className="w-4 h-4"/> Expand / Add Feature</h4>
-                  <p className="text-xs text-blue-600/80 mb-3">Add a major new feature or change requirements.</p>
+                <div className="p-4 bg-info-soft/30 border border-info-soft rounded-[12px]">
+                  <h4 className="text-[13px] font-semibold text-fg-info uppercase tracking-wider mb-2 flex items-center gap-1"><Zap className="w-4 h-4"/> Expand / Add Feature</h4>
+                  <p className="text-[13px] text-fg-info opacity-80 mb-3">Add a major new feature or change requirements.</p>
                   <input
                     type="text"
                     value={expandPrompt}
                     onChange={e => setExpandPrompt(e.target.value)}
                     placeholder="e.g. 'Add a Stripe payment gateway'"
-                    className="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-2"
+                    className="w-full px-3 py-2 border border-info-soft bg-neutral-primary rounded-[8px] text-[13px] text-body focus:outline-none focus:border-fg-info focus:ring-1 focus:ring-fg-info mb-3 shadow-xs"
                   />
                   <button 
                     disabled={isClarifyingExpand || isReviewing || !expandPrompt.trim()}
                     onClick={handleStartExpandClarification}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-fg-info hover:bg-info-strong text-white font-medium rounded-[12px] shadow-xs transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isClarifyingExpand || isReviewing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Zap className="w-5 h-5" />}
                     {isClarifyingExpand ? 'CLARIFYING...' : 'EXPAND ARCHITECTURE'}
@@ -1235,93 +1234,32 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         </div>
       )}
 
-      {/* Diff Preview Modal */}
-      {pendingOptimize && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-gradient-to-r from-purple-600 to-blue-600 rounded-t-xl">
-              <h2 className="text-base font-black tracking-tight text-white uppercase flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                Proposed Optimizations
-              </h2>
-              <button onClick={() => setPendingOptimize(null)} className="text-white/80 hover:text-white font-bold px-3 py-1 bg-white/10 rounded text-sm">Cancel</button>
-            </div>
-            <div className="p-5 flex flex-col gap-4 overflow-y-auto max-h-[60vh]">
-              <p className="text-slate-500 text-sm">Review what the AI proposes to change before it touches your canvas:</p>
-
-              {pendingOptimize.delta?.merges?.length > 0 && (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-orange-700 font-bold text-sm mb-2"><GitMerge className="w-4 h-4" /> Merge Duplicates</div>
-                  {pendingOptimize.delta.merges.map((m: any, i: number) => (
-                    <div key={i} className="text-sm text-orange-600">• Keep <span className="font-mono bg-orange-100 px-1 rounded">{m.keepId}</span>, remove <span className="font-mono bg-orange-100 px-1 rounded">{m.duplicateId}</span></div>
-                  ))}
-                </div>
-              )}
-
-              {pendingOptimize.delta?.conversionsToCapabilities?.length > 0 && (
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-purple-700 font-bold text-sm mb-2"><Zap className="w-4 h-4" /> Convert to Capabilities</div>
-                  {pendingOptimize.delta.conversionsToCapabilities.map((c: any, i: number) => (
-                    <div key={i} className="text-sm text-purple-600">• Module <span className="font-mono bg-purple-100 px-1 rounded">{c.moduleId}</span> → capability <span className="font-bold">{c.capability}</span></div>
-                  ))}
-                </div>
-              )}
-
-              {pendingOptimize.delta?.deletions?.length > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-red-700 font-bold text-sm mb-2"><Trash2 className="w-4 h-4" /> Delete Dead Modules</div>
-                  {pendingOptimize.delta.deletions.map((id: string, i: number) => (
-                    <div key={i} className="text-sm text-red-600">• Remove <span className="font-mono bg-red-100 px-1 rounded">{id}</span></div>
-                  ))}
-                </div>
-              )}
-
-              {pendingOptimize.delta?.newCapabilities?.length > 0 && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-green-700 font-bold text-sm mb-2"><Sparkles className="w-4 h-4" /> Add Capabilities</div>
-                  {pendingOptimize.delta.newCapabilities.map((cap: string, i: number) => (
-                    <div key={i} className="text-sm text-green-600">• {cap}</div>
-                  ))}
-                </div>
-              )}
-
-              {!pendingOptimize.delta?.merges?.length &&
-               !pendingOptimize.delta?.conversionsToCapabilities?.length &&
-               !pendingOptimize.delta?.deletions?.length &&
-               !pendingOptimize.delta?.newCapabilities?.length && (
-                <div className="text-center text-slate-500 text-sm py-4">✅ Architecture looks clean — no changes proposed.</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Expand Clarification Modal */}
       {expandQuestions.length > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"></div>
           
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div className="relative bg-neutral-primary rounded-[12px] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-default">
+            <div className="p-6 border-b border-default flex items-center justify-between bg-neutral-primary-soft">
               <div>
-                <h2 className="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-blue-600" /> Clarify Expansion
+                <h2 className="text-xl font-semibold text-heading tracking-tight flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-fg-brand" /> Clarify Expansion
                 </h2>
-                <p className="text-sm text-slate-500 mt-1">Answer these quick questions to refine your new feature.</p>
+                <p className="text-[13px] text-body-subtle mt-1">Answer these quick questions to refine your new feature.</p>
               </div>
             </div>
             
-            <div className="p-6 overflow-y-auto flex-grow space-y-6">
+            <div className="p-6 overflow-y-auto flex-grow space-y-6 bg-neutral-primary">
               {expandQuestions.map((q) => (
-                <div key={q.id} className="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-slate-300">
-                  <label className="block text-base font-bold text-slate-800 mb-3">{q.question}</label>
+                <div key={q.id} className="bg-neutral-primary-soft p-5 rounded-[12px] border border-default shadow-xs transition-colors hover:border-brand-soft">
+                  <label className="block text-sm font-semibold text-heading mb-3">{q.question}</label>
                   
                   {q.type === 'open_text' ? (
                     <textarea
                       value={expandAnswers[q.id] || ''}
                       onChange={(e) => setExpandAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                       placeholder="Type your answer here..."
-                      className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none h-24"
+                      className="w-full p-3 bg-neutral-primary border border-default text-body text-[13px] rounded-[8px] focus:ring-1 focus:ring-brand-medium focus:border-brand-medium resize-none h-24"
                     />
                   ) : q.type === 'multi_select' ? (
                     <div className="flex flex-wrap gap-2">
@@ -1340,13 +1278,13 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                                 }
                               });
                             }}
-                            className={`px-4 py-2 text-sm rounded-lg transition-all border font-medium flex items-center gap-2 ${
+                            className={`px-4 py-2 text-[13px] rounded-[8px] transition-all border font-medium flex items-center gap-2 ${
                               isSelected
-                                ? 'bg-blue-100 border-blue-400 text-blue-800 shadow-sm scale-[1.02]' 
-                                : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100 hover:border-slate-400'
+                                ? 'bg-brand-softer border-brand text-fg-brand shadow-xs scale-[1.02]' 
+                                : 'bg-neutral-primary border-default text-body-subtle hover:bg-neutral-secondary hover:border-brand-soft'
                             }`}
                           >
-                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-400'}`}>
+                            <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center ${isSelected ? 'bg-brand border-brand text-white' : 'border-default'}`}>
                               {isSelected && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><polyline points="20 6 9 17 4 12"></polyline></svg>}
                             </div>
                             {opt}
@@ -1354,11 +1292,11 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                         );
                       })}
                       <div className="flex items-center gap-2 w-full mt-2">
-                        <span className="text-sm text-slate-500 font-medium whitespace-nowrap">Other:</span>
+                        <span className="text-[13px] text-body-subtle font-medium whitespace-nowrap">Other:</span>
                         <input 
                           type="text" 
                           placeholder="Specify..."
-                          className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="flex-1 px-3 py-2 bg-neutral-primary text-[13px] border border-default text-body rounded-[8px] focus:ring-1 focus:ring-brand-medium focus:border-brand-medium"
                           onBlur={(e) => {
                             if(e.target.value.trim()) {
                               setExpandAnswers(prev => {
@@ -1383,10 +1321,10 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                         <button
                           key={opt}
                           onClick={() => setExpandAnswers(prev => ({ ...prev, [q.id]: opt }))}
-                          className={`px-4 py-2 text-sm rounded-lg transition-all border font-medium ${
+                          className={`px-4 py-2 text-[13px] rounded-[8px] transition-all border font-medium ${
                             expandAnswers[q.id] === opt 
-                              ? 'bg-blue-100 border-blue-400 text-blue-800 shadow-sm scale-[1.02]' 
-                              : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100 hover:border-slate-400'
+                              ? 'bg-brand-softer border-brand text-fg-brand shadow-xs scale-[1.02]' 
+                              : 'bg-neutral-primary border-default text-body-subtle hover:bg-neutral-secondary hover:border-brand-soft'
                           }`}
                         >
                           {opt}
@@ -1395,7 +1333,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                       <input 
                         type="text" 
                         placeholder="Other (specify)"
-                        className="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 bg-neutral-primary text-[13px] border border-default text-body rounded-[8px] focus:ring-1 focus:ring-brand-medium focus:border-brand-medium"
                         value={!q.options.includes(expandAnswers[q.id]) && expandAnswers[q.id] ? expandAnswers[q.id] : ''}
                         onChange={(e) => setExpandAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                       />
@@ -1405,13 +1343,13 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
               ))}
             </div>
 
-            <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end items-center">
+            <div className="p-6 border-t border-default bg-neutral-primary-soft flex justify-end items-center">
                <button
                  onClick={() => {
                    setExpandQuestions([]);
                    setShowExpandChoice(true);
                  }}
-                 className={`flex items-center gap-2 px-8 py-3 text-white rounded-xl font-bold shadow-lg transition-all bg-blue-600 hover:bg-blue-700 hover:shadow-blue-500/25 hover:-translate-y-0.5`}
+                 className={`flex items-center gap-2 px-8 py-3 bg-brand text-white rounded-[12px] font-medium shadow-xs transition-colors hover:bg-brand-strong`}
                >
                  Continue
                </button>
@@ -1422,33 +1360,33 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       {/* Expand Choice Modal (Append vs Regenerate) */}
       {showExpandChoice && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col p-6 animate-in fade-in zoom-in-95">
-            <h2 className="text-xl font-black text-slate-800 mb-2">How should we apply this?</h2>
-            <p className="text-sm text-slate-500 mb-6">Your requested change might require major structural updates.</p>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-primary border border-default rounded-[12px] shadow-2xl w-full max-w-lg flex flex-col p-6 animate-in fade-in zoom-in-95">
+            <h2 className="text-xl font-semibold text-heading mb-2">How should we apply this?</h2>
+            <p className="text-[13px] text-body-subtle mb-6">Your requested change might require major structural updates.</p>
 
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => finalizeExpandChoice('append')}
-                className="flex flex-col items-start p-4 border-2 border-blue-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
+                className="flex flex-col items-start p-4 border border-info-soft bg-neutral-primary rounded-[12px] hover:border-fg-info hover:bg-info-soft/30 transition-colors text-left"
               >
-                <div className="font-bold text-blue-800 text-lg flex items-center gap-2">
+                <div className="font-semibold text-fg-info text-lg flex items-center gap-2">
                   <Zap className="w-5 h-5"/> Append to Current Flow
                 </div>
-                <div className="text-sm text-blue-600/80 mt-1">
+                <div className="text-[13px] text-fg-info opacity-80 mt-1">
                   Adds new modules to the existing graph without destroying your layout.
                 </div>
               </button>
 
               <button
                 onClick={() => finalizeExpandChoice('regenerate')}
-                className="flex flex-col items-start p-4 border-2 border-red-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition-colors text-left"
+                className="flex flex-col items-start p-4 border border-danger-soft bg-neutral-primary rounded-[12px] hover:border-fg-danger hover:bg-danger-soft/30 transition-colors text-left"
               >
-                <div className="font-bold text-red-800 text-lg flex items-center gap-2">
+                <div className="font-semibold text-fg-danger text-lg flex items-center gap-2">
                   <Trash2 className="w-5 h-5"/> Regenerate from Scratch
                 </div>
-                <div className="text-sm text-red-600/80 mt-1">
-                  <span className="font-bold uppercase">Warning:</span> Destroys the current flowchart and generates a brand new one based on your updated needs.
+                <div className="text-[13px] text-fg-danger opacity-80 mt-1">
+                  <span className="font-bold uppercase tracking-wider text-[11px]">Warning:</span> Destroys the current flowchart and generates a brand new one based on your updated needs.
                 </div>
               </button>
             </div>
@@ -1459,7 +1397,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                    setShowExpandChoice(false);
                    setExpandPrompt('');
                 }}
-                className="px-5 py-2 text-slate-500 hover:text-slate-800 font-bold text-sm transition-colors"
+                className="px-5 py-2 text-body-subtle hover:text-heading font-medium text-[13px] transition-colors bg-neutral-secondary border border-default rounded-[8px]"
               >
                 Cancel
               </button>
@@ -1470,50 +1408,50 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       {/* Diff Preview Modal */}
       {pendingOptimize && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-gradient-to-r from-purple-600 to-blue-600 rounded-t-xl">
-              <h2 className="text-base font-black tracking-tight text-white uppercase flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-primary border border-default rounded-[12px] shadow-2xl w-full max-w-lg flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-default bg-brand-softer">
+              <h2 className="text-base font-semibold tracking-tight text-fg-brand uppercase flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-fg-brand" />
                 Proposed Optimizations
               </h2>
-              <button onClick={() => setPendingOptimize(null)} className="text-white/80 hover:text-white font-bold px-3 py-1 bg-white/10 rounded text-sm">Cancel</button>
+              <button onClick={() => setPendingOptimize(null)} className="text-fg-brand hover:text-white font-medium px-3 py-1 bg-white/50 border border-brand-soft hover:bg-brand rounded-[8px] text-[13px] transition-colors">Cancel</button>
             </div>
-            <div className="p-5 flex flex-col gap-4 overflow-y-auto max-h-[60vh]">
-              <p className="text-slate-500 text-sm">Review what the AI proposes to change before it touches your canvas:</p>
+            <div className="p-5 flex flex-col gap-4 overflow-y-auto max-h-[60vh] bg-neutral-primary">
+              <p className="text-body-subtle text-[13px]">Review what the AI proposes to change before it touches your canvas:</p>
 
               {pendingOptimize.delta?.merges?.length > 0 && (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-orange-700 font-bold text-sm mb-2"><GitMerge className="w-4 h-4" /> Merge Duplicates</div>
+                <div className="bg-warning-soft border border-warning-soft rounded-[12px] p-4">
+                  <div className="flex items-center gap-2 text-fg-warning font-semibold text-[13px] mb-2"><GitMerge className="w-4 h-4" /> Merge Duplicates</div>
                   {pendingOptimize.delta.merges.map((m: any, i: number) => (
-                    <div key={i} className="text-sm text-orange-600">• Keep <span className="font-mono bg-orange-100 px-1 rounded">{m.keepId}</span>, remove <span className="font-mono bg-orange-100 px-1 rounded">{m.duplicateId}</span></div>
+                    <div key={i} className="text-[13px] text-fg-warning/90">• Keep <span className="font-mono bg-warning-soft px-1 rounded-[4px] border border-warning/20">{m.keepId}</span>, remove <span className="font-mono bg-warning-soft px-1 rounded-[4px] border border-warning/20">{m.duplicateId}</span></div>
                   ))}
                 </div>
               )}
 
               {pendingOptimize.delta?.conversionsToCapabilities?.length > 0 && (
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-purple-700 font-bold text-sm mb-2"><Zap className="w-4 h-4" /> Convert to Capabilities</div>
+                <div className="bg-brand-softer border border-brand-soft rounded-[12px] p-4">
+                  <div className="flex items-center gap-2 text-fg-brand font-semibold text-[13px] mb-2"><Zap className="w-4 h-4" /> Convert to Capabilities</div>
                   {pendingOptimize.delta.conversionsToCapabilities.map((c: any, i: number) => (
-                    <div key={i} className="text-sm text-purple-600">• Module <span className="font-mono bg-purple-100 px-1 rounded">{c.moduleId}</span> → capability <span className="font-bold">{c.capability}</span></div>
+                    <div key={i} className="text-[13px] text-fg-brand/90">• Module <span className="font-mono bg-brand-softer px-1 rounded-[4px] border border-brand-soft">{c.moduleId}</span> → capability <span className="font-bold">{c.capability}</span></div>
                   ))}
                 </div>
               )}
 
               {pendingOptimize.delta?.deletions?.length > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-red-700 font-bold text-sm mb-2"><Trash2 className="w-4 h-4" /> Delete Dead Modules</div>
+                <div className="bg-danger-soft border border-danger-soft rounded-[12px] p-4">
+                  <div className="flex items-center gap-2 text-fg-danger font-semibold text-[13px] mb-2"><Trash2 className="w-4 h-4" /> Delete Dead Modules</div>
                   {pendingOptimize.delta.deletions.map((id: string, i: number) => (
-                    <div key={i} className="text-sm text-red-600">• Remove <span className="font-mono bg-red-100 px-1 rounded">{id}</span></div>
+                    <div key={i} className="text-[13px] text-fg-danger/90">• Remove <span className="font-mono bg-danger-soft px-1 rounded-[4px] border border-danger/20">{id}</span></div>
                   ))}
                 </div>
               )}
 
               {pendingOptimize.delta?.newCapabilities?.length > 0 && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-green-700 font-bold text-sm mb-2"><Sparkles className="w-4 h-4" /> Add Capabilities</div>
+                <div className="bg-success-soft border border-success-soft rounded-[12px] p-4">
+                  <div className="flex items-center gap-2 text-fg-success font-semibold text-[13px] mb-2"><Sparkles className="w-4 h-4" /> Add Capabilities</div>
                   {pendingOptimize.delta.newCapabilities.map((cap: string, i: number) => (
-                    <div key={i} className="text-sm text-green-600">• {cap}</div>
+                    <div key={i} className="text-[13px] text-fg-success/90">• {cap}</div>
                   ))}
                 </div>
               )}
@@ -1522,12 +1460,12 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
                !pendingOptimize.delta?.conversionsToCapabilities?.length &&
                !pendingOptimize.delta?.deletions?.length &&
                !pendingOptimize.delta?.newCapabilities?.length && (
-                <div className="text-center text-slate-500 text-sm py-4">✅ Architecture looks clean — no changes proposed.</div>
+                <div className="text-center text-body-subtle text-[13px] py-4">✅ Architecture looks clean — no changes proposed.</div>
               )}
             </div>
-            <div className="p-4 border-t border-slate-100 flex gap-3 justify-end">
-              <button onClick={() => setPendingOptimize(null)} className="px-5 py-2 text-slate-600 border border-slate-200 rounded-lg font-bold text-sm hover:bg-slate-50">Cancel</button>
-              <button onClick={applyPendingOptimize} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg font-bold text-sm hover:from-purple-700 hover:to-blue-700 shadow">Apply Changes</button>
+            <div className="p-4 border-t border-default bg-neutral-primary-soft flex gap-3 justify-end rounded-b-[12px]">
+              <button onClick={() => setPendingOptimize(null)} className="px-5 py-2 text-body-subtle bg-neutral-primary border border-default rounded-[8px] font-medium text-[13px] hover:bg-neutral-secondary transition-colors">Cancel</button>
+              <button onClick={applyPendingOptimize} className="px-6 py-2 bg-brand text-white rounded-[8px] font-medium text-[13px] hover:bg-brand-strong shadow-xs transition-colors">Apply Changes</button>
             </div>
           </div>
         </div>

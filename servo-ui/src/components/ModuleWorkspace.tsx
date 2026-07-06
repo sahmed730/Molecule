@@ -138,17 +138,17 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
   };
 
   return (
-    <div className="flex-1 h-full flex overflow-hidden">
+    <div className="flex-1 h-full flex overflow-hidden bg-neutral-primary">
       {/* Left Pane: Module Configuration */}
-      <div className="flex-1 bg-slate-50 dark:bg-slate-900 flex flex-col p-6 overflow-y-auto border-r border-slate-200 dark:border-slate-800">
+      <div className="flex-1 bg-neutral-primary flex flex-col p-6 overflow-y-auto border-r border-default">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
-            Module: <span className="text-blue-600 dark:text-blue-400">{data.label || 'Unnamed Module'}</span>
+          <h2 className="text-2xl font-semibold text-heading tracking-tight">
+            Module: <span className="text-fg-brand">{data.label || 'Unnamed Module'}</span>
           </h2>
           <div className="flex items-center gap-3">
             <button 
               onClick={handleCopy}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded shadow-sm transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-neutral-primary hover:bg-neutral-secondary-medium text-body font-medium text-[13px] rounded-[12px] border border-default shadow-xs transition-colors"
             >
               <Copy className="w-4 h-4" />
               Copy
@@ -156,14 +156,14 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
             <button 
               onClick={handleReview}
               disabled={isReviewing}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold text-sm rounded shadow-sm transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-softer border border-brand-soft hover:bg-brand text-fg-brand hover:text-white font-medium text-[13px] rounded-[12px] shadow-xs transition-colors disabled:opacity-50"
             >
               {isReviewing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               AI Review
             </button>
             <button 
               onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded shadow transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-strong text-white font-medium text-[13px] rounded-[12px] shadow-xs transition-colors"
             >
               <Save className="w-4 h-4" />
               Save Module
@@ -174,33 +174,33 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Module Name</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Module Name</label>
               <input 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs" 
                 value={data.label || ''} 
                 onChange={e => setData({...data, label: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Core Task</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Core Task</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.coreTask || ''} 
                 onChange={e => setData({...data, coreTask: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Shape (Input)</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Data Shape (Input)</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 font-mono text-xs focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 font-mono text-[11px] focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.dataShape || ''} 
                 onChange={e => setData({...data, dataShape: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Expected Output</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Expected Output</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 font-mono text-xs focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 font-mono text-[11px] focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.expectedOutput || ''} 
                 onChange={e => setData({...data, expectedOutput: e.target.value})} 
               />
@@ -209,33 +209,33 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
           
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Rules</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Rules</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.rules || ''} 
                 onChange={e => setData({...data, rules: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Dependencies</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Dependencies</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.dependencies || ''} 
                 onChange={e => setData({...data, dependencies: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Error Handling</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Error Handling</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.errorHandling || ''} 
                 onChange={e => setData({...data, errorHandling: e.target.value})} 
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Testing Requirements</label>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Testing Requirements</label>
               <textarea 
-                className="w-full p-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded text-sm h-24 focus:ring-1 focus:ring-blue-500 outline-none" 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
                 value={data.testingRequirements || ''} 
                 onChange={e => setData({...data, testingRequirements: e.target.value})} 
               />
@@ -245,24 +245,24 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
         
         {/* AI Review Results below the form */}
         {review && (
-          <div className="mt-8 bg-purple-50 border border-purple-200 rounded-xl p-4 w-full">
-            <h3 className="font-bold text-purple-800 mb-2 flex items-center gap-2">
+          <div className="mt-8 bg-brand-softer border border-brand-soft rounded-[12px] p-5 w-full">
+            <h3 className="font-semibold text-fg-brand mb-2 flex items-center gap-2">
               <Sparkles className="w-4 h-4" /> Localized Module Review
             </h3>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs font-bold uppercase text-slate-500">Score</span>
-              <span className={`font-black text-lg ${review.score >= 80 ? 'text-green-600' : 'text-orange-600'}`}>
+              <span className="text-xs font-semibold uppercase text-fg-brand opacity-80">Score</span>
+              <span className={`font-black text-lg ${review.score >= 80 ? 'text-fg-success' : 'text-fg-warning'}`}>
                 {review.score}/100
               </span>
             </div>
             
             {review.issues && review.issues.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Issues</h4>
+                <h4 className="text-xs font-semibold text-fg-brand opacity-80 uppercase mb-2">Issues</h4>
                 <ul className="space-y-2">
                   {review.issues.map((iss: any, i: number) => (
-                    <li key={i} className="text-sm text-slate-700 bg-white p-2 rounded border border-red-100 border-l-4 border-l-red-500 shadow-sm">
-                      <span className="font-bold text-red-700 mr-2">[{iss.type}]</span>
+                    <li key={i} className="text-[13px] text-body bg-neutral-primary p-3 rounded-[8px] border border-danger-soft border-l-4 border-l-fg-danger shadow-xs">
+                      <span className="font-semibold text-fg-danger mr-2">[{iss.type}]</span>
                       {iss.description}
                     </li>
                   ))}
@@ -272,10 +272,10 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
             
             {review.suggestions && review.suggestions.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Suggestions</h4>
+                <h4 className="text-xs font-semibold text-fg-brand opacity-80 uppercase mb-2">Suggestions</h4>
                 <ul className="space-y-2">
                   {review.suggestions.map((sug: string, i: number) => (
-                    <li key={i} className="text-sm text-slate-700 bg-white p-2 rounded border border-blue-100 border-l-4 border-l-blue-500 shadow-sm">
+                    <li key={i} className="text-[13px] text-body bg-neutral-primary p-3 rounded-[8px] border border-info-soft border-l-4 border-l-fg-info shadow-xs">
                       {sug}
                     </li>
                   ))}
@@ -287,30 +287,30 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
       </div>
 
       {/* Right Pane: Module Chat Assistant */}
-      <div className="w-96 bg-white dark:bg-slate-900 flex flex-col border-l border-slate-200 dark:border-slate-800">
-        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h3 className="font-bold text-slate-800 dark:text-slate-200">Module Assistant</h3>
+      <div className="w-96 bg-neutral-primary flex flex-col border-l border-default">
+        <div className="p-4 border-b border-default bg-neutral-primary-soft flex items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-fg-brand" />
+          <h3 className="font-semibold text-heading text-sm">Module Assistant</h3>
         </div>
         
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {chatHistory.length === 0 ? (
-            <div className="text-center text-slate-400 text-sm mt-10">
-              <Sparkles className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+            <div className="text-center text-body-subtle text-[13px] mt-10">
+              <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>Ask the AI to update this module precisely.</p>
-              <p className="mt-2">"Add retry logic to Error Handling"</p>
-              <p>"Change language to Rust"</p>
+              <p className="mt-2 text-fg-info italic">"Add retry logic to Error Handling"</p>
+              <p className="italic text-fg-info">"Change language to Rust"</p>
             </div>
           ) : (
             chatHistory.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-xl p-3 text-sm ${
-                  msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700'
+                <div className={`max-w-[85%] rounded-[12px] p-3 text-[13px] ${
+                  msg.role === 'user' ? 'bg-brand text-white' : 'bg-neutral-primary-soft text-body border border-default'
                 }`}>
                   {msg.role === 'user' ? (
                     msg.content
                   ) : (
-                    <div className="prose prose-sm prose-slate dark:prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-pre:p-2">
+                    <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-pre:my-2 prose-pre:p-2 prose-headings:text-heading prose-a:text-fg-brand prose-code:text-fg-brand text-body">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {msg.content}
                       </ReactMarkdown>
@@ -322,15 +322,15 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
           )}
           {isChatting && chatHistory[chatHistory.length - 1]?.role !== 'assistant' && (
             <div className="flex justify-start">
-              <div className="max-w-[85%] rounded-xl p-3 text-sm bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+              <div className="max-w-[85%] rounded-[12px] p-3 text-[13px] bg-neutral-primary-soft text-body border border-default flex items-center gap-2 shadow-xs">
+                <Loader2 className="w-4 h-4 animate-spin text-fg-brand" />
                 Updating module...
               </div>
             </div>
           )}
         </div>
 
-        <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
+        <div className="p-4 bg-neutral-primary-soft border-t border-default">
           <form onSubmit={handleChatSubmit} className="flex gap-2">
             <input
               type="text"
@@ -338,12 +338,12 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
               onChange={(e) => setChatMessage(e.target.value)}
               placeholder="Suggest an update..."
               disabled={isChatting}
-              className="flex-1 px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 dark:disabled:bg-slate-900"
+              className="flex-1 px-3 py-2 text-[13px] border border-default bg-neutral-primary text-body rounded-[12px] focus:ring-1 focus:ring-brand-medium outline-none disabled:opacity-50 shadow-xs"
             />
             <button
               type="submit"
               disabled={isChatting || !chatMessage.trim()}
-              className="p-2 bg-blue-600 text-white rounded-lg disabled:bg-blue-400 hover:bg-blue-700 transition-colors"
+              className="p-2 bg-brand text-white rounded-[12px] disabled:opacity-50 hover:bg-brand-strong transition-colors shadow-xs"
             >
               <Send className="w-4 h-4" />
             </button>

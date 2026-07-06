@@ -1,19 +1,154 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: 'Geist Mono', monospace;
+  --font-mono: 'Geist Mono', monospace;
+
+  /* Neutral Backgrounds */
+  --color-neutral-primary-soft: #0A0A0A;
+  --color-neutral-primary: #050505;
+  --color-neutral-primary-medium: #111111;
+  --color-neutral-primary-strong: #1A1A1A;
+  
+  --color-neutral-secondary-soft: #0A0A0A;
+  --color-neutral-secondary: #050505;
+  --color-neutral-secondary-medium: #111111;
+  --color-neutral-secondary-strong: #1A1A1A;
+  
+  --color-neutral-tertiary-soft: #0E0E0E;
+  --color-neutral-tertiary: #111111;
+  --color-neutral-tertiary-medium: #1A1A1A;
+  
+  --color-neutral-quaternary: #1A1A1A;
+  --color-quaternary-medium: #252525;
+  --color-gray: #252525;
+
+  /* Brand */
+  --color-brand-softer: #1A0810;
+  --color-brand-soft: #3D0E1F;
+  --color-brand: #F44174;
+  --color-brand-medium: #3D0E1F;
+  --color-brand-strong: #FF5A89;
+
+  /* Status Backgrounds */
+  --color-success-soft: #061A14;
+  --color-success: #00CC88;
+  --color-success-medium: #0A2E22;
+  --color-success-strong: #009966;
+  
+  --color-danger-soft: #1A0508;
+  --color-danger: #FF3355;
+  --color-danger-medium: #3D0A14;
+  --color-danger-strong: #CC2244;
+  
+  --color-warning-soft: #1A0E04;
+  --color-warning: #FF8833;
+  --color-warning-medium: #331A08;
+  --color-warning-strong: #DD5511;
+
+  /* Utility Backgrounds */
+  --color-dark: #111111;
+  --color-dark-strong: #1A1A1A;
+  --color-disabled: #111111;
+
+  /* Accent Backgrounds */
+  --color-purple: #A855F7;
+  --color-sky: #0EA5E9;
+  --color-teal: #0D9488;
+  --color-pink: #F44174;
+  --color-cyan: #06B6D4;
+  --color-fuchsia: #C026D3;
+  --color-indigo: #4F46E5;
+  --color-orange: #FB923C;
+
+  /* Text Colors */
+  --color-white: #FFFFFF;
+  --color-black: #0A0A0A;
+  --color-heading: #EDEDED;
+  --color-body: #888888;
+  --color-body-subtle: #666666;
+
+  --color-fg-brand-subtle: #3D0E1F;
+  --color-fg-brand: #F44174;
+  --color-fg-brand-strong: #FFB0C7;
+
+  --color-fg-success: #065F46;
+  --color-fg-success-strong: #10B981;
+  --color-fg-danger: #FF4466;
+  --color-fg-danger-strong: #FF6677;
+  --color-fg-warning-subtle: #FF8833;
+  --color-fg-warning: #FFBB33;
+  --color-fg-disabled: #444444;
+
+  --color-fg-yellow: #FACC15;
+  --color-fg-info: #93C5FD;
+  --color-fg-purple: #A855F7;
+  --color-fg-purple-strong: #DDD6FE;
+  --color-fg-cyan: #06B6D4;
+  --color-fg-indigo: #4F46E5;
+  --color-fg-pink: #F44174;
+  --color-fg-lime: #84CC16;
+
+  /* Border Colors */
+  --color-border-dark: #333333;
+  --color-border-buffer: #050505;
+  --color-border-buffer-medium: #111111;
+  --color-border-buffer-strong: #1A1A1A;
+  --color-border-muted: #0A0A0A;
+  --color-border-light-subtle: #0A0A0A;
+  --color-border-light: #111111;
+  --color-border-light-medium: #1A1A1A;
+  
+  --color-border-default-subtle: #0E0E0E;
+  --color-border-default: #1A1A1A;
+  --color-border-default-medium: #222222;
+  --color-border-default-strong: #333333;
+  
+  --color-border-success-subtle: #0A2E22;
+  --color-border-success: #065F46;
+  --color-border-danger-subtle: #3D0A14;
+  --color-border-danger: #CC2244;
+  --color-border-warning-subtle: #331A08;
+  --color-border-warning: #FF8833;
+  --color-border-brand-subtle: #3D0E1F;
+  --color-border-brand-light: #F44174;
+  --color-border-brand: #F44174;
+  --color-border-dark-subtle: #222222;
+  
+  --color-border-purple: #A855F7;
+  --color-border-orange: #FB923C;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-pill: 9999px;
+  --radius-default: 12px;
+
+  /* Shadows (Depth) */
+  --shadow-none: none;
+  --shadow-xs: 0px 2px 4px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0px 4px 8px rgba(0, 0, 0, 0.5), 0px 8px 16px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0px 8px 16px rgba(0, 0, 0, 0.6), 0px 16px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0px 16px 24px rgba(0, 0, 0, 0.7), 0px 24px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0px 24px 32px rgba(0, 0, 0, 0.8), 0px 32px 48px rgba(0, 0, 0, 0.6);
+  --shadow-inner: inset 0px 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0px 0px 16px rgba(244, 65, 116, 0.15); /* Brand glow */
+  --shadow-glow-strong: 0px 0px 24px rgba(244, 65, 116, 0.25);
+}
+
 @plugin "@tailwindcss/typography";
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 transition-colors duration-500 ease-in-out selection:bg-indigo-500/30;
-  }
-  
-  .dark body {
-    /* Rich, deep indigo-slate background instead of flat black/gray */
-    @apply bg-[#060913] text-slate-100 selection:bg-indigo-500/40;
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(225,39%,30%,0.1) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(339,49%,30%,0.1) 0, transparent 50%);
-    background-attachment: fixed;
+    background-color: var(--color-neutral-primary);
+    color: var(--color-body);
+    font-family: var(--font-sans);
+    transition: color 500ms ease-in-out, background-color 500ms ease-in-out;
   }
 }
 
@@ -23,6 +158,46 @@ html, body, #root {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: var(--color-neutral-primary);
+}
+
+/* Typography Scale Overrides */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+  font-weight: 600;
+}
+
+h1 { font-size: 56px; line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 24px; }
+h2 { font-size: 42px; line-height: 1.1; letter-spacing: -1px; }
+h3 { font-size: 34px; line-height: 1.15; letter-spacing: -0.5px; }
+h4 { font-size: 28px; line-height: 1.2; letter-spacing: -0.3px; }
+h5 { font-size: 22px; line-height: 1.4; }
+h6 { font-size: 18px; line-height: 1.3; }
+
+@media (max-width: 768px) {
+  h1 { font-size: 38px; }
+  h2 { font-size: 34px; }
+  h3 { font-size: 28px; }
+  h4 { font-size: 24px; }
+  h5 { font-size: 20px; }
+  h6 { font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 30px; }
+  h2 { font-size: 26px; }
+  h3 { font-size: 22px; }
+  h4 { font-size: 20px; }
+  h5 { font-size: 18px; }
+}
+
+a {
+  color: var(--color-fg-brand);
+  text-decoration: underline;
+}
+
+a:hover {
+  text-decoration: none;
 }
 
 /* Custom Scrollbar for a premium feel */
@@ -31,8 +206,14 @@ html, body, #root {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-solid border-transparent bg-clip-padding hover:bg-slate-400 dark:hover:bg-slate-600;
+  background-color: var(--color-neutral-primary-strong);
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-dark);
 }
