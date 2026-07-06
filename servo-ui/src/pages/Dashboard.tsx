@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Loader2, Zap, LayoutTemplate, Brain, CheckCircle2, LogOut, Save, FolderOpen, ArrowLeft, Paperclip, Eye, X, Moon, Sun, Sparkles, ArrowRight, BookOpen, Layers, Target, AlertCircle, LayoutDashboard, BrainCircuit, Rocket, Plus } from 'lucide-react';
+import { Loader2, Zap, LayoutTemplate, Brain, CheckCircle2, LogOut, Save, FolderOpen, ArrowLeft, Paperclip, Eye, X, Moon, Sun } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import dagre from 'dagre';
@@ -450,6 +450,16 @@ function Dashboard() {
         </div>
         
         <div className="flex items-center gap-4">
+          {appState === 'canvas' && (
+            <button
+              onClick={handleSaveProject}
+              disabled={isSaving}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-all duration-300 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Project
+            </button>
+          )}
           <span className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700/50">
             {user?.email}
           </span>

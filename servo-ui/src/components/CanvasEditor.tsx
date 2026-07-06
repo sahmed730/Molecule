@@ -117,7 +117,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const [expandAnswers, setExpandAnswers] = useState<Record<string, any>>({});
   const [showExpandChoice, setShowExpandChoice] = useState(false);
 
-  const { openTab, isDarkMode } = useAppStore();
+  const { openTab } = useAppStore();
 
   const [pendingOptimize, setPendingOptimize] = useState<{delta: any, graph: any} | null>(null);
 
