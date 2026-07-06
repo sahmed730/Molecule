@@ -33,6 +33,7 @@ const Sidebar = () => {
         {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
+      {isExpanded ? (
         <div className="flex flex-col h-full opacity-100 transition-opacity duration-300">
           <div className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6">
             Module Library
