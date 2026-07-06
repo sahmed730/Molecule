@@ -1,0 +1,287 @@
+{
+  "backend/__init__.py": {
+    "mtime": 1782631683.956761,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "backend/auth.py": {
+    "mtime": 1782412669.444159,
+    "ast_hash": "a78e19edbbab3c2adce36e23cf63e92a",
+    "semantic_hash": ""
+  },
+  "backend/engine/__init__.py": {
+    "mtime": 1781089138.8145537,
+    "ast_hash": "df781881fbd64db824044c860c891d1f",
+    "semantic_hash": ""
+  },
+  "backend/engine/ai_generator.py": {
+    "mtime": 1782757700.6973372,
+    "ast_hash": "2a0a3c424e559d46c2f1681c4caf3283",
+    "semantic_hash": ""
+  },
+  "backend/engine/cache.py": {
+    "mtime": 1782659663.9643693,
+    "ast_hash": "fa561dbbaf9d89694779063bb9ea0f02",
+    "semantic_hash": ""
+  },
+  "backend/engine/runner.py": {
+    "mtime": 1781351702.579176,
+    "ast_hash": "8eff7a9e0aa13715138405487845329a",
+    "semantic_hash": ""
+  },
+  "backend/engine/schema.py": {
+    "mtime": 1781351672.3376153,
+    "ast_hash": "f5f4c50b0b0cbdb88c210d2aaa0df0f2",
+    "semantic_hash": ""
+  },
+  "backend/main.py": {
+    "mtime": 1782757667.302921,
+    "ast_hash": "aee3f9bed5e06710731f5e987da7001d",
+    "semantic_hash": ""
+  },
+  "backend/modules/duplicate_checker/implementation.py": {
+    "mtime": 1781079434.638507,
+    "ast_hash": "5061406e185cb325db72b7ba34ca105c",
+    "semantic_hash": ""
+  },
+  "backend/modules/duplicate_checker/metadata.json": {
+    "mtime": 1781079402.7004673,
+    "ast_hash": "92f1f7acdd3f09ae6626dfba1d9c161d",
+    "semantic_hash": ""
+  },
+  "backend/modules/qr_scanner/implementation.py": {
+    "mtime": 1781079351.5344055,
+    "ast_hash": "70111ed37f03778942301f96e22af640",
+    "semantic_hash": ""
+  },
+  "backend/modules/qr_scanner/metadata.json": {
+    "mtime": 1781079335.9119666,
+    "ast_hash": "babec927a4623878499f9b98b84ef8fd",
+    "semantic_hash": ""
+  },
+  "backend/refactor_main.py": {
+    "mtime": 1782044947.700698,
+    "ast_hash": "90357ed8176be321265695dbb5b1849c",
+    "semantic_hash": ""
+  },
+  "backend/scratch.py": {
+    "mtime": 1782322762.9160173,
+    "ast_hash": "88d41f905b318875d824c486922ffeb1",
+    "semantic_hash": ""
+  },
+  "backend/test_nemotron.py": {
+    "mtime": 1782753998.7215521,
+    "ast_hash": "2a8d91f066fd66a0216aef0141650d3c",
+    "semantic_hash": ""
+  },
+  "models.json": {
+    "mtime": 1782677033.9023302,
+    "ast_hash": "910309f3c22906f0504fa237e6fd7cab",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1782657848.961226,
+    "ast_hash": "bc3103454b76943c12cb27de9c3e0729",
+    "semantic_hash": ""
+  },
+  "replace.py": {
+    "mtime": 1782042502.0342908,
+    "ast_hash": "fe06fb7e6dbfb1b7426ba0c46e1c39f6",
+    "semantic_hash": ""
+  },
+  "replace2.py": {
+    "mtime": 1782042533.1838934,
+    "ast_hash": "69570c5d8117de08744f0b7c9b2ab054",
+    "semantic_hash": ""
+  },
+  "servo-ui/eslint.config.js": {
+    "mtime": 1780381897.4256647,
+    "ast_hash": "0355276bc79439afe3c53e3a2470ca1e",
+    "semantic_hash": ""
+  },
+  "servo-ui/package.json": {
+    "mtime": 1782207168.768004,
+    "ast_hash": "3645ce56ad6d4658ff2d340ebbed2c23",
+    "semantic_hash": ""
+  },
+  "servo-ui/postcss.config.js": {
+    "mtime": 1781075283.7904844,
+    "ast_hash": "ac96fa81e8dd4224012bce81068fe169",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/App.tsx": {
+    "mtime": 1782045533.5639837,
+    "ast_hash": "e9fded6064692737b8409e517508bf39",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/components/CanvasEditor.tsx": {
+    "mtime": 1782757597.1980188,
+    "ast_hash": "edcb707a0137b764b54a0ac009fab0d8",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/components/MermaidChart.tsx": {
+    "mtime": 1781114404.3277907,
+    "ast_hash": "6c6d0a8ebdc2cb17348e99b9a439cdad",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/components/ModuleWorkspace.tsx": {
+    "mtime": 1782753904.8894117,
+    "ast_hash": "9946bedac8284ed61378193a9a4ac97e",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/components/ServoNode.tsx": {
+    "mtime": 1781289742.8618724,
+    "ast_hash": "9358b5a5a6ad88ec77e40c2f67e4349a",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/components/Sidebar.tsx": {
+    "mtime": 1782753828.6238372,
+    "ast_hash": "a8e06f0405017a0f62cbefc90e28336c",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/firebase.ts": {
+    "mtime": 1782627523.2225053,
+    "ast_hash": "34bbe7d6f1e08211367b5928e95ab90a",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/main.tsx": {
+    "mtime": 1780381897.6674047,
+    "ast_hash": "787e5a07efeb2bf6209d5937195f2f68",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/pages/Dashboard.tsx": {
+    "mtime": 1782757485.3336165,
+    "ast_hash": "71c0cb9f0aa3c27233aac4b1ae612446",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/pages/Login.tsx": {
+    "mtime": 1782753933.26815,
+    "ast_hash": "50f9eed3ce5b930d2c0e1f1a8d9eb099",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/pages/Signup.tsx": {
+    "mtime": 1782753954.4511595,
+    "ast_hash": "a138f80b7bb476c4ef276ae170709e05",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/store.ts": {
+    "mtime": 1782757415.3723247,
+    "ast_hash": "30e60b90a1cc1b48fcff706ffb234073",
+    "semantic_hash": ""
+  },
+  "servo-ui/tailwind.config.js": {
+    "mtime": 1782753721.7719502,
+    "ast_hash": "f7def4e24b600962a4fdd832481a285f",
+    "semantic_hash": ""
+  },
+  "servo-ui/tsconfig.app.json": {
+    "mtime": 1780381897.455435,
+    "ast_hash": "136630b5accce1ca50663df229534a26",
+    "semantic_hash": ""
+  },
+  "servo-ui/tsconfig.json": {
+    "mtime": 1780381897.4584365,
+    "ast_hash": "a3d39fa780ebff65444de257f291ce6c",
+    "semantic_hash": ""
+  },
+  "servo-ui/tsconfig.node.json": {
+    "mtime": 1780381897.4624357,
+    "ast_hash": "70bdd0a673bcfc0e828080b306e7c680",
+    "semantic_hash": ""
+  },
+  "servo-ui/vite.config.ts": {
+    "mtime": 1781075290.614017,
+    "ast_hash": "6fee4fa1f31fb5850ec75875b4645fb9",
+    "semantic_hash": ""
+  },
+  "test_multipart.py": {
+    "mtime": 1782659707.4392314,
+    "ast_hash": "eed62b4c9919c0bb920a081390be5e18",
+    "semantic_hash": ""
+  },
+  "vercel.json": {
+    "mtime": 1782670510.6821847,
+    "ast_hash": "2fd835131c6d3aca42d159d3bcb0507c",
+    "semantic_hash": ""
+  },
+  "vercel_test.json": {
+    "mtime": 1782660144.7009754,
+    "ast_hash": "1806d790be8599e0999f696a4c1491c9",
+    "semantic_hash": ""
+  },
+  ".agents/rules/graphify.md": {
+    "mtime": 1782757314.8636794,
+    "ast_hash": "a0e4d192b9e2e17256124dbfc8e24e6a",
+    "semantic_hash": ""
+  },
+  ".agents/workflows/graphify.md": {
+    "mtime": 1782757314.865186,
+    "ast_hash": "637776aa6f7496d069afe7520c845c8a",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1782670600.7478812,
+    "ast_hash": "a257233fce0ec5d8a746e4b1b2f909d8",
+    "semantic_hash": ""
+  },
+  "backend/requirements.txt": {
+    "mtime": 1782674008.0041022,
+    "ast_hash": "dfdad12ade2c3ec03c6ef97d030b3568",
+    "semantic_hash": ""
+  },
+  "docs/AGENT_KNOWLEDGE.md": {
+    "mtime": 1781110413.1423087,
+    "ast_hash": "01dc3c2be3e20d35e0860448f54226a2",
+    "semantic_hash": ""
+  },
+  "docs/PROJECT_INFO.md": {
+    "mtime": 1781110582.5471854,
+    "ast_hash": "9fbc92a1ef04ec8f299511218f91b22c",
+    "semantic_hash": ""
+  },
+  "models.txt": {
+    "mtime": 1782677019.091598,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "requirements.txt": {
+    "mtime": 1782658750.9715276,
+    "ast_hash": "c7179c0b334c9db7c0e41d00f75aa7af",
+    "semantic_hash": ""
+  },
+  "servo-ui/README.md": {
+    "mtime": 1780381897.475453,
+    "ast_hash": "f6e3faf55d738cf2affe1b44195f27cf",
+    "semantic_hash": ""
+  },
+  "servo-ui/index.html": {
+    "mtime": 1782753730.5440612,
+    "ast_hash": "b70a5be784ad0f547c6c05a094e8fa52",
+    "semantic_hash": ""
+  },
+  "servo-ui/public/favicon.svg": {
+    "mtime": 1780381897.5144188,
+    "ast_hash": "7e840862161341271697daa99a40d76b",
+    "semantic_hash": ""
+  },
+  "servo-ui/public/icons.svg": {
+    "mtime": 1780381897.608374,
+    "ast_hash": "3b4fcfcf393eca4d264dca4a4663bc37",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/assets/hero.png": {
+    "mtime": 1780381897.4929862,
+    "ast_hash": "aead493361b27e7510691c5d7072dfc1",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/assets/react.svg": {
+    "mtime": 1780381897.6263776,
+    "ast_hash": "f0402b67b6ce880f65666bb49e841696",
+    "semantic_hash": ""
+  },
+  "servo-ui/src/assets/vite.svg": {
+    "mtime": 1780381897.641716,
+    "ast_hash": "9960a24288958394ac50e57ff638b036",
+    "semantic_hash": ""
+  }
+}

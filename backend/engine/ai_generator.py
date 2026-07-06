@@ -164,14 +164,26 @@ def _call_thinking_model(
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
-    response = client.chat.completions.create(**kwargs)
+    try:
+        response = client.chat.completions.create(**kwargs)
+    except Exception as e:
+        print(f"THINKING_MODEL ({THINKING_MODEL}) failed: {e}. Falling back to FAST_MODEL ({FAST_MODEL})...")
+        kwargs["model"] = FAST_MODEL
+        if "extra_body" in kwargs:
+            del kwargs["extra_body"]
+        kwargs["temperature"] = 0.7
+        kwargs["top_p"] = 1.0
+        response = client.chat.completions.create(**kwargs)
     
     # Try to extract reasoning content if present
     message = response.choices[0].message
     reasoning = getattr(message, "reasoning_content", "") or ""
     content = message.content or ""
     
-    final_response = (reasoning + "\n\n" + content).strip() if reasoning else content.strip()
+    if json_mode:
+        final_response = content.strip()
+    else:
+        final_response = (reasoning + "\n\n" + content).strip() if reasoning else content.strip()
     
     set_cached_response(system_prompt, user_prompt, final_response, json_mode=json_mode)
     return final_response
@@ -206,7 +218,17 @@ def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
         kwargs["top_p"] = 0.95
         kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384}
         
-    stream = client.chat.completions.create(**kwargs)
+    try:
+        stream = client.chat.completions.create(**kwargs)
+    except Exception as e:
+        print(f"THINKING_MODEL stream ({THINKING_MODEL}) failed: {e}. Falling back to FAST_MODEL ({FAST_MODEL})...")
+        yield f"\n\n> **Notice:** The primary reasoning model is currently degraded. Falling back to the fast model ({FAST_MODEL}) for generation.\n\n"
+        kwargs["model"] = FAST_MODEL
+        if "extra_body" in kwargs:
+            del kwargs["extra_body"]
+        kwargs["temperature"] = 0.7
+        kwargs["top_p"] = 1.0
+        stream = client.chat.completions.create(**kwargs)
     
     for event in stream:
         if not event.choices:
@@ -351,7 +373,7 @@ def classify_system_type(prompt: str) -> dict:
 
     try:
         print(f"[CLASSIFY] Classifying: {prompt[:80]}...")
-        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, temperature=0.15)
+        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, temperature=0.15, json_mode=True)
         result = _extract_json(raw)
         print(f"[CLASSIFY] → {result.get('primary_archetype')} / {result.get('core_domain')}")
         return result
@@ -652,7 +674,7 @@ Probe the architectural dimensions that will have the biggest impact on the desi
 
     try:
         print(f"[CLARIFY] Generating {archetype} questions for: {prompt[:60]}...")
-        raw = _call_fast_model(system_prompt, user_msg, temperature=0.35)
+        raw = _call_fast_model(system_prompt, user_msg, temperature=0.35, json_mode=True)
         print(f"[CLARIFY] Got {len(raw)} chars")
         result = _extract_json(raw)
 
@@ -1139,7 +1161,7 @@ Respond with ONLY valid JSON:
 }"""
 
 
-def auto_improve_architecture(graph_data: dict, instruction: str = None) -> dict:
+def auto_improve_architecture(graph_data: dict, instruction: str = None, original_reasoning: str = None) -> dict:
     """Stage 5: Intelligent graph optimization."""
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
@@ -1164,8 +1186,9 @@ def auto_improve_architecture(graph_data: dict, instruction: str = None) -> dict
     ]
 
     instruction_text = f"\nUser instruction: {instruction}\n" if instruction else ""
+    reasoning_text = f"\nOriginal Architecture Reasoning:\n{original_reasoning}\n" if original_reasoning else ""
 
-    prompt = f"""{instruction_text}
+    prompt = f"""{reasoning_text}{instruction_text}
 MODULES:
 {json.dumps(module_summary, indent=2)}
 
@@ -1303,7 +1326,7 @@ Respond with ONLY valid JSON:
 }"""
 
 
-def expand_architecture(graph_data: dict, module_name: str, reason: str) -> dict:
+def expand_architecture(graph_data: dict, module_name: str, reason: str, original_reasoning: str = None) -> dict:
     """Adds a single new module with validated connections."""
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
@@ -1325,7 +1348,9 @@ def expand_architecture(graph_data: dict, module_name: str, reason: str) -> dict
 
     connections = [{"from": e.get("source"), "to": e.get("target")} for e in existing_edges]
 
-    prompt = f"""EXISTING MODULES (use ONLY these IDs):
+    reasoning_text = f"\nOriginal Architecture Reasoning:\n{original_reasoning}\n" if original_reasoning else ""
+
+    prompt = f"""{reasoning_text}EXISTING MODULES (use ONLY these IDs):
 {json.dumps(module_summary, indent=2)}
 
 CONNECTIONS:
@@ -1363,7 +1388,7 @@ Design with full detail.  Only use existing IDs for connections."""
         raise
 
 
-async def async_expand_architecture(graph_data: dict, module_name: str, reason: str) -> dict:
+async def async_expand_architecture(graph_data: dict, module_name: str, reason: str, original_reasoning: str = None) -> dict:
     """Adds a single new module asynchronously."""
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
@@ -1385,7 +1410,9 @@ async def async_expand_architecture(graph_data: dict, module_name: str, reason: 
 
     connections = [{"from": e.get("source"), "to": e.get("target")} for e in existing_edges]
 
-    prompt = f"""EXISTING MODULES (use ONLY these IDs):
+    reasoning_text = f"\nOriginal Architecture Reasoning:\n{original_reasoning}\n" if original_reasoning else ""
+
+    prompt = f"""{reasoning_text}EXISTING MODULES (use ONLY these IDs):
 {json.dumps(module_summary, indent=2)}
 
 CONNECTIONS:
@@ -1423,7 +1450,7 @@ Design with full detail.  Only use existing IDs for connections."""
         raise
 
 
-async def batch_expand_architecture(graph_data: dict, modules_to_add: list) -> dict:
+async def batch_expand_architecture(graph_data: dict, modules_to_add: list, original_reasoning: str = None) -> dict:
     """Generates multiple modules concurrently."""
     import asyncio
     all_new_modules = []
@@ -1431,7 +1458,7 @@ async def batch_expand_architecture(graph_data: dict, modules_to_add: list) -> d
     
     tasks = []
     for item in modules_to_add:
-        tasks.append(async_expand_architecture(graph_data, item["name"], item.get("reason", "Required")))
+        tasks.append(async_expand_architecture(graph_data, item["name"], item.get("reason", "Required"), original_reasoning))
         
     results = await asyncio.gather(*tasks, return_exceptions=True)
     
@@ -1443,7 +1470,7 @@ async def batch_expand_architecture(graph_data: dict, modules_to_add: list) -> d
 
     for item in modules_to_add:
         try:
-            result = expand_architecture(current_graph, item["name"], item.get("reason", "Required"))
+            result = expand_architecture(current_graph, item["name"], item.get("reason", "Required"), original_reasoning)
             nm = result["new_module"]
             all_new_modules.append(nm)
             all_new_connections.extend(result["new_connections"])

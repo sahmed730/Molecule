@@ -18,11 +18,17 @@ interface AppState {
   // Theme State
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  
+  // Architecture State
+  architectureReasoning: string | null;
+  setArchitectureReasoning: (reasoning: string | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
   activeTabId: 'canvas',
   openedTabs: [],
+  architectureReasoning: null,
+  setArchitectureReasoning: (reasoning) => set({ architectureReasoning: reasoning }),
   setActiveTabId: (id) => set({ activeTabId: id }),
   openTab: (id) => set((state) => {
     if (state.openedTabs.includes(id)) {

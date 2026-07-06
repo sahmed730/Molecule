@@ -3,7 +3,17 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-900 dark:text-slate-100;
+    @apply bg-slate-50 text-slate-900 transition-colors duration-500 ease-in-out selection:bg-indigo-500/30;
+  }
+  
+  .dark body {
+    /* Rich, deep indigo-slate background instead of flat black/gray */
+    @apply bg-[#060913] text-slate-100 selection:bg-indigo-500/40;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(225,39%,30%,0.1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(339,49%,30%,0.1) 0, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
@@ -13,4 +23,16 @@ html, body, #root {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full border-2 border-solid border-transparent bg-clip-padding hover:bg-slate-400 dark:hover:bg-slate-600;
 }

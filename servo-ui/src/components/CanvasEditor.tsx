@@ -80,6 +80,7 @@ interface CanvasEditorProps {
   onEdgesChange: (edges: any[]) => void;
   onNewProject: () => void;
   onRegenerate: (prompt: string) => void;
+  onExtractGraph?: () => void;
 }
 
 const CanvasEditor: React.FC<CanvasEditorProps> = ({
@@ -91,8 +92,11 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onNodesChange,
   onEdgesChange,
   onNewProject,
-  onRegenerate
+  onRegenerate,
+  onExtractGraph
 }) => {
+  const isDarkMode = useAppStore(state => state.isDarkMode);
+  const architectureReasoning = useAppStore(state => state.architectureReasoning);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<any[]>(initialNodes);
   const [edges, setEdges] = useState<any[]>(initialEdges);
@@ -490,7 +494,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/auto-improve-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ graph_data: { nodes, edges, projectCapabilities }, instruction: instruction || null }),
+        body: JSON.stringify({ graph_data: { nodes, edges, projectCapabilities }, instruction: instruction || null, original_reasoning: architectureReasoning }),
       });
       const data = await response.json();
       if (data.status === 'success') {
@@ -514,7 +518,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/expand-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ graph_data: { nodes, edges }, module_name: moduleName, reason }),
+        body: JSON.stringify({ graph_data: { nodes, edges, projectCapabilities }, module_name: moduleName, reason, original_reasoning: architectureReasoning }),
       });
       const data = await response.json();
       if (data.status === 'success') {
@@ -598,7 +602,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/batch-expand-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ graph_data: { nodes, edges }, modules: modulesToAdd }),
+        body: JSON.stringify({ graph_data: { nodes, edges, projectCapabilities }, modules: modulesToAdd, original_reasoning: architectureReasoning }),
       });
       const data = await response.json();
       if (data.status === 'success') {
@@ -735,8 +739,10 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ 
-             graph_data: { nodes, edges }, 
-             modules: [{ name: "User Custom Expansion", reason: finalPrompt }] 
+             graph_data: { nodes, edges, projectCapabilities }, 
+             instruction: finalPrompt, 
+             modules: [{ name: "User Custom Expansion", reason: finalPrompt }],
+             original_reasoning: architectureReasoning 
            }),
          });
          const data = await response.json();
@@ -860,6 +866,16 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
             <Plus className="w-4 h-4" />
             New Project
           </button>
+          
+          {nodes.length === 0 && onExtractGraph && (
+            <button
+              onClick={onExtractGraph}
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-md shadow-lg text-sm font-bold hover:bg-green-600 transition-colors"
+            >
+              <Zap className="w-4 h-4" />
+              Graph Again
+            </button>
+          )}
           
 
 

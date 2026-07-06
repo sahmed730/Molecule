@@ -24,54 +24,54 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className={`relative border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-all duration-300 ease-in-out flex flex-col ${isExpanded ? 'w-64 p-4' : 'w-16 p-2 items-center'}`}>
+    <aside className={`relative border-r border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-[#060913]/40 backdrop-blur-xl transition-all duration-300 ease-in-out flex flex-col shadow-lg shadow-indigo-500/5 ${isExpanded ? 'w-64 p-5' : 'w-16 p-2 items-center'}`}>
       <button 
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute -right-3 top-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-1 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 z-50 transition-transform"
+        className="absolute -right-3 top-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-1.5 shadow-md hover:scale-110 z-50 transition-all duration-300 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
         title={isExpanded ? "Collapse Sidebar" : "Expand Sidebar"}
       >
-        {isExpanded ? <ChevronLeft className="w-4 h-4 text-slate-500 dark:text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-500 dark:text-slate-400" />}
+        {isExpanded ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
-      {isExpanded ? (
         <div className="flex flex-col h-full opacity-100 transition-opacity duration-300">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+          <div className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-6">
             Module Library
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div
-              className="p-4 bg-white dark:bg-slate-800 border-2 border-dashed border-blue-400 dark:border-blue-500/50 rounded-lg shadow-sm cursor-grab active:cursor-grabbing hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors flex flex-col items-center justify-center text-center"
+              className="group p-5 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-indigo-200 dark:border-indigo-500/30 rounded-xl shadow-sm cursor-grab active:cursor-grabbing hover:bg-indigo-50/80 dark:hover:bg-slate-700/80 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300 flex flex-col items-center justify-center text-center"
               onDragStart={(event) => onDragStart(event, 'servo', defaultModuleData)}
               draggable
             >
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-2">
-                <Plus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/20 rounded-full flex items-center justify-center mb-3 shadow-inner group-hover:scale-110 transition-transform duration-300 border border-indigo-200/50 dark:border-indigo-700/50">
+                <Plus className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div className="text-sm font-bold text-slate-800 dark:text-slate-200">Drag New Module</div>
-              <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Place on canvas to customize</div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 leading-tight">Place on canvas to customize</div>
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed italic">
+          <div className="mt-8 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed italic bg-slate-100/50 dark:bg-slate-800/30 p-3 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
               Drag the "New Module" block onto the board to start manually assembling your application.
-              You can then click it to edit its Name, Inputs, and Outputs.
             </div>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center mt-10 space-y-6 opacity-100 transition-opacity duration-300">
+        <div className="flex flex-col items-center mt-10 space-y-8 opacity-100 transition-opacity duration-300">
           <div title="Module Library" className="text-slate-400 dark:text-slate-500">
             <Library className="w-5 h-5" />
           </div>
           <div
-            className="w-10 h-10 bg-white dark:bg-slate-800 border-2 border-dashed border-blue-400 dark:border-blue-500/50 rounded-lg shadow-sm cursor-grab active:cursor-grabbing hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center justify-center"
+            className="w-12 h-12 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-indigo-200 dark:border-indigo-500/30 rounded-xl shadow-sm cursor-grab active:cursor-grabbing hover:bg-indigo-50/80 dark:hover:bg-slate-700/80 hover:shadow-lg hover:shadow-indigo-500/10 flex items-center justify-center hover:scale-105 transition-all duration-300"
             title="Drag New Module"
             onDragStart={(event) => onDragStart(event, 'servo', defaultModuleData)}
             draggable
           >
-            <Plus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-100 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/20 rounded-full flex items-center justify-center shadow-inner border border-indigo-200/50 dark:border-indigo-700/50">
+              <Plus className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </div>
           </div>
         </div>
       )}
