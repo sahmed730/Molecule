@@ -329,40 +329,30 @@ SYSTEM_ARCHETYPES = [
     "marketplace",        # Two-sided platforms, matching, transactions
 ]
 
-CLASSIFIER_SYSTEM_PROMPT = """You are a System Architecture Classifier. Your task is to analyze a project description and determine its architectural archetype.
+CLASSIFIER_SYSTEM_PROMPT = """Role: System Architect Classifier.
+Classify the project into ONE primary archetype (and optional secondary).
+Archetypes:
+- crud_app: Forms, basic APIs
+- saas_platform: Multi-tenant, billing, auth
+- autonomous_agent: AI agents, tools, memory
+- workflow_engine: Orchestration, DAG, state machines
+- embedded_system: IoT, hardware, real-time
+- compiler_toolchain: Parsers, ASTs, code gen
+- data_pipeline: ETL, stream processing
+- cognitive_system: Multi-model AI, RAG
+- realtime_system: WebSocket, chat, live collab
+- marketplace: Two-sided, matching, transactions
 
-ARCHETYPES (pick ONE primary, optionally ONE secondary):
-- crud_app: Standard data management — forms, admin panels, dashboards, simple REST APIs with CRUD operations on a database.
-- saas_platform: Multi-tenant cloud product — user management, billing/subscriptions, tenant isolation, onboarding flows.
-- autonomous_agent: AI-driven autonomous system — LLM agents that invoke tools, manage memory, recurse, and make decisions without human input per step.
-- workflow_engine: Multi-step orchestration — DAGs, state machines, approval chains, pipelines with conditional branching and rollback.
-- embedded_system: Hardware-coupled software — IoT devices, MCUs, real-time constraints, interrupt-driven I/O, firmware updates.
-- compiler_toolchain: Language processing — parsers, lexers, ASTs, code generation, interpreters, transpilers, linters.
-- data_pipeline: Data movement & transformation — ETL/ELT, batch processing, stream processing, schema evolution, data lakes.
-- cognitive_system: Multi-model AI system — RAG pipelines, reasoning chains, multi-model orchestration, knowledge graphs, embeddings.
-- realtime_system: Low-latency bidirectional communication — WebSocket/SSE/WebRTC, chat, live collaboration, gaming, presence tracking.
-- marketplace: Two-sided platform — matching buyers/sellers, search/discovery, escrow payments, ratings/reputation, dispute resolution.
-
-DISAMBIGUATION RULES:
-- If the system has AI/LLM components AND a user-facing product, prefer the product archetype as primary and the AI archetype as secondary.
-- If the system is primarily about moving/transforming data, choose data_pipeline even if it uses AI for enrichment.
-- If unsure between two, pick the one that defines the HARDEST architectural constraint.
-
-COMPLEXITY TIERS:
-- simple: Single user, single database, <5 entities, no auth complexity.
-- moderate: Multi-user, role-based access, 5-15 entities, standard integrations.
-- complex: Multi-service, event-driven, 15+ entities, external API dependencies, caching layers.
-- enterprise: Multi-region, compliance requirements (GDPR/HIPAA/SOC2), SLA guarantees, multi-tenant data isolation.
-
+Also identify: Core Domain, Primary Entity, Critical Path.
 Respond with ONLY valid JSON:
 {
   "primary_archetype": "<archetype>",
   "secondary_archetype": "<archetype|null>",
-  "core_domain": "<1-3 word domain, e.g. 'fintech', 'healthcare', 'e-commerce'>",
-  "primary_entity": "<the central data object users interact with>",
-  "critical_path": "<the single most important user journey, 1 sentence>",
+  "core_domain": "<domain>",
+  "primary_entity": "<entity>",
+  "critical_path": "<1-sentence flow>",
   "complexity_tier": "<simple|moderate|complex|enterprise>",
-  "reasoning": "<2-3 sentences explaining WHY this archetype and not the alternatives>"
+  "reasoning": "<1-2 sentences>"
 }"""
 
 
@@ -383,7 +373,7 @@ def classify_system_type(prompt: str) -> dict:
 
     try:
         print(f"[CLASSIFY] Classifying: {prompt[:80]}...")
-        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, temperature=0.3, json_mode=True)
+        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, temperature=0.15, json_mode=True)
         result = _extract_json(raw)
         print(f"[CLASSIFY] → {result.get('primary_archetype')} / {result.get('core_domain')}")
         return result
@@ -593,49 +583,42 @@ ARCHETYPE_QUESTION_AXES = {
     },
 }
 
-CLARIFY_SYSTEM_PROMPT_TEMPLATE = """You are a Principal Architect conducting a technical requirements interview for a {archetype_display} system in the {domain} domain.
+CLARIFY_SYSTEM_PROMPT_TEMPLATE = """Role: Senior Architect interviewing for {archetype_display} in {domain}.
 
-SYSTEM CONTEXT:
-- Primary Archetype: {primary_archetype}
-- Secondary Archetype: {secondary_archetype}
-- Core Domain: {domain}
-- Central Entity: {primary_entity}
-- Critical User Journey: {critical_path}
-- Complexity Tier: {complexity}
+System Classification:
+- Primary: {primary_archetype}
+- Secondary: {secondary_archetype}
+- Domain: {domain}
+- Entity: {primary_entity}
+- Path: {critical_path}
+- Complexity: {complexity}
 
-YOUR TASK:
-Generate exactly 5 clarifying questions that will UNLOCK specific architectural decisions. Each question must directly impact how the system is built.
-
-QUESTION DESIGN RULES:
-1. NEVER ask yes/no questions. Every question must offer 3+ concrete architectural alternatives.
-2. NEVER re-ask something the user already stated in their original prompt. Extract what they already told you and skip those dimensions.
-3. Every option must be a SPECIFIC technical choice (e.g., "Use Redis with TTL-based eviction" not "Use caching").
-4. At least 1 question must be "open_text" type — phrase it as "Describe the specific..." not "Tell me about..."
-5. Questions must target these architectural dimensions:
+Generate 4-6 clarifying questions targeting these dimensions:
 {dimension_list}
 
-6. Order questions from MOST impactful to LEAST impactful on the architecture.
-
-REFERENCE EXAMPLES (adapt to the user's specific project, do NOT copy verbatim):
+Examples:
 {example_questions}
 
-RESPONSE FORMAT — respond with ONLY valid JSON:
-{{{{
+RULES:
+1. Specific to archetype/domain.
+2. Unlocks architectural decisions.
+3. Skip answered questions.
+4. >=1 "open_text" question.
+5. Actionable options.
+
+Types: "single_select" (3-5 options), "multi_select" (4-6 options), "open_text" ([]).
+
+Respond ONLY with valid JSON:
+{{
   "questions": [
-    {{{{
+    {{
       "id": "q1",
       "type": "single_select",
-      "question": "<specific question about THIS project>",
-      "options": ["<concrete option A>", "<concrete option B>", "<concrete option C>"],
-      "architectural_impact": "<1 sentence: what design decision this unlocks>"
-    }}}}
+      "question": "?",
+      "options": ["A", "B"]
+    }}
   ]
-}}}}
-
-QUESTION TYPES:
-- "single_select": Exactly ONE choice from 3-5 options.
-- "multi_select": Pick 1+ from 4-6 options.
-- "open_text": Free-form answer (options array must be empty [])."""
+}}"""
 
 
 def generate_clarifying_questions(prompt: str, classification: dict = None) -> dict:
@@ -714,68 +697,91 @@ Probe the architectural dimensions that will have the biggest impact on the desi
 #  generating the module list.
 # ═══════════════════════════════════════════════════════════════
 
-REASONING_SYSTEM_PROMPT = """You are an Enterprise Architecture Compiler. You transform user intent into a precise, deployable module graph.
+REASONING_SYSTEM_PROMPT = """You are an Enterprise Architecture Compiler.
 
-YOUR REASONING CHAIN (follow this exact order):
-1. INTENT ANALYSIS: What is the user actually trying to build? What problem does it solve?
-2. CONSTRAINT EXTRACTION: What are the hard technical constraints (scale, latency, compliance, integrations)?
-3. EXECUTION FLOW: What is the critical data path from input to output?
-4. FAILURE ANALYSIS: What are the top 3 ways this system can fail catastrophically?
-5. MODULE DECOMPOSITION: Based on 1-4, what are the minimum modules needed?
+Your job is NOT to generate generic architecture. Your job is to maintain architectural integrity across multiple model handoffs.
 
-MODULE COUNT GUIDELINES:
-- simple complexity: 3-5 modules
-- moderate complexity: 5-8 modules
-- complex complexity: 8-12 modules
-- enterprise complexity: 10-15 modules
-Never exceed 15 modules. If you need more, you are not abstracting enough.
+PRIMARY OBJECTIVE:
+Preserve system continuity, execution fidelity, and platform constraints while transforming user intent into deployable modules.
 
-MODULE CONTRACT — every module MUST have these fields with SUBSTANTIVE content:
-- id: Sequential format M001, M002, M003... (MANDATORY)
-- name: Clear, specific name (e.g., "Payment Processing Gateway" not "Payments")
-- coreTask: 2-3 sentences describing EXACTLY what this module does. Include the primary algorithm or process, not just "handles X".
-- dataShape: Explicit input schema with types. Example: "{ order_id: string(uuid), items: list<{sku: string, qty: int, price: float}>, customer_id: string }"
-- expectedOutput: Explicit output schema with types. Example: "{ payment_id: string(uuid), status: enum(success|failed|pending), receipt_url: string(url) }"
-- rules: Hard constraints this module enforces. Example: "Max 50 items per order. Price must be > 0. Idempotent on order_id."
-- platform: Primary technology. Example: "FastAPI + SQLAlchemy + PostgreSQL"
-- language: Primary programming language. Example: "Python"
-- dependencies: Specific packages with minimum versions. Example: "stripe>=7.0.0, sqlalchemy>=2.0.0, pydantic>=2.0.0"
-- errorHandling: 2-3 specific exception scenarios with recovery actions. Example: "StripeCardDeclinedError -> retry once then mark failed. TimeoutError after 30s -> queue for async retry."
-- testingRequirements: 3-5 specific test cases. Example: "Valid order succeeds, Duplicate order_id is idempotent, Negative price rejected, Stripe timeout handled gracefully."
+GLOBAL RULES:
 
-CONNECTION RULES:
-- Connections represent data flow, not just dependencies.
-- Every module must have at least one connection (either inbound or outbound) unless it is a standalone entry point.
-- No cycles allowed. The graph must be a valid DAG.
+1. STATE PRESERVATION (MANDATORY)
+Read and preserve the canonical architecture state object. Never reinterpret platform, execution environment, constraints, module boundaries, dependencies, ownership model, or governance model.
 
-OUTPUT FORMAT — respond with ONLY valid JSON:
-{
-  "reasoning": {
-    "intent": "<what the user is building and why>",
-    "constraints": ["<constraint 1>", "<constraint 2>"],
-    "execution_flow": "<critical path description>",
-    "failure_modes": ["<failure 1>", "<failure 2>", "<failure 3>"],
-    "design_decisions": ["<decision 1 and why>", "<decision 2 and why>"]
-  },
-  "modules": [
-    {
-      "id": "M001",
-      "name": "<label>",
-      "coreTask": "<detailed 2-3 sentence description>",
-      "dataShape": "<explicit input schema with types>",
-      "expectedOutput": "<explicit output schema with types>",
-      "rules": "<hard constraints>",
-      "platform": "<technology stack>",
-      "language": "<primary language>",
-      "dependencies": "<packages with versions>",
-      "errorHandling": "<specific exception scenarios>",
-      "testingRequirements": "<specific test cases>"
-    }
-  ],
-  "connections": [
-    {"from_node": "M001", "to_node": "M002"}
-  ]
-}"""
+2. NO PLATFORM DRIFT
+Do not substitute technologies. If external runtime is introduced, justify it.
+
+3. MODULE CONTRACT ENFORCEMENT
+Each module must contain exactly these fields:
+- moduleId: Must follow format M001, M002, etc. (MANDATORY)
+- label
+- coreTask
+- dataShape
+- expectedOutput
+- rules
+- platform
+- dependencies
+- errorHandling
+- testingRequirements
+
+4. ARCHITECTURAL CONSISTENCY
+Ensure security, observability, governance, and scaling assumptions remain intact.
+
+5. SECURITY, OBSERVABILITY, GOVERNANCE
+Security (RBAC, Audit Logging), Observability (latency, load times), and Governance (owners) must exist as separate operational layers in the text.
+
+6. FAILURE MODEL & SCALABILITY
+Address deep failure modes (timeout, schema drift, broken joins) and massive scale (100x data, multi-region).
+
+7. OUTPUT DISCIPLINE (Pure Markdown)
+Return strictly in this order:
+
+## A. Reasoning
+<Concise intent and constraints>
+
+## B. Global Architecture Flow
+```mermaid
+graph TD
+  M001[M001: Name] --> M002[M002: Name]
+```
+
+## C. Modules
+
+### M001: <label>
+**coreTask:** <desc>
+**dataShape:** <desc>
+**expectedOutput:** <desc>
+**rules:** <desc>
+**platform:** <desc>
+**dependencies:** <desc>
+**errorHandling:** <desc>
+**testingRequirements:** <desc>
+
+### M002: <label>
+...
+
+## D. Security Layer
+<details>
+
+## E. Governance Layer
+<details>
+
+## F. Observability Layer
+<details>
+
+## G. Failure Modes
+<details>
+
+## H. Scalability Risks
+<details>
+
+## I. Testing Matrix
+<details>
+
+RULES:
+- Module IDs MUST use M001, M002 format.
+- Output ONLY Markdown."""
 
 
 def suggest_architecture(prompt: str, classification: dict = None, answers: dict = None) -> str:
@@ -788,7 +794,7 @@ def suggest_architecture(prompt: str, classification: dict = None, answers: dict
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
         print("WARNING: No NVIDIA_API_KEY, returning mock architecture.")
-        return _mock_architecture(prompt)
+        return "# Mock Architecture\n\n```mermaid\ngraph TD\nA-->B\n```\n\n## M001 Mock\n**Core Task:** Test"
 
     # Build rich context from classification + answers
     context_parts = [f'The user wants to build: "{prompt}"']
@@ -811,13 +817,13 @@ System Classification:
     user_prompt += """
 
 Follow the full reasoning chain: Intent → Constraints → Flow → Failure Analysis → Architecture.
-Generate the minimum modules needed. Respond with ONLY valid JSON."""
+Generate the minimum modules needed in pure Markdown format."""
 
     try:
         print(f"[ARCH] Reasoning about architecture for: {prompt[:60]}...")
 
-        # Use the thinking model for deep reasoning with JSON output
-        raw = _call_thinking_model(REASONING_SYSTEM_PROMPT, user_prompt, json_mode=True)
+        # Use the thinking model for deep reasoning
+        raw = _call_thinking_model(REASONING_SYSTEM_PROMPT, user_prompt)
         print(f"[ARCH] Got {len(raw)} chars from thinking model")
 
         result = _extract_json(raw)
@@ -908,10 +914,11 @@ def extract_graph_json(markdown_text: str) -> dict:
     system_prompt = """You are a strict JSON extractor. Read the provided Markdown text which contains an Enterprise Architecture.
 
 CRITICAL RULES:
-1. Parse the architecture text and extract ALL module definitions.
-2. Preserve all mandatory module fields EXACTLY as written.
-3. Enforce deterministic module IDs (M001, M002, etc.). Do not generate arbitrary IDs or rename them.
-4. Edge generation: Generate edges from the Mermaid diagram if present. If no diagram exists, infer edges from explicit dependency references in module descriptions and from the logical data flow between modules. Do NOT create edges that would form cycles.
+1. Parse ONLY the `## C. Modules` section.
+2. Completely IGNORE all other sections (Reasoning, Flowchart, Security, Governance, Observability, etc.).
+3. Preserve all mandatory module fields EXACTLY as written.
+4. Enforce deterministic module IDs (M001, M002, etc.). Do not generate arbitrary IDs or rename them.
+5. Edge generation rules: Generate edges ONLY from the explicit sequential ordering of the modules (M001 -> M002 -> M003). Do not infer edges from the reasoning text or create cross-links.
 
 Extract the modules and connections exactly into this JSON schema:
 {
@@ -1068,37 +1075,18 @@ def _mock_architecture(prompt: str) -> dict:
 #     What can duplicate?  What can overload?"
 # ═══════════════════════════════════════════════════════════════
 
-MODULE_REVIEW_PROMPT = """You are a ruthless architecture reviewer performing adversarial analysis on a software module.
-
-Your job is NOT to be encouraging. Your job is to find REAL problems that will cause production incidents.
-
-REVIEW CHECKLIST (evaluate each):
-1. INTERFACE INTEGRITY: Are dataShape inputs fully consumed? Does expectedOutput cover all success AND error cases?
-2. ERROR COVERAGE: Does errorHandling cover network failures, timeouts, invalid input, upstream failures, and resource exhaustion?
-3. SPECIFICATION COMPLETENESS: Is coreTask specific enough that two different developers would implement it the same way?
-4. DEPENDENCY RISK: Are dependencies pinned? Are there known vulnerabilities? Is there vendor lock-in?
-5. TESTABILITY: Can the testing requirements actually verify the coreTask? Are edge cases covered?
-6. SECURITY: Does this module handle auth tokens, PII, or secrets? If so, are they protected?
-
-SCORING RUBRIC:
-- 90-100: Production-ready. No critical issues.
-- 70-89: Needs minor fixes. No blocking issues.
-- 50-69: Significant gaps. Would cause incidents in production.
-- 0-49: Fundamentally flawed. Needs redesign.
+MODULE_REVIEW_PROMPT = """You are an architecture reviewer analyzing a single software module.
+Your job is to review its definition, evaluate its robustness, and point out logic flaws, missing edge cases, or interface mismatches.
 
 Respond with ONLY valid JSON:
 {
   "score": 85,
-  "verdict": "<production_ready|needs_fixes|significant_gaps|redesign_needed>",
   "issues": [
-    {
-      "severity": "<critical|major|minor>",
-      "category": "<interface|error_handling|spec_completeness|dependency|testability|security>",
-      "description": "<specific problem>",
-      "fix": "<concrete fix recommendation>"
-    }
+    {"type": "errorHandling", "description": "Missing timeout handling for external API."}
   ],
-  "suggestions": ["<improvement that would raise the score>"]
+  "suggestions": [
+    "Add idempotency key to expectedOutput."
+  ]
 }
 """
 
@@ -1138,23 +1126,15 @@ Your job is to make the graph SMALLER and SIMPLER without losing functionality.
 OPTIMIZATION PASSES (execute in order):
 
 ━━━ PASS 1: REDUNDANCY COLLAPSE ━━━
-Find modules whose coreTask descriptions describe the SAME transformation on the SAME data.
-Indicators of TRUE duplicates:
-- Both modules mention the same input/output schemas
-- Both modules handle the same entity (e.g., "User" or "Order")
-- One module's coreTask is a strict subset of another's
-FALSE duplicates (do NOT merge):
-- Modules that process the same entity at different pipeline stages (e.g., "Validate Order" vs "Fulfill Order")
-- Modules with similar names but different data flows
-Keep the module with the better specification. Redirect all edges.
+Find modules with >80% responsibility overlap.  Merge them.
+Keep the module with the better specification.  Redirect all edges.
 
 ━━━ PASS 2: INFRASTRUCTURE EXTRACTION ━━━
-INFRASTRUCTURE modules (convert to capabilities):
-  Auth/AuthZ, Logging, Monitoring/Metrics, Rate Limiting, Caching, Generic Error Handling,
-  Encryption/TLS, CORS, Generic Input Validation, Health Checks, Circuit Breaking
-BUSINESS modules (NEVER convert, even if they sound infrastructure-like):
-  Notification Service, Email/SMS Sender, Payment Processing, Search/Discovery,
-  User Management, Dashboard, Reports, Analytics, File Storage, Webhooks
+Convert cross-cutting infrastructure modules to capabilities:
+  Auth, Logging, Monitoring, Rate Limiting, Caching, Error Handling,
+  Encryption, CORS, Input Validation (generic)
+NEVER convert business logic to capabilities:
+  Dashboards, Payments, Search, User Profiles, Reports, Notifications = MODULES.
 
 ━━━ PASS 3: ORPHAN REMOVAL ━━━
 Remove modules with zero connections (unless ≤2 modules total).
@@ -1308,44 +1288,41 @@ Optimize this graph.  Only reference IDs from MODULES above."""
 
 
 
-EXPAND_SYSTEM_PROMPT = """You are a Software Architect adding a NEW module to an existing system graph.
+EXPAND_SYSTEM_PROMPT = """You are a Software Architect adding a NEW module to an existing system.
 
-INPUTS YOU RECEIVE:
-1. Existing modules with their IDs, names, and core tasks.
-2. Existing connections (data flow edges).
-3. The name and reason for the new module.
+You receive:
+  1. Existing modules with IDs
+  2. Existing connections
+  3. Name and reason for the new module
 
-YOUR TASKS:
-1. Assign a new ID that follows the existing convention. If existing IDs are M001, M002, M003, your new module should be the next sequential (e.g., M004). If existing IDs use other formats, match that format.
-2. Design the module with COMPLETE, detailed specifications matching the quality of existing modules.
-3. Determine connections by analyzing DATA FLOW:
-   - connect_from: Which existing modules produce data that this new module CONSUMES?
-   - connect_to: Which existing modules need data that this new module PRODUCES?
-4. Match the technology stack and language conventions of the existing system unless the new module's requirements demand something different.
+YOUR JOBS:
+1. Design the module with COMPLETE specifications.
+2. Choose connections: which existing modules feed INTO it (connect_from)
+   and which it feeds OUT TO (connect_to).
+3. Pick a unique ID ("m_new_1") not conflicting with existing IDs.
+4. Choose the BEST language for this task.
+5. Ensure the new module doesn't create a cycle in the graph.
 
-CONNECTION RULES:
-- ONLY reference IDs that exist in the provided module list.
-- Prefer connecting to adjacent modules in the pipeline, not distant ones.
-- The new module must not create a cycle in the graph.
-- If the module is a new entry point, connect_from can be empty.
-- If the module is a terminal sink, connect_to can be empty.
+IMPORTANT:
+- connect_from/connect_to MUST only contain IDs from the existing list.
+- Fill EVERY field with real content.
 
 Respond with ONLY valid JSON:
 {
   "new_module": {
-    "id": "<next sequential ID matching existing convention>",
-    "name": "<descriptive name>",
-    "coreTask": "<2-3 sentences with specific logic, not vague descriptions>",
-    "dataShape": "<explicit input schema with types, e.g. { field: type }>",
-    "expectedOutput": "<explicit output schema with types>",
-    "rules": "<hard constraints and invariants>",
-    "language": "<match existing system unless justified>",
-    "dependencies": "<real packages with version ranges>",
-    "errorHandling": "<2-3 specific exception scenarios with recovery>",
-    "testingRequirements": "<3-5 specific, falsifiable test cases>"
+    "id": "m_new_1",
+    "name": "<name>",
+    "coreTask": "<2-3 sentences>",
+    "dataShape": "<keys with types>",
+    "expectedOutput": "<keys with types>",
+    "rules": "<constraints>",
+    "language": "<best language>",
+    "dependencies": "<real packages>",
+    "errorHandling": "<2-3 exception scenarios>",
+    "testingRequirements": "<3-5 test cases>"
   },
-  "connect_from": ["<existing_id that feeds INTO this module>"],
-  "connect_to": ["<existing_id that this module feeds INTO>"]
+  "connect_from": ["<existing_id>"],
+  "connect_to": ["<existing_id>"]
 }"""
 
 
@@ -1474,7 +1451,7 @@ Design with full detail.  Only use existing IDs for connections."""
 
 
 async def batch_expand_architecture(graph_data: dict, modules_to_add: list, original_reasoning: str = None) -> dict:
-    """Generates multiple modules concurrently using async expansion."""
+    """Generates multiple modules concurrently."""
     import asyncio
     all_new_modules = []
     all_new_connections = []
@@ -1485,20 +1462,15 @@ async def batch_expand_architecture(graph_data: dict, modules_to_add: list, orig
         
     results = await asyncio.gather(*tasks, return_exceptions=True)
     
-    # Process the async results, building up the graph incrementally
+    # We must construct a completely new graph to avoid mutating the input while iterating
     current_graph = {
         "nodes": list(graph_data.get("nodes", [])),
         "edges": list(graph_data.get("edges", [])),
     }
 
-    for i, result in enumerate(results):
-        item_name = modules_to_add[i].get("name", "unknown")
-        
-        if isinstance(result, Exception):
-            print(f"WARNING: Failed to expand '{item_name}': {result}")
-            continue
-
+    for item in modules_to_add:
         try:
+            result = expand_architecture(current_graph, item["name"], item.get("reason", "Required"), original_reasoning)
             nm = result["new_module"]
             all_new_modules.append(nm)
             all_new_connections.extend(result["new_connections"])
@@ -1517,7 +1489,7 @@ async def batch_expand_architecture(graph_data: dict, modules_to_add: list, orig
                 current_graph["edges"].append({"source": conn["from_node"], "target": conn["to_node"]})
 
         except Exception as e:
-            print(f"WARNING: Failed to process result for '{item_name}': {e}")
+            print(f"WARNING: Failed to expand '{item.get('name')}': {e}")
             continue
 
     return {"new_modules": all_new_modules, "new_connections": all_new_connections}
@@ -1527,22 +1499,20 @@ async def batch_expand_architecture(graph_data: dict, modules_to_add: list, orig
 #  CODE GENERATION & FLOWCHART  (per-module tools)
 # ═══════════════════════════════════════════════════════════════
 
-CODE_GENERATION_SYSTEM_PROMPT = """You are an expert Python developer writing a module for the EasePr framework.
-Write ONLY raw Python source code. No markdown fences. No explanations before or after the code.
+CODE_GENERATION_SYSTEM_PROMPT = """You are an expert developer writing a module for the EasePr framework.
+Write ONLY raw source code.  No markdown.  No explanations.
 
 RULES:
-1. File must contain exactly one entry point: def run(state: dict) -> dict
-2. Use Python 3.10+ features (match/case, type unions with |, etc.) where appropriate.
-3. Extract inputs with state.get() and sensible defaults. Validate required inputs — raise ValueError with clear messages.
-4. Implement ACTUAL business logic, not stubs or placeholders.
-5. Return a dict with EXACTLY the keys described in "Expected Output".
-6. Wrap ALL external calls (HTTP, DB, file I/O) in try/except with specific exception types.
-7. Add brief inline comments for non-obvious logic.
-8. Use type hints on all helper functions and class methods.
-9. Import all dependencies at the top of the file.
-10. NO placeholders, NO 'TODO', NO 'pass', NO '...' as implementation.
-11. Follow the error handling patterns from the module spec — each documented error scenario must have a corresponding except clause.
-12. If the module processes collections, handle empty collections gracefully."""
+1. File must contain: def run(state: dict) -> dict
+2. Extract inputs with .get() and sensible defaults.
+3. Validate required inputs — raise ValueError with clear messages.
+4. Implement ACTUAL logic, not stubs.
+5. Return dict with EXACTLY the keys from "Expected Output".
+6. Include try/except for external calls.
+7. Brief inline comments for non-obvious logic.
+8. Type hints on helper functions.
+9. Import dependencies at top.
+10. NO placeholders, NO "TODO", NO "pass"."""
 
 
 def generate_module_code(module_spec: dict, base_dir: str = "modules"):
@@ -1580,16 +1550,8 @@ Write a complete def run(state: dict) -> dict function.  Raw Python only."""
 
 
 FLOWCHART_SYSTEM_PROMPT = """Generate a Mermaid.js flowchart (graph TD) for a module's internal logic.
-ONLY raw Mermaid code. No markdown fences. Start with: graph TD
-
-REQUIREMENTS:
-- Include an input validation step with a decision diamond.
-- Show the happy path (main processing flow) with 3-5 processing nodes.
-- Include a separate error path for EACH error scenario from the errorHandling spec.
-- End with a final output node.
-- Use descriptive labels: Process[Parse Input Data] not Process[Process].
-- Target 8-15 nodes total. Never fewer than 6.
-- Use proper Mermaid syntax: decision diamonds {{}}, rounded ([]) for start/end, square [] for process."""
+ONLY raw Mermaid code.  No markdown fences.  Start with: graph TD
+Include validation, processing, error paths.  6-15 nodes."""
 
 
 def generate_logic_flowchart(module_spec: dict) -> str:
@@ -1622,13 +1584,12 @@ ERRORS: {module_spec.get('errorHandling')}"""
 
 def _mock_code(spec: dict) -> str:
     name = spec.get("name", "Module")
-    safe_name = name.lower().replace(" ", "_")
     return f'''def run(state: dict) -> dict:
     """{name}: {spec.get("coreTask", "Process data.")}"""
     if not state:
         raise ValueError("State cannot be empty")
     result = dict(state)
-    result["_{safe_name}_done"] = True
+    result["_{name.lower().replace(" ", "_")}_done"] = True
     return result
 '''
 
@@ -1652,14 +1613,8 @@ def chat_update_module(module_data: dict, user_message: str) -> dict:
     """Updates a single module's spec interactively via chat request."""
     system_prompt = """You are an AI Architect assistant updating a single module specification.
 You will be provided with the CURRENT JSON state of a module, and a user's REQUEST to change it.
-
-RULES:
-1. Return ONLY valid JSON representing the fully updated module. Do NOT wrap it in markdown.
-2. Keep ALL existing fields. Do not remove fields unless the user explicitly requests removal.
-3. When modifying dataShape or expectedOutput, ensure the changes are compatible with upstream and downstream modules.
-4. When changing errorHandling, ensure the new error scenarios match the updated coreTask.
-5. When changing dependencies, use real package names with version ranges.
-6. Preserve the module ID — never change it."""
+Your task is to return ONLY valid JSON representing the fully updated module. Do NOT wrap it in markdown.
+Keep the structure identical, but modify the fields according to the user's intent. Do not remove existing fields unless requested."""
     
     user_prompt = f"CURRENT MODULE STATE:\n{json.dumps(module_data, indent=2)}\n\nUSER REQUEST:\n{user_message}"
     
@@ -1675,17 +1630,10 @@ def chat_update_module_stream(module_data: dict, user_message: str):
     """Yields streaming chunks of AI reasoning, ending with a JSON block of the updated module."""
     system_prompt = """You are an AI Architect assistant updating a single module specification.
 You will be provided with the CURRENT JSON state of a module, and a user's REQUEST to change it.
-
-YOUR OUTPUT FORMAT:
-1. First, explain in exactly 2 concise sentences: what you will change and WHY it improves the module.
-2. Then, output EXACTLY ONE JSON block wrapped in ```json ... ``` with the fully updated module.
-
-RULES:
-- Keep ALL existing JSON fields. Do not remove fields unless explicitly asked.
-- When modifying dataShape or expectedOutput, ensure compatibility with the module's stated dependencies.
-- When changing errorHandling, ensure new scenarios match the updated coreTask.
-- Preserve the module ID — never change it.
-- Your final output must end with the JSON block."""
+First, explain how you will modify the module based on the request in exactly a concise 2-sentence summary.
+Then, output EXACTLY ONE JSON block wrapped in ```json ... ``` that contains the fully updated module.
+Keep the JSON structure identical, but modify the fields according to the user's intent. Do not remove existing fields unless requested.
+Your final output must be the JSON block."""
     
     user_prompt = f"CURRENT MODULE STATE:\n{json.dumps(module_data, indent=2)}\n\nUSER REQUEST:\n{user_message}"
     
