@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Zap, LogOut, ArrowLeft, CheckCircle2, Loader2, LayoutTemplate, Brain, FolderOpen, Paperclip, Eye, X, Save } from 'lucide-react';
+import { Zap, LogOut, ArrowLeft, CheckCircle2, Loader2, LayoutTemplate, Brain, FolderOpen, Paperclip, Eye, X, Save, Sun, Moon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import dagre from 'dagre';
@@ -68,7 +68,7 @@ function Dashboard() {
   const [generatedEdges, setGeneratedEdges] = useState<any[]>([]);
 
   // Global Tab State
-  const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout } = useAppStore();
+  const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout, isDarkMode, toggleDarkMode } = useAppStore();
 
   // Pipeline state
   const [isClassifying, setIsClassifying] = useState(false);
@@ -469,6 +469,13 @@ function Dashboard() {
           >
             <LogOut className="w-4 h-4" />
             Sign Out
+          </button>
+          
+          <button
+            onClick={toggleDarkMode}
+            className="flex items-center justify-center w-9 h-9 text-body hover:text-heading hover:bg-neutral-secondary rounded-[12px] transition-all active:scale-95 border border-default"
+          >
+            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <div className="px-3 py-1 bg-brand-softer border border-brand-soft rounded-full text-xs font-bold text-fg-brand tracking-wider">
             V0.2.0-ALPHA

@@ -1,6 +1,3 @@
-@import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap');
-
 @theme {
   --font-sans: 'Geist Mono', monospace;
   --font-mono: 'Geist Mono', monospace;
@@ -113,18 +110,18 @@
 }
 
 :root {
-  --color-neutral-primary-soft: #F9FAFB;
-  --color-neutral-primary: #FFFFFF;
-  --color-neutral-primary-medium: #F3F4F6;
-  --color-neutral-primary-strong: #E5E7EB;
-  --color-neutral-secondary-soft: #F9FAFB;
-  --color-neutral-secondary: #FFFFFF;
-  --color-neutral-secondary-medium: #F3F4F6;
-  --color-neutral-secondary-strong: #E5E7EB;
+  --color-neutral-primary-soft: #0A0A0A;
+  --color-neutral-primary: #050505;
+  --color-neutral-primary-medium: #111111;
+  --color-neutral-primary-strong: #1A1A1A;
+  --color-neutral-secondary-soft: #0A0A0A;
+  --color-neutral-secondary: #050505;
+  --color-neutral-secondary-medium: #111111;
+  --color-neutral-secondary-strong: #1A1A1A;
   --color-neutral-tertiary-soft: #0E0E0E;
-  --color-neutral-tertiary: #F3F4F6;
-  --color-neutral-tertiary-medium: #E5E7EB;
-  --color-neutral-quaternary: #E5E7EB;
+  --color-neutral-tertiary: #111111;
+  --color-neutral-tertiary-medium: #1A1A1A;
+  --color-neutral-quaternary: #1A1A1A;
   --color-quaternary-medium: #252525;
   --color-gray: #252525;
   --color-brand-softer: #1A0810;
@@ -157,9 +154,9 @@
   --color-orange: #FB923C;
   --color-white: #FFFFFF;
   --color-black: #0A0A0A;
-  --color-heading: #111827;
-  --color-body: #4B5563;
-  --color-body-subtle: #6B7280;
+  --color-heading: #EDEDED;
+  --color-body: #888888;
+  --color-body-subtle: #666666;
   --color-fg-brand-subtle: #3D0E1F;
   --color-fg-brand: #F44174;
   --color-fg-brand-strong: #FFB0C7;
@@ -169,7 +166,7 @@
   --color-fg-danger-strong: #FF6677;
   --color-fg-warning-subtle: #FF8833;
   --color-fg-warning: #FFBB33;
-  --color-fg-disabled: #9CA3AF;
+  --color-fg-disabled: #444444;
   --color-fg-yellow: #FACC15;
   --color-fg-info: #93C5FD;
   --color-fg-purple: #A855F7;
@@ -178,18 +175,18 @@
   --color-fg-indigo: #4F46E5;
   --color-fg-pink: #F44174;
   --color-fg-lime: #84CC16;
-  --color-border-dark: #9CA3AF;
-  --color-border-buffer: #FFFFFF;
-  --color-border-buffer-medium: #F3F4F6;
-  --color-border-buffer-strong: #E5E7EB;
-  --color-border-muted: #F9FAFB;
-  --color-border-light-subtle: #F9FAFB;
-  --color-border-light: #F3F4F6;
-  --color-border-light-medium: #E5E7EB;
+  --color-border-dark: #333333;
+  --color-border-buffer: #050505;
+  --color-border-buffer-medium: #111111;
+  --color-border-buffer-strong: #1A1A1A;
+  --color-border-muted: #0A0A0A;
+  --color-border-light-subtle: #0A0A0A;
+  --color-border-light: #111111;
+  --color-border-light-medium: #1A1A1A;
   --color-border-default-subtle: #0E0E0E;
-  --color-border-default: #E5E7EB;
-  --color-border-default-medium: #D1D5DB;
-  --color-border-default-strong: #9CA3AF;
+  --color-border-default: #1A1A1A;
+  --color-border-default-medium: #222222;
+  --color-border-default-strong: #333333;
   --color-border-success-subtle: #0A2E22;
   --color-border-success: #065F46;
   --color-border-danger-subtle: #3D0A14;
@@ -199,7 +196,7 @@
   --color-border-brand-subtle: #3D0E1F;
   --color-border-brand-light: #F44174;
   --color-border-brand: #F44174;
-  --color-border-dark-subtle: #D1D5DB;
+  --color-border-dark-subtle: #222222;
   --color-border-purple: #A855F7;
   --color-border-orange: #FB923C;
 }
@@ -294,81 +291,4 @@
   --color-border-dark-subtle: #222222;
   --color-border-purple: #A855F7;
   --color-border-orange: #FB923C;
-}
-
-@plugin "@tailwindcss/typography";
-
-@layer base {
-  body {
-    background-color: var(--color-neutral-primary);
-    color: var(--color-body);
-    font-family: var(--font-sans);
-    transition: color 500ms ease-in-out, background-color 500ms ease-in-out;
-  }
-}
-
-html, body, #root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: var(--color-neutral-primary);
-}
-
-/* Typography Scale Overrides */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--color-heading);
-  font-weight: 600;
-}
-
-h1 { font-size: 56px; line-height: 1.05; letter-spacing: -1.5px; margin-bottom: 24px; }
-h2 { font-size: 42px; line-height: 1.1; letter-spacing: -1px; }
-h3 { font-size: 34px; line-height: 1.15; letter-spacing: -0.5px; }
-h4 { font-size: 28px; line-height: 1.2; letter-spacing: -0.3px; }
-h5 { font-size: 22px; line-height: 1.4; }
-h6 { font-size: 18px; line-height: 1.3; }
-
-@media (max-width: 768px) {
-  h1 { font-size: 38px; }
-  h2 { font-size: 34px; }
-  h3 { font-size: 28px; }
-  h4 { font-size: 24px; }
-  h5 { font-size: 20px; }
-  h6 { font-size: 16px; }
-}
-
-@media (max-width: 480px) {
-  h1 { font-size: 30px; }
-  h2 { font-size: 26px; }
-  h3 { font-size: 22px; }
-  h4 { font-size: 20px; }
-  h5 { font-size: 18px; }
-}
-
-a {
-  color: var(--color-fg-brand);
-  text-decoration: underline;
-}
-
-a:hover {
-  text-decoration: none;
-}
-
-/* Custom Scrollbar for a premium feel */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background-color: var(--color-neutral-primary-strong);
-  border-radius: var(--radius-pill);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-border-dark);
 }

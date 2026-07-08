@@ -95,6 +95,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onRegenerate,
   onExtractGraph
 }) => {
+  const isDarkMode = useAppStore(state => state.isDarkMode);
   const architectureReasoning = useAppStore(state => state.architectureReasoning);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<any[]>(initialNodes);
@@ -831,7 +832,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         nodeTypes={nodeTypes}
         fitView
       >
-        <Background color="#525252" gap={20} />
+        <Background color={isDarkMode ? "#525252" : "#E5E7EB"} gap={20} />
         <Controls className="dark-controls" />
         
         <Panel position="top-left" className="flex flex-col gap-2 p-2">
