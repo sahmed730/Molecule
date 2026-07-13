@@ -352,28 +352,30 @@ Output format:
 #  STAGE 3: REASONING-BASED ARCHITECTURE GENERATION
 # ═══════════════════════════════════════════════════════════════
 
-REASONING_SYSTEM_PROMPT = """You are a Senior Enterprise Architect. You design systems using Domain-Driven Design (DDD), Event-Driven Architecture (EDA), and microservices best practices.
+REASONING_SYSTEM_PROMPT = """You are a Universal Systems Architect. You design architectures for ANY engineered system (Web Apps, SaaS, Embedded Firmware, Robotics, Game Engines, ML Pipelines, Blockchain, etc.).
 
 CRITICAL ARCHITECTURE RULES:
-1. **Architecture-Centric, not Module-Centric**: Decompose the system by Business Capability -> Bounded Context -> Domain -> Service.
-2. **Strict Layering**: Explicitly separate Business Services (e.g. Inventory, Order), Platform/Shared Services (e.g. Audit, Notification, Secret Management, Feature Flags), and Infrastructure (e.g. API Gateway, Service Discovery, Event Bus).
-3. **No Circular Dependencies**: Use Event-Driven Architecture. Services should publish domain events (e.g., `TenantProvisioned`) and subscribe to them via a central Event Bus. Never link two services in a bidirectional synchronous loop.
-4. **Granularity**: Do not create monolith "Core" modules. Break them into specific services (e.g., Inventory Movement, Inventory Reservation).
-5. **Realism**: Assume enterprise scale. Your implementation estimations MUST be realistic (e.g., 250-500 files, >100 APIs, 500-700 hours of development).
+1. **Universal Architecture**: Do not bias toward SaaS. Identify the Architecture Type (e.g., Embedded, Robotics, Data Pipeline) and tailor all components and constraints to that domain.
+2. **Component Versatility**: Components are not always "Services". They can be Libraries, Packages, Plugins, Workers, Drivers, Devices, Firmware, Containers, Threads, Databases, Pipeline Stages, or Hardware.
+3. **Concrete Implementations**: Infer platforms, languages, and runtimes explicitly. If it's firmware, output C++/FreeRTOS/STM32. If it's ML, output Python/PyTorch/CUDA.
+4. **No Circular Dependencies**: Route communication correctly. If using events/messages, route through an Event Bus/MQTT Broker. 
 
-MODULE REQUIREMENTS (Output as Markdown lists):
-- **Module ID**: M001, M002, etc.
-- **Name**: e.g. Inventory Movement Service
-- **Type**: Business Service | Shared Service | Infrastructure
-- **Core Task**: 
-- **Events Published**: e.g., InventoryReserved, StockAdjusted (or 'None')
-- **Events Subscribed**: e.g., OrderPlaced (or 'None')
-- **API Contracts**: Describe HTTP Methods, Paths, and schemas (e.g. `POST /api/v1/inventory/reserve` -> 200 OK)
-- **Data Shape**: Shared kernel models (e.g. Tenant, SKU) used by this service
-- **Expected Output**:
-- **Error Handling**:
+COMPONENT REQUIREMENTS (Output as Markdown lists for each component):
+- **Component ID**: M001, M002, etc.
+- **Name**: Component Name
+- **Type**: Component Type (e.g., Firmware, Microservice, Database, ML Model, Hardware)
+- **Responsibilities**: What this component does.
+- **Interfaces**: (e.g., REST API, GraphQL, CLI, Serial Port, CAN Bus, Shared Memory)
+- **Communication Contracts**: Detailed payload schemas for Events, Commands, Requests, or Packets.
+- **Technology Stack**: (Language, Framework, Runtime, Platform, OS, Database)
+- **Dependencies**: Internal components, External systems, Hardware, Cloud services.
+- **Constraints**: (Latency <10ms, Memory 256MB, Power 5W, Offline Required, etc.)
+- **Non-Functional**: (Performance, Reliability, Security, Portability)
+- **Testing**: (Hardware-in-the-Loop, Fuzz, Unit, Simulation)
+- **Deployment**: (Docker, ESP32 Flash, Android APK)
+- **Architecture Decisions**: "Decision: X, Reason: Y"
 
-You MUST also include a Mermaid Sequence Diagram showing a core execution flow (e.g., a checkout or provisioning flow)."""
+You MUST also include a Mermaid Diagram (Sequence or Architecture) showing a core execution flow."""
 
 
 def suggest_architecture(prompt: str, graphify_context: str = "", answers: dict = None) -> str:
@@ -424,10 +426,17 @@ Generate the minimum modules needed in pure Markdown format."""
 
         # Ensure all module fields are present
         for mod in result["modules"]:
-            mod.setdefault("language", "Python")
+            mod.setdefault("type", "Component")
+            mod.setdefault("responsibilities", "")
+            mod.setdefault("interfaces", "")
+            mod.setdefault("communicationContracts", "")
+            mod.setdefault("technologyStack", "")
             mod.setdefault("dependencies", "")
-            mod.setdefault("errorHandling", "")
-            mod.setdefault("testingRequirements", "")
+            mod.setdefault("constraints", "")
+            mod.setdefault("nonFunctional", "")
+            mod.setdefault("testing", "")
+            mod.setdefault("deployment", "")
+            mod.setdefault("architectureDecisions", "")
             mod.setdefault("rules", "")
             mod.setdefault("dataShape", "")
             mod.setdefault("expectedOutput", "")
@@ -493,19 +502,22 @@ def suggest_architecture_stream(prompt: str, graphify_context: str = "", answers
 
 Follow the full reasoning chain: Intent → Constraints → Flow → Failure Analysis → Architecture.
 
-Generate the Enterprise Architecture in pure Markdown format. For each module in the Architecture section, you MUST provide exactly these fields using a bulleted list:
-- **Module ID**: (e.g., M001, M002)
-- **Name**: (e.g., API Gateway, Inventory Service, Notification Service)
-- **Type**: (Business Service | Shared Service | Infrastructure)
-- **Core Task**: 
-- **Events Published**: (comma separated list of domain events emitted, or 'None')
-- **Events Subscribed**: (comma separated list of domain events consumed, or 'None')
-- **API Contracts**: (List key HTTP endpoints and methods, e.g. `POST /api/v1/resource`)
-- **Data Shape**:
-- **Expected Output**:
-- **Error Handling**:
+Generate the Universal Architecture in pure Markdown format. For each component in the Architecture section, you MUST provide exactly these fields using a bulleted list:
+- **Component ID**: (e.g., M001, M002)
+- **Name**: 
+- **Type**: (e.g., Service, Library, Firmware, Hardware, ML Model)
+- **Responsibilities**: 
+- **Interfaces**: (e.g., REST API, CAN Bus, MQTT, CLI, Shared Memory)
+- **Communication Contracts**: (Events, Commands, Packets, schemas)
+- **Technology Stack**: (Language, OS, Protocol, MCU, Framework)
+- **Dependencies**: 
+- **Constraints**: (Latency, Memory, Power, etc)
+- **Non-Functional**: 
+- **Testing**: (Simulation, Hardware, Unit, Fuzz, Load)
+- **Deployment**: (Docker, Flash, Installer, Kubernetes)
+- **Architecture Decisions**:
 
-Make sure to include an API Gateway and an Event Bus as Infrastructure modules. Include Shared Services like Audit, Notification, and Observability. Provide realistic Enterprise estimations for APIs, Files, and Hours. Finally, include a Mermaid Sequence diagram for a critical user journey."""
+Ensure the components accurately reflect the system type (e.g., don't use Kubernetes for an ESP32 firmware project). Include a Mermaid diagram demonstrating a critical flow."""
 
     try:
         print(f"[ARCH-STREAM] Reasoning about architecture for: {prompt[:60]}...")

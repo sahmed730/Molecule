@@ -19,6 +19,7 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
   const [chatMessage, setChatMessage] = useState('');
   const [isChatting, setIsChatting] = useState(false);
   const [chatHistory, setChatHistory] = useState<{role: 'user'|'assistant', content: string}[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'contracts' | 'operations'>('overview');
 
   useEffect(() => {
     setData(moduleData);
@@ -171,77 +172,144 @@ const ModuleWorkspace: React.FC<ModuleWorkspaceProps> = ({ moduleData, onUpdate 
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Module Name</label>
-              <input 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs" 
-                value={data.label || ''} 
-                onChange={e => setData({...data, label: e.target.value})} 
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Core Task</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.coreTask || ''} 
-                onChange={e => setData({...data, coreTask: e.target.value})} 
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Data Shape (Input)</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 font-mono text-[11px] focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.dataShape || ''} 
-                onChange={e => setData({...data, dataShape: e.target.value})} 
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Expected Output</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 font-mono text-[11px] focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.expectedOutput || ''} 
-                onChange={e => setData({...data, expectedOutput: e.target.value})} 
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Rules</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.rules || ''} 
-                onChange={e => setData({...data, rules: e.target.value})} 
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Dependencies</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.dependencies || ''} 
-                onChange={e => setData({...data, dependencies: e.target.value})} 
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Error Handling</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.errorHandling || ''} 
-                onChange={e => setData({...data, errorHandling: e.target.value})} 
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Testing Requirements</label>
-              <textarea 
-                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
-                value={data.testingRequirements || ''} 
-                onChange={e => setData({...data, testingRequirements: e.target.value})} 
-              />
-            </div>
-          </div>
+        {/* Tabs */}
+        <div className="flex border-b border-default mb-6">
+          <button 
+            className={`px-4 py-2 font-semibold text-sm transition-colors ${activeTab === 'overview' ? 'border-b-2 border-brand text-brand' : 'text-body-subtle hover:text-body'}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            Overview
+          </button>
+          <button 
+            className={`px-4 py-2 font-semibold text-sm transition-colors ${activeTab === 'contracts' ? 'border-b-2 border-brand text-brand' : 'text-body-subtle hover:text-body'}`}
+            onClick={() => setActiveTab('contracts')}
+          >
+            Contracts
+          </button>
+          <button 
+            className={`px-4 py-2 font-semibold text-sm transition-colors ${activeTab === 'operations' ? 'border-b-2 border-brand text-brand' : 'text-body-subtle hover:text-body'}`}
+            onClick={() => setActiveTab('operations')}
+          >
+            Operations & Stack
+          </button>
         </div>
+
+        {activeTab === 'overview' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Component Name</label>
+                <input 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs" 
+                  value={data.label || ''} 
+                  onChange={e => setData({...data, label: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Component Type</label>
+                <input 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs" 
+                  value={data.type || ''} 
+                  onChange={e => setData({...data, type: e.target.value})} 
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Responsibilities</label>
+              <textarea 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-32 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                value={data.responsibilities || data.coreTask || ''} 
+                onChange={e => setData({...data, responsibilities: e.target.value})} 
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Architecture Decisions</label>
+              <textarea 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-32 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                value={data.architectureDecisions || ''} 
+                onChange={e => setData({...data, architectureDecisions: e.target.value})} 
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'contracts' && (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Interfaces (REST, CLI, UART, etc.)</label>
+              <textarea 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-32 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                value={data.interfaces || ''} 
+                onChange={e => setData({...data, interfaces: e.target.value})} 
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Communication Contracts (Events, Commands, Packets)</label>
+              <textarea 
+                className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-64 font-mono text-[12px] focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                value={data.communicationContracts || ''} 
+                onChange={e => setData({...data, communicationContracts: e.target.value})} 
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'operations' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Technology Stack</label>
+                <textarea 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                  value={data.technologyStack || ''} 
+                  onChange={e => setData({...data, technologyStack: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Dependencies</label>
+                <textarea 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                  value={data.dependencies || ''} 
+                  onChange={e => setData({...data, dependencies: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Testing Strategy</label>
+                <textarea 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                  value={data.testing || data.testingRequirements || ''} 
+                  onChange={e => setData({...data, testing: e.target.value})} 
+                />
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Constraints</label>
+                <textarea 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                  value={data.constraints || ''} 
+                  onChange={e => setData({...data, constraints: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Non-Functional Requirements</label>
+                <textarea 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                  value={data.nonFunctional || ''} 
+                  onChange={e => setData({...data, nonFunctional: e.target.value})} 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-body-subtle uppercase mb-1">Deployment Strategy</label>
+                <textarea 
+                  className="w-full p-2.5 bg-neutral-primary border border-default text-body rounded-[12px] text-sm h-24 focus:ring-1 focus:ring-brand-medium outline-none transition-colors shadow-xs resize-none" 
+                  value={data.deployment || ''} 
+                  onChange={e => setData({...data, deployment: e.target.value})} 
+                />
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* AI Review Results below the form */}
         {review && (
