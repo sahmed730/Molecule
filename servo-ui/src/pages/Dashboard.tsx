@@ -712,32 +712,33 @@ ${attachedContext}
                             </button>
 
                             <div className="flex items-center gap-3">
-                              <button
-                                onClick={() => {
-                                  setAnswers({});
-                                  setQuestions([]);
-                                  handleGenerateArchitecture();
-                                }}
-                                disabled={isGenerating}
-                                className="text-body-subtle hover:text-heading font-medium text-sm transition-colors px-4 py-2 active:scale-95 disabled:opacity-50"
-                              >
-                                Skip & Generate
-                              </button>
+                              {Object.keys(accumulatedAnswers).length > 0 && (
+                                <button
+                                  onClick={() => {
+                                    setAnswers({});
+                                    setQuestions([]);
+                                    handleGenerateArchitecture();
+                                  }}
+                                  disabled={isGenerating}
+                                  className="text-body-subtle hover:text-heading font-medium text-sm transition-colors px-4 py-2 active:scale-95 disabled:opacity-50"
+                                >
+                                  Skip & Generate
+                                </button>
+                              )}
 
                               <button
                                 onClick={() => {
-                                  handleGenerateArchitecture();
-                                  setQuestions([]);
+                                  handleClarifyLoop(false);
                                 }}
-                                disabled={isGenerating}
+                                disabled={isGenerating || questions.some(q => !answers[q.id] || answers[q.id].length === 0)}
                                 className={`flex items-center gap-2 px-6 py-[10px] text-white rounded-[12px] font-medium shadow-xs transition-all active:scale-95 ${
-                                  isGenerating
+                                  isGenerating || questions.some(q => !answers[q.id] || answers[q.id].length === 0)
                                     ? 'bg-neutral-primary-strong cursor-not-allowed opacity-50 shadow-none'
                                     : 'bg-brand hover:bg-brand-strong'
                                 }`}
                               >
                                 {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Brain className="w-5 h-5" />}
-                                {isGenerating ? 'Reasoning...' : 'Reason & Generate'}
+                                {isGenerating ? 'Reasoning...' : 'Submit Answers & Continue'}
                               </button>
                             </div>
                           </div>
