@@ -374,9 +374,7 @@ def suggest_architecture(prompt: str, graphify_context: str = "", answers: dict 
     # Build rich context from classification + answers
     context_parts = [f'The user wants to build: "{prompt}"']
     if graphify_context:
-        context_parts.append(f"
-Graphify Context:
-{graphify_context}")
+        context_parts.append(f"\nGraphify Context:\n{graphify_context}")
 
     if answers:
         answer_text = "\n".join(f"  Q: {k}\n  A: {v}" for k, v in answers.items())
