@@ -456,7 +456,14 @@ def suggest_architecture_stream(prompt: str, graphify_context: str = "", answers
     user_prompt += """
 
 Follow the full reasoning chain: Intent → Constraints → Flow → Failure Analysis → Architecture.
-Generate the minimum modules needed in pure Markdown format."""
+Generate the minimum modules needed in pure Markdown format. For each module in the Architecture section, you MUST provide exactly these fields using a bulleted list:
+- **Module ID**: (e.g., M001, M002)
+- **Name**: (e.g., API Gateway)
+- **Core Task**: 
+- **Dependencies**: (comma separated list of Module IDs this depends on)
+- **Data Shape**:
+- **Expected Output**:
+- **Error Handling**:"""
 
     try:
         print(f"[ARCH-STREAM] Reasoning about architecture for: {prompt[:60]}...")
@@ -474,7 +481,7 @@ def extract_graph_json(markdown_text: str) -> dict:
     system_prompt = """You are a strict JSON extractor. Read the provided Markdown text which contains an Enterprise Architecture.
 
 CRITICAL RULES:
-1. Parse ONLY the `## C. Modules` section.
+1. Parse the architecture modules from the provided markdown.
 2. Completely IGNORE all other sections (Reasoning, Flowchart, Security, Governance, Observability, etc.).
 3. Preserve all mandatory module fields EXACTLY as written.
 4. Enforce deterministic module IDs (M001, M002, etc.). Do not generate arbitrary IDs or rename them.
