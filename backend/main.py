@@ -130,7 +130,7 @@ async def api_upload_context(file: UploadFile = File(...)):
 def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 2: Generate domain-adaptive clarifying questions."""
     try:
-        result = generate_clarifying_questions(req.prompt, req.graphify_context)
+        result = generate_clarifying_questions(req.prompt, req.graphify_context, req.answers)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -235,6 +235,7 @@ def api_auto_improve_architecture(req:  AutoImproveRequest, current_user: auth.U
 class ClarifyRequest(BaseModel):
     prompt: str
     graphify_context: Optional[str] = None
+    answers: Optional[dict] = None
 
 class ArchitectureRequest(BaseModel):
     prompt: str
@@ -315,7 +316,7 @@ async def api_upload_context(file: UploadFile = File(...)):
 def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 2: Generate domain-adaptive clarifying questions."""
     try:
-        result = generate_clarifying_questions(req.prompt, req.graphify_context)
+        result = generate_clarifying_questions(req.prompt, req.graphify_context, req.answers)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

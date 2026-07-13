@@ -307,19 +307,25 @@ SYSTEM_ARCHETYPES = [
 
 
 
-def generate_clarifying_questions(prompt: str, graphify_context: str = "") -> dict:
-    """Generates clarifying questions based on the prompt and optional Graphify context."""
+def generate_clarifying_questions(prompt: str, graphify_context: str = "", answers: dict = None) -> dict:
+    """Generates clarifying questions iteratively based on the prompt, optional Graphify context, and past answers."""
     system_prompt = """You are a highly analytical systems architect.
-Analyze the user's prompt and the provided Graphify context (if any).
-Return a JSON array of up to 3 clarifying questions to resolve ambiguities in the architecture.
+Analyze the user's prompt, the provided Graphify context (if any), and any answers they have already provided to previous questions.
+Determine if the architecture is clear enough to be generated. If it is clear, or if 15 questions have already been answered, set `confidence_high: true` and return an empty `questions` array.
+If the architecture is still ambiguous, return a JSON array of 1 to 3 new clarifying questions to resolve those ambiguities.
+
+For each question, provide a `recommended_default` to guide the user without forcing them to know the exact answer.
 
 Output format:
 {
+  "confidence_high": false,
   "questions": [
     {
-      "id": "q1",
+      "id": "q_some_unique_id",
       "question": "Your question here?",
-      "type": "open_text"
+      "type": "open_text",
+      "options": ["Option A", "Option B"],
+      "recommended_default": "Use Option A unless you have strict constraints."
     }
   ]
 }"""
@@ -327,6 +333,10 @@ Output format:
     user_msg = f"Prompt: {prompt}"
     if graphify_context:
         user_msg += f"\n\nGraphify Context:\n{graphify_context}"
+    
+    if answers:
+        answer_text = "\n".join(f"  Q: {k}\n  A: {v}" for k, v in answers.items())
+        user_msg += f"\n\nUser's Answers to Previous Questions:\n{answer_text}"
 
     try:
         raw = _call_fast_model(system_prompt, user_msg, json_mode=True)
@@ -334,7 +344,7 @@ Output format:
         return data
     except Exception as e:
         print(f"Clarification generation failed: {e}")
-        return {"questions": []}
+        return {"confidence_high": False, "questions": []}
 
 # ═══════════════════════════════════════════════════════════════
 #  STAGE 3: REASONING-BASED ARCHITECTURE GENERATION

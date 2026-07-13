@@ -61,7 +61,6 @@ function Dashboard() {
   const [isClarifying, setIsClarifying] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [accumulatedAnswers, setAccumulatedAnswers] = useState<Record<string, string>>({});
   
   // File Upload State
   const [isUploading, setIsUploading] = useState(false);
@@ -166,29 +165,11 @@ function Dashboard() {
 
   // ── Stage 1: Classify → Stage 2: Clarify ──────────────────
 
-  const handleClarifyLoop = async (skip: boolean = false) => {
+  const handleStartPipeline = async () => {
     if (!prompt.trim()) return;
 
-    // If skip is true or we are just starting, build structured answers
-    const newStructured: Record<string, string> = { ...accumulatedAnswers };
-    if (!skip && questions.length > 0) {
-      questions.forEach(q => {
-        const ans = answers[q.id];
-        const label = q.question;
-        if (Array.isArray(ans)) {
-          newStructured[label] = ans.length > 0 ? ans.join(', ') : 'Not specified';
-        } else {
-          newStructured[label] = ans || 'Not specified';
-        }
-      });
-      setAccumulatedAnswers(newStructured);
-    }
-
-    if (skip) {
-       return handleGenerateArchitecture(undefined, newStructured);
-    }
-
     setIsClarifying(true);
+    setQuestions([]);
     
     const finalPrompt = attachedContext 
       ? `${prompt}
@@ -200,53 +181,38 @@ ${attachedContext}
       : prompt;
 
     try {
+      // Stage 2: Generate domain-adaptive questions
       const clarifyRes = await fetch(`${API_BASE}/api/clarify-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ 
-           prompt: finalPrompt, 
-           graphify_context: attachedContext || undefined,
-           answers: Object.keys(newStructured).length > 0 ? newStructured : undefined
-        }),
+        body: JSON.stringify({ prompt: finalPrompt, graphify_context: attachedContext || undefined }),
       });
       const clarifyData = await clarifyRes.json();
 
-      if (clarifyData.status === 'success') {
-         if (clarifyData.data.confidence_high || !clarifyData.data.questions || clarifyData.data.questions.length === 0) {
-            // High confidence or no questions -> proceed to generation
-            handleGenerateArchitecture(undefined, newStructured);
-         } else {
-            // Show new questions
-            setQuestions(clarifyData.data.questions);
-            const initial: Record<string, any> = {};
-            clarifyData.data.questions.forEach((q: any) => {
-              initial[q.id] = q.type === 'multi_select' ? [] : '';
-            });
-            setAnswers(initial);
-         }
+      if (clarifyData.status === 'success' && clarifyData.data.questions?.length > 0) {
+        setQuestions(clarifyData.data.questions);
+                // Pre-fill answers
+        const initial: Record<string, any> = {};
+        clarifyData.data.questions.forEach((q: any) => {
+          initial[q.id] = q.type === 'multi_select' ? [] : '';
+        });
+        setAnswers(initial);
       } else {
-        handleGenerateArchitecture(undefined, newStructured);
+        // No questions → go straight to generation
+        handleGenerateArchitecture(undefined);
       }
     } catch (e) {
-      console.error('Pipeline loop failed:', e);
-      handleGenerateArchitecture(undefined, newStructured);
+      console.error('Pipeline start failed:', e);
+      handleGenerateArchitecture();
     } finally {
       setIsClarifying(false);
     }
   };
 
-  const handleStartPipeline = async () => {
-     setAccumulatedAnswers({});
-     setQuestions([]);
-     setAnswers({});
-     await handleClarifyLoop();
-  };
-
   // ── Stage 3: Generate Architecture ─────────────────────────
 
   const handleGenerateArchitecture = async (
-    finalPromptOverride?: string,
-    providedAnswers?: Record<string, string>
+    finalPromptOverride?: string
   ) => {
     let basePrompt = finalPromptOverride || prompt;
     const finalPrompt = attachedContext 
@@ -255,7 +221,19 @@ ${attachedContext}
       
     if (!basePrompt.trim()) return;
 
-    const finalAnswers = providedAnswers || accumulatedAnswers;
+    // Build structured answers dict for the API
+    const structuredAnswers: Record<string, string> = {};
+    if (questions.length > 0) {
+      questions.forEach(q => {
+        const ans = answers[q.id];
+        const label = q.question;
+        if (Array.isArray(ans)) {
+          structuredAnswers[label] = ans.length > 0 ? ans.join(', ') : 'Not specified';
+        } else {
+          structuredAnswers[label] = ans || 'Not specified';
+        }
+      });
+    }
 
     setIsGenerating(true);
     setStreamingMarkdown('');
@@ -267,7 +245,7 @@ ${attachedContext}
         body: JSON.stringify({
           prompt: finalPrompt,
           graphify_context: attachedContext || undefined,
-          answers: Object.keys(finalAnswers).length > 0 ? finalAnswers : null,
+          answers: Object.keys(structuredAnswers).length > 0 ? structuredAnswers : null,
         }),
       });
       
