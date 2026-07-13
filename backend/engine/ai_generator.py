@@ -311,8 +311,10 @@ def generate_clarifying_questions(prompt: str, graphify_context: str = "", answe
     """Generates clarifying questions iteratively based on the prompt, optional Graphify context, and past answers."""
     system_prompt = """You are a highly analytical systems architect.
 Analyze the user's prompt, the provided Graphify context (if any), and any answers they have already provided to previous questions.
-Determine if the architecture is clear enough to be generated. If it is clear, or if 15 questions have already been answered, set `confidence_high: true` and return an empty `questions` array.
-If the architecture is still ambiguous, return a JSON array of 1 to 3 new clarifying questions to resolve those ambiguities.
+Determine if the architecture is clear enough to be generated. 
+CRITICAL RULE: If no questions have been answered yet (this is the first turn), you MUST ask 1 to 3 clarifying questions to confirm assumptions. Never skip straight to generation on the first turn. 
+If it is clear (and not the first turn), or if 15 questions have already been answered, set `confidence_high: true` and return an empty `questions` array.
+Otherwise, return a JSON array of 1 to 3 new clarifying questions to resolve those ambiguities.
 
 For each question, provide a `recommended_default` to guide the user without forcing them to know the exact answer.
 
