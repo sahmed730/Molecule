@@ -350,23 +350,28 @@ Output format:
 #  STAGE 3: REASONING-BASED ARCHITECTURE GENERATION
 # ═══════════════════════════════════════════════════════════════
 
-REASONING_SYSTEM_PROMPT = """You are an Enterprise Architecture Compiler.
+REASONING_SYSTEM_PROMPT = """You are a Senior Enterprise Architect. You design systems using Domain-Driven Design (DDD), Event-Driven Architecture (EDA), and microservices best practices.
 
-Preserve system continuity, execution fidelity, and platform constraints while transforming user intent into deployable modules.
+CRITICAL ARCHITECTURE RULES:
+1. **Architecture-Centric, not Module-Centric**: Decompose the system by Business Capability -> Bounded Context -> Domain -> Service.
+2. **Strict Layering**: Explicitly separate Business Services (e.g. Inventory, Order), Platform/Shared Services (e.g. Audit, Notification, Secret Management, Feature Flags), and Infrastructure (e.g. API Gateway, Service Discovery, Event Bus).
+3. **No Circular Dependencies**: Use Event-Driven Architecture. Services should publish domain events (e.g., `TenantProvisioned`) and subscribe to them via a central Event Bus. Never link two services in a bidirectional synchronous loop.
+4. **Granularity**: Do not create monolith "Core" modules. Break them into specific services (e.g., Inventory Movement, Inventory Reservation).
+5. **Realism**: Assume enterprise scale. Your implementation estimations MUST be realistic (e.g., 250-500 files, >100 APIs, 500-700 hours of development).
 
-MODULE REQUIREMENTS:
-- moduleId: Must follow format M001, M002, etc.
-- label
-- coreTask
-- dataShape
-- expectedOutput
-- rules
-- platform
-- dependencies
-- errorHandling
-- testingRequirements
+MODULE REQUIREMENTS (Output as Markdown lists):
+- **Module ID**: M001, M002, etc.
+- **Name**: e.g. Inventory Movement Service
+- **Type**: Business Service | Shared Service | Infrastructure
+- **Core Task**: 
+- **Events Published**: e.g., InventoryReserved, StockAdjusted (or 'None')
+- **Events Subscribed**: e.g., OrderPlaced (or 'None')
+- **API Contracts**: Describe HTTP Methods, Paths, and schemas (e.g. `POST /api/v1/inventory/reserve` -> 200 OK)
+- **Data Shape**: Shared kernel models (e.g. Tenant, SKU) used by this service
+- **Expected Output**:
+- **Error Handling**:
 
-Output modules in standard Markdown format."""
+You MUST also include a Mermaid Sequence Diagram showing a core execution flow (e.g., a checkout or provisioning flow)."""
 
 
 def suggest_architecture(prompt: str, graphify_context: str = "", answers: dict = None) -> str:
@@ -425,8 +430,27 @@ Generate the minimum modules needed in pure Markdown format."""
             mod.setdefault("dataShape", "")
             mod.setdefault("expectedOutput", "")
 
-        # Validate connections reference real module IDs
+        # Ensure EVENT_BUS exists if referenced
         valid_ids = {m["id"] for m in result["modules"]}
+        has_event_bus = "EVENT_BUS" in valid_ids
+        references_event_bus = any(
+            c.get("from_node") == "EVENT_BUS" or c.get("to_node") == "EVENT_BUS" 
+            for c in result.get("connections", [])
+        )
+        
+        if references_event_bus and not has_event_bus:
+            result["modules"].append({
+                "id": "EVENT_BUS",
+                "name": "Event Bus",
+                "type": "Infrastructure",
+                "coreTask": "Pub/Sub message routing",
+                "dataShape": "Event Envelopes",
+                "expectedOutput": "Message Delivery",
+                "errorHandling": "Dead Letter Queue"
+            })
+            valid_ids.add("EVENT_BUS")
+
+        # Validate connections reference real module IDs
         result["connections"] = [
             c for c in result.get("connections", [])
             if c.get("from_node") in valid_ids and c.get("to_node") in valid_ids
@@ -466,14 +490,20 @@ def suggest_architecture_stream(prompt: str, graphify_context: str = "", answers
     user_prompt += """
 
 Follow the full reasoning chain: Intent → Constraints → Flow → Failure Analysis → Architecture.
-Generate the minimum modules needed in pure Markdown format. For each module in the Architecture section, you MUST provide exactly these fields using a bulleted list:
+
+Generate the Enterprise Architecture in pure Markdown format. For each module in the Architecture section, you MUST provide exactly these fields using a bulleted list:
 - **Module ID**: (e.g., M001, M002)
-- **Name**: (e.g., API Gateway)
+- **Name**: (e.g., API Gateway, Inventory Service, Notification Service)
+- **Type**: (Business Service | Shared Service | Infrastructure)
 - **Core Task**: 
-- **Dependencies**: (comma separated list of Module IDs this depends on)
+- **Events Published**: (comma separated list of domain events emitted, or 'None')
+- **Events Subscribed**: (comma separated list of domain events consumed, or 'None')
+- **API Contracts**: (List key HTTP endpoints and methods, e.g. `POST /api/v1/resource`)
 - **Data Shape**:
 - **Expected Output**:
-- **Error Handling**:"""
+- **Error Handling**:
+
+Make sure to include an API Gateway and an Event Bus as Infrastructure modules. Include Shared Services like Audit, Notification, and Observability. Provide realistic Enterprise estimations for APIs, Files, and Hours. Finally, include a Mermaid Sequence diagram for a critical user journey."""
 
     try:
         print(f"[ARCH-STREAM] Reasoning about architecture for: {prompt[:60]}...")
