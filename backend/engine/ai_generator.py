@@ -305,351 +305,39 @@ SYSTEM_ARCHETYPES = [
     "marketplace",        # Two-sided platforms, matching, transactions
 ]
 
-CLASSIFIER_SYSTEM_PROMPT = """Role: System Architect Classifier.
-Classify the project into ONE primary archetype (crud_app, saas_platform, autonomous_agent, workflow_engine, embedded_system, compiler_toolchain, data_pipeline, cognitive_system, realtime_system, marketplace).
-
-Respond with ONLY valid JSON containing: primary_archetype, secondary_archetype, core_domain, primary_entity, critical_path, complexity_tier, reasoning."""
 
 
-def classify_system_type(prompt: str) -> dict:
-    """Stage 1: Classify the user's project into a system archetype.
-    This classification controls all downstream reasoning."""
-    api_key = os.environ.get("NVIDIA_API_KEY")
-    if not api_key:
-        return {
-            "primary_archetype": "crud_app",
-            "secondary_archetype": None,
-            "core_domain": "general",
-            "primary_entity": "data",
-            "critical_path": "User submits data and receives a response",
-            "complexity_tier": "moderate",
-            "reasoning": "No API key — defaulting to CRUD archetype.",
-        }
+def generate_clarifying_questions(prompt: str, graphify_context: str = "") -> dict:
+    """Generates clarifying questions based on the prompt and optional Graphify context."""
+    system_prompt = """You are a highly analytical systems architect.
+Analyze the user's prompt and the provided Graphify context (if any).
+Return a JSON array of up to 3 clarifying questions to resolve ambiguities in the architecture.
 
-    try:
-        print(f"[CLASSIFY] Classifying: {prompt[:80]}...")
-        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, json_mode=True)
-        result = _extract_json(raw)
-        print(f"[CLASSIFY] → {result.get('primary_archetype')} / {result.get('core_domain')}")
-        return result
-    except Exception as e:
-        print(f"ERROR: Classification failed: {e}")
-        traceback.print_exc()
-        return {
-            "primary_archetype": "crud_app",
-            "secondary_archetype": None,
-            "core_domain": "general",
-            "primary_entity": "data",
-            "critical_path": "Unknown",
-            "complexity_tier": "moderate",
-            "reasoning": f"Classification failed: {e}",
-        }
-
-
-# ═══════════════════════════════════════════════════════════════
-#  STAGE 2: DOMAIN-ADAPTIVE CLARIFICATION
-#
-#  Questions are NOT static.  They are generated based on the
-#  system archetype detected in Stage 1.  Each archetype has
-#  a different question tree that probes the dimensions that
-#  actually matter for that kind of system.
-# ═══════════════════════════════════════════════════════════════
-
-# Domain-specific question axes per archetype
-ARCHETYPE_QUESTION_AXES = {
-    "autonomous_agent": {
-        "dimensions": [
-            "tool_invocation_policy",
-            "max_recursion_depth",
-            "memory_architecture",
-            "retry_and_recovery",
-            "sub_agent_spawning",
-            "token_budget_allocation",
-            "checkpoint_strategy",
-            "safety_guardrails",
-        ],
-        "critical_questions": [
-            "What tools/APIs can the agent invoke, and is there an approval step?",
-            "What is the maximum recursion depth before the agent must stop?",
-            "How should the agent manage memory — full conversation, sliding window, or summarization?",
-            "When a tool call fails, should the agent retry, skip, or ask the user?",
-            "Can this agent spawn sub-agents, and if so, what limits apply?",
-            "Is there a token/cost budget per run, and what happens when it's exceeded?",
-        ],
-    },
-    "workflow_engine": {
-        "dimensions": [
-            "concurrency_model",
-            "rollback_policy",
-            "state_persistence",
-            "step_timeout",
-            "conditional_branching",
-            "human_in_the_loop",
-            "idempotency",
-        ],
-        "critical_questions": [
-            "Should workflow steps run sequentially, in parallel, or a mix?",
-            "When a step fails, should the entire workflow rollback or skip and continue?",
-            "How should workflow state be persisted — in-memory, database, or event log?",
-            "Is there a timeout per step, and what happens when it fires?",
-            "Are there conditional branches (if/else) in the workflow, or is it strictly linear?",
-            "Do any steps require human approval before proceeding?",
-        ],
-    },
-    "embedded_system": {
-        "dimensions": [
-            "hardware_target",
-            "latency_requirements",
-            "interrupt_model",
-            "power_constraints",
-            "memory_budget",
-            "communication_protocol",
-            "update_mechanism",
-        ],
-        "critical_questions": [
-            "What is the target hardware (MCU, SBC, FPGA) and its memory/CPU constraints?",
-            "What is the maximum acceptable latency for the critical path?",
-            "Does the system use interrupt-driven I/O or polling?",
-            "Are there power constraints (battery, sleep modes, duty cycling)?",
-            "How will firmware/software be updated in the field?",
-        ],
-    },
-    "saas_platform": {
-        "dimensions": [
-            "multi_tenancy_model",
-            "billing_integration",
-            "auth_provider",
-            "data_isolation",
-            "scaling_strategy",
-            "compliance_requirements",
-            "onboarding_flow",
-        ],
-        "critical_questions": [
-            "Is this single-tenant or multi-tenant, and how is data isolated?",
-            "What billing model — subscription, usage-based, freemium, or enterprise?",
-            "What auth provider — OAuth, SAML, custom, or passwordless?",
-            "Are there compliance requirements (GDPR, HIPAA, SOC2)?",
-            "What is the expected scale — hundreds, thousands, or millions of users?",
-        ],
-    },
-    "data_pipeline": {
-        "dimensions": [
-            "batch_vs_stream",
-            "data_volume",
-            "transformation_complexity",
-            "error_recovery",
-            "schema_evolution",
-            "sink_destinations",
-            "monitoring",
-        ],
-        "critical_questions": [
-            "Is this batch processing, real-time streaming, or both?",
-            "What is the expected data volume per day/hour?",
-            "What are the data sources (databases, APIs, files, message queues)?",
-            "How should schema changes be handled — fail, migrate, or ignore?",
-            "Where does processed data land (data warehouse, API, file system, dashboard)?",
-        ],
-    },
-    "cognitive_system": {
-        "dimensions": [
-            "model_stack",
-            "retrieval_strategy",
-            "knowledge_representation",
-            "reasoning_chain_depth",
-            "grounding_sources",
-            "evaluation_metrics",
-            "context_management",
-        ],
-        "critical_questions": [
-            "What AI models are involved and do they chain together?",
-            "Is there a retrieval/RAG component, and what is the knowledge source?",
-            "How deep can reasoning chains go before the system must produce output?",
-            "How is context managed across multi-turn interactions?",
-            "What are the quality/accuracy requirements — best-effort or mission-critical?",
-        ],
-    },
-    "compiler_toolchain": {
-        "dimensions": [
-            "source_language",
-            "target_output",
-            "error_reporting",
-            "optimization_passes",
-            "ast_representation",
-            "plugin_extensibility",
-        ],
-        "critical_questions": [
-            "What is the source language/format being parsed?",
-            "What is the target output — machine code, bytecode, another language, or AST?",
-            "How detailed should error messages and diagnostics be?",
-            "Are there optimization passes, and which are critical?",
-            "Should the toolchain support plugins or extensions?",
-        ],
-    },
-    "realtime_system": {
-        "dimensions": [
-            "protocol",
-            "connection_scale",
-            "message_ordering",
-            "presence_tracking",
-            "offline_sync",
-            "conflict_resolution",
-        ],
-        "critical_questions": [
-            "What real-time protocol — WebSocket, SSE, WebRTC, or MQTT?",
-            "How many concurrent connections do you expect?",
-            "Is message ordering guaranteed, and does it matter for your use case?",
-            "Do you need presence tracking (who's online/typing)?",
-            "How should the system handle offline clients reconnecting?",
-        ],
-    },
-    "marketplace": {
-        "dimensions": [
-            "participant_types",
-            "matching_algorithm",
-            "payment_escrow",
-            "trust_and_reputation",
-            "dispute_resolution",
-            "search_and_discovery",
-        ],
-        "critical_questions": [
-            "Who are the two sides of the marketplace (e.g., buyers/sellers, drivers/riders)?",
-            "How are matches made — search, algorithm, auction, or manual?",
-            "How are payments handled — direct, escrow, split?",
-            "Is there a rating/reputation system, and how does it affect matching?",
-            "How are disputes between participants resolved?",
-        ],
-    },
-    "crud_app": {
-        "dimensions": [
-            "data_model_complexity",
-            "access_control",
-            "search_and_filter",
-            "import_export",
-            "audit_trail",
-            "notifications",
-        ],
-        "critical_questions": [
-            "How many core entities (tables/collections) does your data model have?",
-            "What access control is needed — public, login-only, role-based, or row-level?",
-            "Do you need full-text search or just basic filtering?",
-            "Is data import/export (CSV, Excel, API) required?",
-            "Do you need an audit trail of all changes?",
-        ],
-    },
-}
-
-CLARIFY_SYSTEM_PROMPT_TEMPLATE = """Role: Senior Architect interviewing for {archetype_display} in {domain}.
-
-System Classification:
-- Primary: {primary_archetype}
-- Secondary: {secondary_archetype}
-- Domain: {domain}
-- Entity: {primary_entity}
-- Path: {critical_path}
-- Complexity: {complexity}
-
-Generate 4-6 clarifying questions targeting these dimensions:
-{dimension_list}
-
-Examples:
-{example_questions}
-
-RULES:
-1. Specific to archetype/domain.
-2. Unlocks architectural decisions.
-3. Skip answered questions.
-4. >=1 "open_text" question.
-5. Actionable options.
-
-Types: "single_select" (3-5 options), "multi_select" (4-6 options), "open_text" ([]).
-
-Respond ONLY with valid JSON:
-{{
+Output format:
+{
   "questions": [
-    {{
+    {
       "id": "q1",
-      "type": "single_select",
-      "question": "?",
-      "options": ["A", "B"]
-    }}
+      "question": "Your question here?",
+      "type": "open_text"
+    }
   ]
-}}"""
+}"""
 
-
-def generate_clarifying_questions(prompt: str, classification: dict = None) -> dict:
-    """Stage 2: Generate domain-adaptive questions based on system classification.
-    If classification is not provided, runs classifier first."""
-    api_key = os.environ.get("NVIDIA_API_KEY")
-    if not api_key:
-        return {"questions": []}
-
-    # Run classifier if not provided
-    if classification is None:
-        classification = classify_system_type(prompt)
-
-    archetype = classification.get("primary_archetype", "crud_app")
-    secondary = classification.get("secondary_archetype")
-    domain = classification.get("core_domain", "general")
-    primary_entity = classification.get("primary_entity", "data")
-    critical_path = classification.get("critical_path", "")
-    complexity = classification.get("complexity_tier", "moderate")
-
-    # Get archetype-specific question dimensions
-    archetype_config = ARCHETYPE_QUESTION_AXES.get(archetype, ARCHETYPE_QUESTION_AXES["crud_app"])
-    dimensions = archetype_config["dimensions"]
-    examples = archetype_config["critical_questions"]
-
-    # If there's a secondary archetype, merge its dimensions
-    if secondary and secondary in ARCHETYPE_QUESTION_AXES:
-        secondary_config = ARCHETYPE_QUESTION_AXES[secondary]
-        dimensions = dimensions + secondary_config["dimensions"][:3]
-        examples = examples + secondary_config["critical_questions"][:2]
-
-    archetype_display = archetype.replace("_", " ").title()
-    dimension_list = "\n".join(f"  - {d.replace('_', ' ').title()}" for d in dimensions)
-    example_list = "\n".join(f"  - {q}" for q in examples)
-
-    system_prompt = CLARIFY_SYSTEM_PROMPT_TEMPLATE.format(
-        archetype_display=archetype_display,
-        domain=domain,
-        primary_archetype=archetype,
-        secondary_archetype=secondary or "none",
-        primary_entity=primary_entity,
-        critical_path=critical_path,
-        complexity=complexity,
-        dimension_list=dimension_list,
-        example_questions=example_list,
-    )
-
-    user_msg = f"""The user wants to build:
-\"{prompt}\"
-
-Generate 4-6 clarifying questions specific to this {archetype_display} system.
-Probe the architectural dimensions that will have the biggest impact on the design."""
+    user_msg = f"Prompt: {prompt}"
+    if graphify_context:
+        user_msg += f"\n\nGraphify Context:\n{graphify_context}"
 
     try:
-        print(f"[CLARIFY] Generating {archetype} questions for: {prompt[:60]}...")
         raw = _call_fast_model(system_prompt, user_msg, json_mode=True)
-        print(f"[CLARIFY] Got {len(raw)} chars")
-        result = _extract_json(raw)
-
-        # Attach the classification so frontend can display it
-        result["classification"] = classification
-        return result
+        data = _extract_json(raw)
+        return data
     except Exception as e:
-        print(f"ERROR: Clarification failed: {e}")
-        traceback.print_exc()
-        return {"questions": [], "classification": classification}
-
+        print(f"Clarification generation failed: {e}")
+        return {"questions": []}
 
 # ═══════════════════════════════════════════════════════════════
 #  STAGE 3: REASONING-BASED ARCHITECTURE GENERATION
-#
-#  This is NOT "list modules."  It is a reasoning chain:
-#    Intent → Constraints → Execution Flow → Failure Analysis → Architecture
-#
-#  The thinking model reasons about WHY each module exists before
-#  generating the module list.
 # ═══════════════════════════════════════════════════════════════
 
 REASONING_SYSTEM_PROMPT = """You are an Enterprise Architecture Compiler.
@@ -671,7 +359,7 @@ MODULE REQUIREMENTS:
 Output modules in standard Markdown format."""
 
 
-def suggest_architecture(prompt: str, classification: dict = None, answers: dict = None) -> str:
+def suggest_architecture(prompt: str, graphify_context: str = "", answers: dict = None) -> str:
     """Stage 3: Reasoning-based architecture generation.
 
     Uses the thinking model to reason about the architecture before
@@ -685,16 +373,10 @@ def suggest_architecture(prompt: str, classification: dict = None, answers: dict
 
     # Build rich context from classification + answers
     context_parts = [f'The user wants to build: "{prompt}"']
-
-    if classification:
-        context_parts.append(f"""
-System Classification:
-- Archetype: {classification.get('primary_archetype', 'unknown')}
-- Secondary: {classification.get('secondary_archetype', 'none')}
-- Domain: {classification.get('core_domain', 'general')}
-- Primary Entity: {classification.get('primary_entity', 'data')}
-- Critical Path: {classification.get('critical_path', 'unknown')}
-- Complexity: {classification.get('complexity_tier', 'moderate')}""")
+    if graphify_context:
+        context_parts.append(f"
+Graphify Context:
+{graphify_context}")
 
     if answers:
         answer_text = "\n".join(f"  Q: {k}\n  A: {v}" for k, v in answers.items())
@@ -753,7 +435,7 @@ Generate the minimum modules needed in pure Markdown format."""
         return _mock_architecture(prompt)
 
 
-def suggest_architecture_stream(prompt: str, classification: dict = None, answers: dict = None):
+def suggest_architecture_stream(prompt: str, graphify_context: str = "", answers: dict = None):
     """Stage 3 (Streaming): Reasoning-based architecture generation.
     Yields Markdown tokens in real-time.
     """
@@ -762,18 +444,11 @@ def suggest_architecture_stream(prompt: str, classification: dict = None, answer
         yield "# Mock Architecture\n\nNo API Key available."
         return
 
-    # Build rich context from classification + answers
+    # Build rich context from graphify + answers
     context_parts = [f'The user wants to build: "{prompt}"']
 
-    if classification:
-        context_parts.append(f"""
-System Classification:
-- Archetype: {classification.get('primary_archetype', 'unknown')}
-- Secondary: {classification.get('secondary_archetype', 'none')}
-- Domain: {classification.get('core_domain', 'general')}
-- Primary Entity: {classification.get('primary_entity', 'data')}
-- Critical Path: {classification.get('critical_path', 'unknown')}
-- Complexity: {classification.get('complexity_tier', 'moderate')}""")
+    if graphify_context:
+        context_parts.append(f"\nGraphify Context:\n{graphify_context}")
 
     if answers:
         answer_text = "\n".join(f"  Q: {k}\n  A: {v}" for k, v in answers.items())
@@ -805,7 +480,7 @@ CRITICAL RULES:
 2. Completely IGNORE all other sections (Reasoning, Flowchart, Security, Governance, Observability, etc.).
 3. Preserve all mandatory module fields EXACTLY as written.
 4. Enforce deterministic module IDs (M001, M002, etc.). Do not generate arbitrary IDs or rename them.
-5. Edge generation rules: Generate edges ONLY from the explicit sequential ordering of the modules (M001 -> M002 -> M003). Do not infer edges from the reasoning text or create cross-links.
+5. Edge generation rules: Intelligently analyze the `dependencies` field of each module. If Module M003 depends on M001 and M002, generate the edges `{"from_node": "M001", "to_node": "M003"}` and `{"from_node": "M002", "to_node": "M003"}`. Create accurate connections matching the dependencies.
 
 Extract the modules and connections exactly into this JSON schema:
 {

@@ -48,16 +48,13 @@ app.add_middleware(
 
 # ── Request Models ──────────────────────────────────────────
 
-class ClassifyRequest(BaseModel):
-    prompt: str
-
 class ClarifyRequest(BaseModel):
     prompt: str
-    classification: Optional[dict] = None
+    graphify_context: Optional[str] = None
 
 class ArchitectureRequest(BaseModel):
     prompt: str
-    classification: Optional[dict] = None
+    graphify_context: Optional[str] = None
     answers: Optional[dict] = None
 
 class FlowchartRequest(BaseModel):
@@ -130,21 +127,11 @@ async def api_upload_context(file: UploadFile = File(...)):
             os.remove(temp_file_path)
 
 
-@app.post("/api/classify-system")
-def api_classify_system(req:  ClassifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
-    """Stage 1: Classify the project into a system archetype."""
-    try:
-        classification = classify_system_type(req.prompt)
-        return {"status": "success", "classification": classification}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.post("/api/clarify-architecture")
 def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 2: Generate domain-adaptive clarifying questions."""
     try:
-        result = generate_clarifying_questions(req.prompt, req.classification)
+        result = generate_clarifying_questions(req.prompt, req.graphify_context)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -154,7 +141,7 @@ def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Dep
 def api_suggest_architecture(req:  ArchitectureRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 3: Reasoning-based architecture generation."""
     try:
-        suggestion = suggest_architecture(req.prompt, req.classification, req.answers)
+        suggestion = suggest_architecture(req.prompt, req.graphify_context, req.answers)
         return {"status": "success", "suggestion": suggestion}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -166,7 +153,7 @@ from fastapi.responses import StreamingResponse
 def api_suggest_architecture_stream(req:  ArchitectureRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 3 (Streaming): Reasoning-based architecture generation returning pure Markdown."""
     def event_generator():
-        for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
+        for chunk in suggest_architecture_stream(req.prompt, req.graphify_context, req.answers):
             # Format as SSE
             # Replace newlines in chunk with something SSE safe, or use proper data: payload
             # Fast way for simple markdown: just send the chunk as a plain string using StreamingResponse text/plain,
@@ -183,7 +170,7 @@ def api_suggest_architecture_stream(req:  ArchitectureRequest, current_user: aut
             
     # Wait, the easiest way to stream markdown directly to frontend without SSE parsing is just streaming text.
     def text_generator():
-        for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
+        for chunk in suggest_architecture_stream(req.prompt, req.graphify_context, req.answers):
             yield chunk
 
     return StreamingResponse(text_generator(), media_type="text/plain")
@@ -248,11 +235,11 @@ def api_auto_improve_architecture(req:  AutoImproveRequest, current_user: auth.U
 
 class ClarifyRequest(BaseModel):
     prompt: str
-    classification: Optional[dict] = None
+    graphify_context: Optional[str] = None
 
 class ArchitectureRequest(BaseModel):
     prompt: str
-    classification: Optional[dict] = None
+    graphify_context: Optional[str] = None
     answers: Optional[dict] = None
 
 class FlowchartRequest(BaseModel):
@@ -325,21 +312,11 @@ async def api_upload_context(file: UploadFile = File(...)):
             os.remove(temp_file_path)
 
 
-@app.post("/api/classify-system")
-def api_classify_system(req:  ClassifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
-    """Stage 1: Classify the project into a system archetype."""
-    try:
-        classification = classify_system_type(req.prompt)
-        return {"status": "success", "classification": classification}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.post("/api/clarify-architecture")
 def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 2: Generate domain-adaptive clarifying questions."""
     try:
-        result = generate_clarifying_questions(req.prompt, req.classification)
+        result = generate_clarifying_questions(req.prompt, req.graphify_context)
         return {"status": "success", "data": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -349,7 +326,7 @@ def api_clarify_architecture(req:  ClarifyRequest, current_user: auth.User = Dep
 def api_suggest_architecture(req:  ArchitectureRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 3: Reasoning-based architecture generation."""
     try:
-        suggestion = suggest_architecture(req.prompt, req.classification, req.answers)
+        suggestion = suggest_architecture(req.prompt, req.graphify_context, req.answers)
         return {"status": "success", "suggestion": suggestion}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -361,7 +338,7 @@ from fastapi.responses import StreamingResponse
 def api_suggest_architecture_stream(req:  ArchitectureRequest, current_user: auth.User = Depends(auth.get_authorized_user)):
     """Stage 3 (Streaming): Reasoning-based architecture generation returning pure Markdown."""
     def event_generator():
-        for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
+        for chunk in suggest_architecture_stream(req.prompt, req.graphify_context, req.answers):
             # Format as SSE
             # Replace newlines in chunk with something SSE safe, or use proper data: payload
             # Fast way for simple markdown: just send the chunk as a plain string using StreamingResponse text/plain,
@@ -378,7 +355,7 @@ def api_suggest_architecture_stream(req:  ArchitectureRequest, current_user: aut
             
     # Wait, the easiest way to stream markdown directly to frontend without SSE parsing is just streaming text.
     def text_generator():
-        for chunk in suggest_architecture_stream(req.prompt, req.classification, req.answers):
+        for chunk in suggest_architecture_stream(req.prompt, req.graphify_context, req.answers):
             yield chunk
 
     return StreamingResponse(text_generator(), media_type="text/plain")

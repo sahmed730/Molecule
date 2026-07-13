@@ -12,19 +12,6 @@ import { db } from '../firebase';
 
 const API_BASE = 'https://ali7277-molecule-engine.hf.space';
 
-// Archetype display config
-const ARCHETYPE_META: Record<string, { label: string; color: string; icon: string }> = {
-  crud_app:           { label: 'CRUD Application',    color: 'bg-emerald-100 text-emerald-800 border-emerald-300', icon: '📋' },
-  saas_platform:      { label: 'SaaS Platform',       color: 'bg-violet-100 text-violet-800 border-violet-300',    icon: '☁️' },
-  autonomous_agent:   { label: 'Autonomous Agent',    color: 'bg-amber-100 text-amber-800 border-amber-300',      icon: '🤖' },
-  workflow_engine:    { label: 'Workflow Engine',      color: 'bg-blue-100 text-blue-800 border-blue-300',         icon: '⚙️' },
-  embedded_system:    { label: 'Embedded System',      color: 'bg-red-100 text-red-800 border-red-300',            icon: '🔌' },
-  compiler_toolchain: { label: 'Compiler / Toolchain', color: 'bg-orange-100 text-orange-800 border-orange-300',   icon: '🔧' },
-  data_pipeline:      { label: 'Data Pipeline',        color: 'bg-cyan-100 text-cyan-800 border-cyan-300',         icon: '🔀' },
-  cognitive_system:   { label: 'Cognitive System',     color: 'bg-pink-100 text-pink-800 border-pink-300',         icon: '🧠' },
-  realtime_system:    { label: 'Real-time System',     color: 'bg-indigo-100 text-indigo-800 border-indigo-300',   icon: '⚡' },
-  marketplace:        { label: 'Marketplace',          color: 'bg-teal-100 text-teal-800 border-teal-300',         icon: '🏪' },
-};
 
 const nodeWidth = 450;
 const nodeHeight = 150;
@@ -71,8 +58,6 @@ function Dashboard() {
   const { activeTabId, openedTabs, setActiveTabId, closeTab, token, user, logout, isDarkMode, toggleDarkMode } = useAppStore();
 
   // Pipeline state
-  const [isClassifying, setIsClassifying] = useState(false);
-  const [classification, setClassification] = useState<any>(null);
   const [isClarifying, setIsClarifying] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -183,46 +168,30 @@ function Dashboard() {
   const handleStartPipeline = async () => {
     if (!prompt.trim()) return;
 
-    setIsClassifying(true);
-    setClassification(null);
+    setIsClarifying(true);
+    setQuestions([]);
     
     const finalPrompt = attachedContext 
-      ? `${prompt}\n\n--- Context from ${attachedDocName} ---\n${attachedContext}\n-------------------------\n` 
+      ? `${prompt}
+
+--- Context from ${attachedDocName} ---
+${attachedContext}
+-------------------------
+` 
       : prompt;
 
     try {
-      // Stage 1: Classify the system type
-      const classifyRes = await fetch(`${API_BASE}/api/classify-system`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ prompt: finalPrompt }),
-      });
-      const classifyData = await classifyRes.json();
-      let classificationResult = null;
-
-      if (classifyData.status === 'success') {
-        classificationResult = classifyData.classification;
-        setClassification(classificationResult);
-      }
-
-      setIsClassifying(false);
-      setIsClarifying(true);
-
       // Stage 2: Generate domain-adaptive questions
       const clarifyRes = await fetch(`${API_BASE}/api/clarify-architecture`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ prompt: finalPrompt, classification: classificationResult }),
+        body: JSON.stringify({ prompt: finalPrompt, graphify_context: attachedContext || undefined }),
       });
       const clarifyData = await clarifyRes.json();
 
       if (clarifyData.status === 'success' && clarifyData.data.questions?.length > 0) {
         setQuestions(clarifyData.data.questions);
-        // Also update classification if returned with questions
-        if (clarifyData.data.classification) {
-          setClassification(clarifyData.data.classification);
-        }
-        // Pre-fill answers
+                // Pre-fill answers
         const initial: Record<string, any> = {};
         clarifyData.data.questions.forEach((q: any) => {
           initial[q.id] = q.type === 'multi_select' ? [] : '';
@@ -230,13 +199,12 @@ function Dashboard() {
         setAnswers(initial);
       } else {
         // No questions → go straight to generation
-        handleGenerateArchitecture(undefined, classificationResult);
+        handleGenerateArchitecture(undefined);
       }
     } catch (e) {
       console.error('Pipeline start failed:', e);
       handleGenerateArchitecture();
     } finally {
-      setIsClassifying(false);
       setIsClarifying(false);
     }
   };
@@ -244,8 +212,7 @@ function Dashboard() {
   // ── Stage 3: Generate Architecture ─────────────────────────
 
   const handleGenerateArchitecture = async (
-    finalPromptOverride?: string,
-    classificationOverride?: any
+    finalPromptOverride?: string
   ) => {
     let basePrompt = finalPromptOverride || prompt;
     const finalPrompt = attachedContext 
@@ -277,7 +244,7 @@ function Dashboard() {
         headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           prompt: finalPrompt,
-          classification: classificationOverride || classification,
+          graphify_context: attachedContext || undefined,
           answers: Object.keys(structuredAnswers).length > 0 ? structuredAnswers : null,
         }),
       });
@@ -394,48 +361,7 @@ function Dashboard() {
 
   // ── Archetype badge rendering ──────────────────────────────
 
-  const renderClassificationBadge = () => {
-    if (!classification) return null;
-    const archetype = classification.primary_archetype || 'crud_app';
-    const meta = ARCHETYPE_META[archetype] || ARCHETYPE_META.crud_app;
-    return (
-      <div className="mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200 animate-in fade-in slide-in-from-top-2">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-2xl">{meta.icon}</span>
-          <div>
-            <span className={`inline-block px-3 py-1 text-xs font-black uppercase tracking-wider rounded-full border ${meta.color}`}>
-              {meta.label}
-            </span>
-            {classification.secondary_archetype && (
-              <span className="ml-2 inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 rounded-full border border-slate-200">
-                + {(ARCHETYPE_META[classification.secondary_archetype] || { label: classification.secondary_archetype }).label}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          <div className="text-center p-2 bg-white rounded-lg border border-slate-100">
-            <div className="text-[9px] uppercase font-bold tracking-widest text-slate-400">Domain</div>
-            <div className="text-sm font-bold text-slate-700 capitalize">{classification.core_domain}</div>
-          </div>
-          <div className="text-center p-2 bg-white rounded-lg border border-slate-100">
-            <div className="text-[9px] uppercase font-bold tracking-widest text-slate-400">Entity</div>
-            <div className="text-sm font-bold text-slate-700 capitalize">{classification.primary_entity}</div>
-          </div>
-          <div className="text-center p-2 bg-white rounded-lg border border-slate-100">
-            <div className="text-[9px] uppercase font-bold tracking-widest text-slate-400">Complexity</div>
-        <div className="text-sm font-bold text-slate-700 capitalize">{classification.complexity_tier}</div>
-          </div>
-        </div>
-        {classification.critical_path && (
-          <div className="mt-2 text-xs text-slate-500 italic">
-            <span className="font-bold text-slate-600">Critical path:</span> {classification.critical_path}
-          </div>
-        )}
-      </div>
-    );
-  };
-
+  
   return (
     <div className="flex w-full h-screen bg-neutral-primary text-body overflow-hidden">
       {/* Top Header */}
@@ -523,7 +449,7 @@ function Dashboard() {
                       Describe Your System
                     </h1>
                     <p className="text-body-subtle mb-6 text-[13px]">
-                      The AI will classify your project, ask domain-specific questions, then reason through the architecture.
+                      The AI will ask domain-specific questions and reason through the architecture. Upload a Graphify context file for maximum accuracy.
                     </p>
 
                     <div className="flex flex-wrap gap-2 mb-4">
@@ -536,7 +462,7 @@ function Dashboard() {
                       ].map(example => (
                         <button
                           key={example}
-                          onClick={() => { setPrompt(example); setClassification(null); setQuestions([]); }}
+                          onClick={() => { setPrompt(example); setQuestions([]); }}
                           className="text-xs px-3 py-1.5 bg-neutral-primary hover:bg-neutral-secondary-medium text-body border border-default rounded-[12px] transition-all font-medium active:scale-95"
                         >
                           {example}
@@ -546,13 +472,12 @@ function Dashboard() {
 
                     <textarea
                       value={prompt}
-                      onChange={(e) => { setPrompt(e.target.value); setClassification(null); setQuestions([]); }}
+                      onChange={(e) => { setPrompt(e.target.value); setQuestions([]); }}
                       placeholder="Describe what you want to build in detail..."
                       className="w-full h-40 p-5 bg-neutral-primary border border-default rounded-[12px] focus:border-brand-medium focus:ring-1 focus:ring-brand-medium outline-none resize-none mb-6 text-body transition-all placeholder:text-body-subtle shadow-xs"
                     />
 
-                    {/* Classification badge */}
-                    {renderClassificationBadge()}
+                    
 
                     <div className="flex justify-between items-center">
                       <div>
@@ -561,7 +486,7 @@ function Dashboard() {
                           ref={fileInputRef} 
                           className="hidden" 
                           onChange={handleFileUpload}
-                          accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.json,.html"
+                          accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.csv,.json,.html,.md"
                         />
                         {attachedDocName ? (
                           <div className="flex items-center gap-1 px-3 py-1.5 bg-neutral-primary border border-default rounded-[12px]">
@@ -601,12 +526,10 @@ function Dashboard() {
                       
                       <button
                         onClick={handleStartPipeline}
-                        disabled={isClassifying || isClarifying || isGenerating || !prompt.trim()}
+                        disabled={isClarifying || isGenerating || !prompt.trim()}
                         className="px-6 py-[10px] bg-brand text-white rounded-[12px] font-medium hover:bg-brand-strong flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xs active:scale-95"
                       >
-                        {isClassifying ? (
-                          <><Loader2 className="w-5 h-5 animate-spin" /> Classifying System...</>
-                        ) : isClarifying ? (
+                        {isClarifying ? (
                           <><Loader2 className="w-5 h-5 animate-spin" /> Generating Questions...</>
                         ) : isGenerating ? (
                           <><Loader2 className="w-5 h-5 animate-spin" /> Reasoning...</>
@@ -657,14 +580,7 @@ function Dashboard() {
                                   Domain-specific questions to sharpen the architecture.
                                 </p>
                               </div>
-                              {classification && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-lg">{(ARCHETYPE_META[classification.primary_archetype] || {}).icon}</span>
-                                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border ${(ARCHETYPE_META[classification.primary_archetype] || ARCHETYPE_META.crud_app).color}`}>
-                                    {(ARCHETYPE_META[classification.primary_archetype] || ARCHETYPE_META.crud_app).label}
-                                  </span>
-                                </div>
-                              )}
+                              
                             </div>
                           </div>
 
@@ -949,7 +865,7 @@ function Dashboard() {
                       setPrompt('');
                       setGeneratedNodes([]);
                       setGeneratedEdges([]);
-                      setClassification(null);
+                      
                       setQuestions([]);
                       setAnswers({});
                       setStreamingMarkdown('');
