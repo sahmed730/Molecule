@@ -12,7 +12,6 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 from markitdown import MarkItDown
 from backend.engine.ai_generator import (
-    classify_system_type,
     suggest_architecture,
     generate_logic_flowchart,
     review_single_module,
