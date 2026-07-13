@@ -54,8 +54,8 @@ def _async_get_client() -> AsyncOpenAI:
         max_retries=0,
     )
 
-FAST_MODEL = os.environ.get("AI_FAST_MODEL", "minimaxai/minimax-m3")
-THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "z-ai/glm-5.1")
+FAST_MODEL = os.environ.get("AI_FAST_MODEL", "z-ai/glm-5.2")
+THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "z-ai/glm-5.2")
 
 def _call_fast_model(
     system_prompt: str,
@@ -152,14 +152,9 @@ def _call_thinking_model(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "max_completion_tokens": 16384,
-    }
+            }
     
     # Enable reasoning for Nemotron/NVIDIA reasoning models
-    if "nemotron" in THINKING_MODEL.lower():
-        kwargs["temperature"] = 1.0
-        kwargs["top_p"] = 0.95
-        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384}
 
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
@@ -167,13 +162,7 @@ def _call_thinking_model(
     try:
         response = client.chat.completions.create(**kwargs)
     except Exception as e:
-        print(f"THINKING_MODEL ({THINKING_MODEL}) failed: {e}. Falling back to FAST_MODEL ({FAST_MODEL})...")
-        kwargs["model"] = FAST_MODEL
-        if "extra_body" in kwargs:
-            del kwargs["extra_body"]
-        kwargs["temperature"] = 0.7
-        kwargs["top_p"] = 1.0
-        response = client.chat.completions.create(**kwargs)
+        raise e
     
     # Try to extract reasoning content if present
     message = response.choices[0].message
@@ -209,26 +198,13 @@ def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "max_completion_tokens": 16384,
-        "stream": True
+                "stream": True
     }
-    
-    if "nemotron" in THINKING_MODEL.lower():
-        kwargs["temperature"] = 1.0
-        kwargs["top_p"] = 0.95
-        kwargs["extra_body"] = {"chat_template_kwargs":{"enable_thinking":True},"reasoning_budget":16384}
         
     try:
         stream = client.chat.completions.create(**kwargs)
     except Exception as e:
-        print(f"THINKING_MODEL stream ({THINKING_MODEL}) failed: {e}. Falling back to FAST_MODEL ({FAST_MODEL})...")
-        yield f"\n\n> **Notice:** The primary reasoning model is currently degraded. Falling back to the fast model ({FAST_MODEL}) for generation.\n\n"
-        kwargs["model"] = FAST_MODEL
-        if "extra_body" in kwargs:
-            del kwargs["extra_body"]
-        kwargs["temperature"] = 0.7
-        kwargs["top_p"] = 1.0
-        stream = client.chat.completions.create(**kwargs)
+        raise e
     
     for event in stream:
         if not event.choices:
@@ -330,30 +306,9 @@ SYSTEM_ARCHETYPES = [
 ]
 
 CLASSIFIER_SYSTEM_PROMPT = """Role: System Architect Classifier.
-Classify the project into ONE primary archetype (and optional secondary).
-Archetypes:
-- crud_app: Forms, basic APIs
-- saas_platform: Multi-tenant, billing, auth
-- autonomous_agent: AI agents, tools, memory
-- workflow_engine: Orchestration, DAG, state machines
-- embedded_system: IoT, hardware, real-time
-- compiler_toolchain: Parsers, ASTs, code gen
-- data_pipeline: ETL, stream processing
-- cognitive_system: Multi-model AI, RAG
-- realtime_system: WebSocket, chat, live collab
-- marketplace: Two-sided, matching, transactions
+Classify the project into ONE primary archetype (crud_app, saas_platform, autonomous_agent, workflow_engine, embedded_system, compiler_toolchain, data_pipeline, cognitive_system, realtime_system, marketplace).
 
-Also identify: Core Domain, Primary Entity, Critical Path.
-Respond with ONLY valid JSON:
-{
-  "primary_archetype": "<archetype>",
-  "secondary_archetype": "<archetype|null>",
-  "core_domain": "<domain>",
-  "primary_entity": "<entity>",
-  "critical_path": "<1-sentence flow>",
-  "complexity_tier": "<simple|moderate|complex|enterprise>",
-  "reasoning": "<1-2 sentences>"
-}"""
+Respond with ONLY valid JSON containing: primary_archetype, secondary_archetype, core_domain, primary_entity, critical_path, complexity_tier, reasoning."""
 
 
 def classify_system_type(prompt: str) -> dict:
@@ -373,7 +328,7 @@ def classify_system_type(prompt: str) -> dict:
 
     try:
         print(f"[CLASSIFY] Classifying: {prompt[:80]}...")
-        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, temperature=0.15, json_mode=True)
+        raw = _call_fast_model(CLASSIFIER_SYSTEM_PROMPT, prompt, json_mode=True)
         result = _extract_json(raw)
         print(f"[CLASSIFY] → {result.get('primary_archetype')} / {result.get('core_domain')}")
         return result
@@ -674,7 +629,7 @@ Probe the architectural dimensions that will have the biggest impact on the desi
 
     try:
         print(f"[CLARIFY] Generating {archetype} questions for: {prompt[:60]}...")
-        raw = _call_fast_model(system_prompt, user_msg, temperature=0.35, json_mode=True)
+        raw = _call_fast_model(system_prompt, user_msg, json_mode=True)
         print(f"[CLARIFY] Got {len(raw)} chars")
         result = _extract_json(raw)
 
@@ -699,22 +654,10 @@ Probe the architectural dimensions that will have the biggest impact on the desi
 
 REASONING_SYSTEM_PROMPT = """You are an Enterprise Architecture Compiler.
 
-Your job is NOT to generate generic architecture. Your job is to maintain architectural integrity across multiple model handoffs.
-
-PRIMARY OBJECTIVE:
 Preserve system continuity, execution fidelity, and platform constraints while transforming user intent into deployable modules.
 
-GLOBAL RULES:
-
-1. STATE PRESERVATION (MANDATORY)
-Read and preserve the canonical architecture state object. Never reinterpret platform, execution environment, constraints, module boundaries, dependencies, ownership model, or governance model.
-
-2. NO PLATFORM DRIFT
-Do not substitute technologies. If external runtime is introduced, justify it.
-
-3. MODULE CONTRACT ENFORCEMENT
-Each module must contain exactly these fields:
-- moduleId: Must follow format M001, M002, etc. (MANDATORY)
+MODULE REQUIREMENTS:
+- moduleId: Must follow format M001, M002, etc.
 - label
 - coreTask
 - dataShape
@@ -725,63 +668,7 @@ Each module must contain exactly these fields:
 - errorHandling
 - testingRequirements
 
-4. ARCHITECTURAL CONSISTENCY
-Ensure security, observability, governance, and scaling assumptions remain intact.
-
-5. SECURITY, OBSERVABILITY, GOVERNANCE
-Security (RBAC, Audit Logging), Observability (latency, load times), and Governance (owners) must exist as separate operational layers in the text.
-
-6. FAILURE MODEL & SCALABILITY
-Address deep failure modes (timeout, schema drift, broken joins) and massive scale (100x data, multi-region).
-
-7. OUTPUT DISCIPLINE (Pure Markdown)
-Return strictly in this order:
-
-## A. Reasoning
-<Concise intent and constraints>
-
-## B. Global Architecture Flow
-```mermaid
-graph TD
-  M001[M001: Name] --> M002[M002: Name]
-```
-
-## C. Modules
-
-### M001: <label>
-**coreTask:** <desc>
-**dataShape:** <desc>
-**expectedOutput:** <desc>
-**rules:** <desc>
-**platform:** <desc>
-**dependencies:** <desc>
-**errorHandling:** <desc>
-**testingRequirements:** <desc>
-
-### M002: <label>
-...
-
-## D. Security Layer
-<details>
-
-## E. Governance Layer
-<details>
-
-## F. Observability Layer
-<details>
-
-## G. Failure Modes
-<details>
-
-## H. Scalability Risks
-<details>
-
-## I. Testing Matrix
-<details>
-
-RULES:
-- Module IDs MUST use M001, M002 format.
-- Output ONLY Markdown."""
+Output modules in standard Markdown format."""
 
 
 def suggest_architecture(prompt: str, classification: dict = None, answers: dict = None) -> str:
@@ -831,7 +718,7 @@ Generate the minimum modules needed in pure Markdown format."""
         # Validate we got modules
         if "modules" not in result or len(result.get("modules", [])) == 0:
             print("WARNING: Thinking model returned no modules, retrying with fast model")
-            raw = _call_fast_model(REASONING_SYSTEM_PROMPT, user_prompt, temperature=0.35, max_tokens=12000)
+            raw = _call_fast_model(REASONING_SYSTEM_PROMPT, user_prompt)
             result = _extract_json(raw)
 
         if "modules" not in result or len(result.get("modules", [])) == 0:
@@ -1100,7 +987,7 @@ def review_single_module(module_data: dict) -> dict:
     
     prompt = f"Review this module:\n{json.dumps(module_data, indent=2)}\nAnalyze and return JSON review."
     try:
-        raw = _call_fast_model(MODULE_REVIEW_PROMPT, prompt, temperature=0.2, max_tokens=1024, json_mode=True)
+        raw = _call_fast_model(MODULE_REVIEW_PROMPT, prompt, json_mode=True)
         review = _extract_json(raw)
         return review
     except Exception as e:
@@ -1202,7 +1089,7 @@ Optimize this graph.  Only reference IDs from MODULES above."""
 
     try:
         print(f"[OPTIMIZE] Compressing graph ({len(module_summary)} nodes)...")
-        raw = _call_fast_model(OPTIMIZE_SYSTEM_PROMPT, prompt, temperature=0.15, json_mode=True)
+        raw = _call_fast_model(OPTIMIZE_SYSTEM_PROMPT, prompt, json_mode=True)
         print(f"[OPTIMIZE] Got {len(raw)} chars")
 
         delta = _extract_json(raw)
@@ -1364,7 +1251,7 @@ Design with full detail.  Only use existing IDs for connections."""
 
     try:
         print(f"[EXPAND] Designing '{module_name}'...")
-        raw = _call_fast_model(EXPAND_SYSTEM_PROMPT, prompt, temperature=0.3, json_mode=True)
+        raw = _call_fast_model(EXPAND_SYSTEM_PROMPT, prompt, json_mode=True)
         result = _extract_json(raw)
 
         new_mod = result.get("new_module", {})
@@ -1426,7 +1313,7 @@ Design with full detail.  Only use existing IDs for connections."""
 
     try:
         print(f"[EXPAND ASYNC] Designing '{module_name}'...")
-        raw = await _async_call_fast_model(EXPAND_SYSTEM_PROMPT, prompt, temperature=0.3, json_mode=True)
+        raw = await _async_call_fast_model(EXPAND_SYSTEM_PROMPT, prompt, json_mode=True)
         result = _extract_json(raw)
 
         new_mod = result.get("new_module", {})
@@ -1567,7 +1454,7 @@ OUTPUT: {module_spec.get('expectedOutput')}
 ERRORS: {module_spec.get('errorHandling')}"""
 
     try:
-        raw = _call_fast_model(FLOWCHART_SYSTEM_PROMPT, prompt, temperature=0.2, max_tokens=1500)
+        raw = _call_fast_model(FLOWCHART_SYSTEM_PROMPT, prompt)
         chart = raw.strip()
         if chart.startswith("```"):
             chart = chart.split("\n", 1)[1]
@@ -1619,7 +1506,7 @@ Keep the structure identical, but modify the fields according to the user's inte
     user_prompt = f"CURRENT MODULE STATE:\n{json.dumps(module_data, indent=2)}\n\nUSER REQUEST:\n{user_message}"
     
     try:
-        raw = _call_fast_model(system_prompt, user_prompt, temperature=0.2, json_mode=True)
+        raw = _call_fast_model(system_prompt, user_prompt, json_mode=True)
         return _extract_json(raw)
     except Exception as e:
         print(f"ERROR: Module chat update failed: {e}")
