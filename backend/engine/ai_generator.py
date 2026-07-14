@@ -557,26 +557,29 @@ def extract_graph_json(markdown_text: str) -> dict:
     system_prompt = """You are a strict JSON extractor. Read the provided Markdown text which contains an Enterprise Architecture.
 
 CRITICAL RULES:
-1. Parse the architecture modules from the provided markdown.
-2. Completely IGNORE all other sections (Reasoning, Flowchart, Security, Governance, Observability, etc.).
-3. Preserve all mandatory module fields EXACTLY as written.
+1. Parse the architecture components from the provided markdown.
+2. Completely IGNORE all other sections (Reasoning, Flowchart, Security, etc.).
+3. Preserve all mandatory component fields EXACTLY as written.
 4. Enforce deterministic module IDs (M001, M002, etc.). Do not generate arbitrary IDs or rename them.
-5. Edge generation rules: Intelligently analyze the `dependencies` field of each module. If Module M003 depends on M001 and M002, generate the edges `{"from_node": "M001", "to_node": "M003"}` and `{"from_node": "M002", "to_node": "M003"}`. Create accurate connections matching the dependencies.
+5. Edge generation rules: Intelligently analyze the `communicationContracts` and `dependencies` fields of each module. If Module M003 depends on or communicates with M001, generate an edge `{"from_node": "M001", "to_node": "M003"}`. Map out the runtime connections.
 
 Extract the modules and connections exactly into this JSON schema:
 {
   "modules": [
     {
       "id": "M001",
-      "name": "Label from the markdown (e.g. Ingestion Layer)",
-      "coreTask": "Task description",
-      "dataShape": "Data shape",
-      "expectedOutput": "Expected output",
-      "rules": "Rules",
-      "platform": "Platform",
+      "name": "Component Name",
+      "type": "Component Type (Firmware, Hardware, etc)",
+      "responsibilities": "Responsibilities",
+      "interfaces": "Interfaces",
+      "communicationContracts": "Communication Contracts",
+      "technologyStack": "Technology Stack",
       "dependencies": "Dependencies",
-      "errorHandling": "Error handling",
-      "testingRequirements": "Testing requirements"
+      "constraints": "Constraints",
+      "nonFunctional": "Non-Functional",
+      "testing": "Testing",
+      "deployment": "Deployment",
+      "architectureDecisions": "Architecture Decisions"
     }
   ],
   "connections": [
@@ -589,15 +592,19 @@ Return ONLY valid JSON, no markdown fences."""
         raw = _call_thinking_model(system_prompt, markdown_text, json_mode=True)
         result = _extract_json(raw)
         
-        # Ensure fields exist
+        # Ensure universal fields exist
         for mod in result.get("modules", []):
-            mod.setdefault("platform", "Unknown")
-            # Backward compatibility alias for the legacy frontend schema
-            if "language" not in mod or not mod["language"]:
-                mod["language"] = mod.get("platform")
+            mod.setdefault("type", "Component")
+            mod.setdefault("responsibilities", "None")
+            mod.setdefault("interfaces", "None")
+            mod.setdefault("communicationContracts", "None")
+            mod.setdefault("technologyStack", "None")
             mod.setdefault("dependencies", "None")
-            mod.setdefault("errorHandling", "None specified")
-            mod.setdefault("testingRequirements", "None specified")
+            mod.setdefault("constraints", "None")
+            mod.setdefault("nonFunctional", "None")
+            mod.setdefault("testing", "None")
+            mod.setdefault("deployment", "None")
+            mod.setdefault("architectureDecisions", "None")
             mod.setdefault("rules", "None specified")
             mod.setdefault("dataShape", "Unknown")
             mod.setdefault("expectedOutput", "Unknown")

@@ -204,16 +204,18 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         data: {
           moduleId: m.id,
           label: existingNode ? existingNode.data.label : `${m.id} ${m.name || 'Module'}`,
-          coreTask: m.coreTask || '',
-          dataShape: m.dataShape || '',
-          expectedOutput: m.expectedOutput || '',
-          rules: m.rules || '',
-          status: 'ready',
-          language: m.language || m.platform || '',
-          platform: m.platform || '',
+          type: m.type || '',
+          responsibilities: m.responsibilities || '',
+          interfaces: m.interfaces || '',
+          communicationContracts: m.communicationContracts || '',
+          technologyStack: m.technologyStack || '',
           dependencies: m.dependencies || '',
-          errorHandling: m.errorHandling || '',
-          testingRequirements: m.testingRequirements || ''
+          constraints: m.constraints || '',
+          nonFunctional: m.nonFunctional || '',
+          testing: m.testing || '',
+          deployment: m.deployment || '',
+          architectureDecisions: m.architectureDecisions || '',
+          status: 'ready'
         }
       };
     });
@@ -334,7 +336,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     let filledFields = 0;
     nodes.forEach(node => {
       const data = node.data || {};
-      const fields = ['coreTask', 'dataShape', 'expectedOutput', 'dependencies', 'errorHandling', 'testingRequirements'];
+      const fields = ['responsibilities', 'interfaces', 'communicationContracts', 'technologyStack', 'dependencies', 'constraints', 'nonFunctional', 'testing', 'deployment', 'architectureDecisions'];
       fields.forEach(f => {
         totalFields++;
         if (data[f] && data[f].trim() !== '') filledFields++;
@@ -410,7 +412,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       text += `**File**: modules/${fileName}/implementation.${ext}\n\n`;
 
       text += `**Dependencies**: ${node.data.dependencies || 'None'}\n\n`;
-      text += `**Core Task**: ${node.data.coreTask || 'Not specified'}\n\n`;
+      text += `**Responsibilities**: ${node.data.responsibilities || 'Not specified'}\n\n`;
       text += `**Data Shape (Input)**: ${node.data.dataShape || 'Not specified'}\n\n`;
       text += `**Expected Output**: ${node.data.expectedOutput || 'Not specified'}\n\n`;
       text += `**Error Handling**: ${node.data.errorHandling || 'None'}\n\n`;
@@ -454,7 +456,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       text += `    <platform>${node.data.platform || node.data.language || 'Unknown'}</platform>\n`;
       text += `    <file>modules/${fileName}/implementation.${ext}</file>\n`;
       text += `    <dependencies>${node.data.dependencies || 'None'}</dependencies>\n`;
-      text += `    <task>${node.data.coreTask || 'None'}</task>\n`;
+      text += `    <responsibilities>${node.data.responsibilities || 'None'}</responsibilities>\n`;
       text += `    <inputs>${node.data.dataShape || 'None'}</inputs>\n`;
       text += `    <outputs>${node.data.expectedOutput || 'None'}</outputs>\n`;
       text += `    <errors>${node.data.errorHandling || 'None'}</errors>\n`;

@@ -5,16 +5,18 @@ import { Cpu, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 export type ServoNodeData = {
   label: string;
-  coreTask?: string;
-  purpose?: string;
   status: 'ready' | 'generating' | 'error';
-  language: string;
-  icon?: string;
-  dataShape?: string;
-  expectedOutput?: string;
+  type?: string;
+  responsibilities?: string;
+  interfaces?: string;
+  communicationContracts?: string;
+  technologyStack?: string;
   dependencies?: string;
-  errorHandling?: string;
-  testingRequirements?: string;
+  constraints?: string;
+  nonFunctional?: string;
+  testing?: string;
+  deployment?: string;
+  architectureDecisions?: string;
 };
 
 /** Calculates a 0–100 completeness score based on QUALITY of filled fields, not just presence */
@@ -22,23 +24,12 @@ const getCompleteness = (data: ServoNodeData): number => {
   let score = 0;
   const maxScore = 6;
   
-  // coreTask must be descriptive (at least 20 chars)
-  if (data.coreTask && data.coreTask.trim().length > 20) score += 1;
-  
-  // dataShape must mention types (e.g., dict, string, int)
-  if (data.dataShape && /dict|string|int|array|object|list/i.test(data.dataShape)) score += 1;
-  
-  // expectedOutput must mention types
-  if (data.expectedOutput && /dict|string|int|array|object|list|boolean/i.test(data.expectedOutput)) score += 1;
-  
-  // dependencies only count if the core task is actually defined (prevent gaming the score)
-  if (data.dependencies && data.dependencies.trim().length > 2 && score >= 1) score += 1;
-  
-  // errorHandling must mention specific errors (Error, Exception, ValueError, etc)
-  if (data.errorHandling && /error|exception|fail|timeout|invalid/i.test(data.errorHandling)) score += 1;
-  
-  // testingRequirements should have multiple scenarios (look for commas, "and", or newlines)
-  if (data.testingRequirements && (data.testingRequirements.includes(',') || data.testingRequirements.includes(' and ') || data.testingRequirements.includes('\n'))) score += 1;
+  if (data.responsibilities && data.responsibilities.trim().length > 15) score += 1;
+  if (data.interfaces && data.interfaces.trim().length > 3) score += 1;
+  if (data.communicationContracts && data.communicationContracts.trim().length > 5) score += 1;
+  if (data.technologyStack && data.technologyStack.trim().length > 3) score += 1;
+  if (data.architectureDecisions && data.architectureDecisions.trim().length > 10) score += 1;
+  if (data.testing && data.testing.trim().length > 3) score += 1;
 
   return Math.round((score / maxScore) * 100);
 };
@@ -105,21 +96,25 @@ const ServoNode = ({ data }: NodeProps<ServoNodeData>) => {
         </div>
 
         <div className="py-2 space-y-1">
-          <div className="text-[10px] text-fg-muted font-semibold uppercase tracking-wider">Core Task</div>
+          <div className="text-[10px] text-fg-muted font-semibold uppercase tracking-wider">Responsibilities</div>
           <div className="text-xs text-body leading-tight line-clamp-2 italic">
-            &ldquo;{data.coreTask || data.purpose || 'Not specified'}&rdquo;
+            &ldquo;{data.responsibilities || 'Not specified'}&rdquo;
           </div>
         </div>
 
         <div className="flex items-center justify-between mt-1 pt-2 border-t border-default">
           <div className="flex items-center gap-1">
-            {data.language && (
-              <span className="text-[10px] bg-neutral-tertiary px-1.5 py-0.5 rounded text-fg-muted font-mono border border-default">
-                {data.language}
+            {data.type && (
+              <span className="text-[10px] bg-neutral-tertiary px-1.5 py-0.5 rounded text-fg-muted font-mono border border-default truncate max-w-[80px]">
+                {data.type}
+              </span>
+            )}
+            {data.technologyStack && (
+              <span className="text-[10px] bg-brand-softer text-fg-brand px-1.5 py-0.5 rounded font-mono border border-brand-soft truncate max-w-[80px]" title={data.technologyStack}>
+                {data.technologyStack.split(',')[0]}
               </span>
             )}
           </div>
-          <div className="text-[10px] text-fg-muted font-medium">MODULE</div>
         </div>
       </div>
 
