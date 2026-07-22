@@ -54,8 +54,8 @@ def _async_get_client() -> AsyncOpenAI:
         max_retries=0,
     )
 
-FAST_MODEL = os.environ.get("AI_FAST_MODEL", "thinkingmachines/inkling")
-THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "thinkingmachines/inkling")
+FAST_MODEL = os.environ.get("AI_FAST_MODEL", "z-ai/glm-5.2")
+THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "z-ai/glm-5.2")
 
 def _call_fast_model(
     system_prompt: str,
@@ -76,7 +76,10 @@ def _call_fast_model(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "max_completion_tokens": max_tokens,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "top_p": 1.0,
+        "seed": 42
     }
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
@@ -115,7 +118,10 @@ async def _async_call_fast_model(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "max_completion_tokens": max_tokens,
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "top_p": 1.0,
+        "seed": 42
     }
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
@@ -152,7 +158,11 @@ def _call_thinking_model(
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-            }
+        "max_tokens": 16384,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "seed": 42
+    }
     
     # Enable reasoning for Nemotron/NVIDIA reasoning models
 
@@ -198,7 +208,11 @@ def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-                "stream": True
+        "stream": True,
+        "max_tokens": 16384,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "seed": 42
     }
         
     try:
@@ -206,11 +220,13 @@ def _call_thinking_model_stream(system_prompt: str, user_prompt: str):
     except Exception as e:
         raise e
     
-    for event in stream:
-        if not event.choices:
+    for chunk in stream:
+        if not getattr(chunk, "choices", None):
+            continue
+        if len(chunk.choices) == 0 or getattr(chunk.choices[0], "delta", None) is None:
             continue
             
-        delta = event.choices[0].delta
+        delta = chunk.choices[0].delta
         
         reasoning = getattr(delta, "reasoning_content", None)
         if reasoning:
