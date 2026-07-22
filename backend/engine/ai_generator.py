@@ -54,8 +54,8 @@ def _async_get_client() -> AsyncOpenAI:
         max_retries=0,
     )
 
-FAST_MODEL = os.environ.get("AI_FAST_MODEL", "z-ai/glm-5.2")
-THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "z-ai/glm-5.2")
+FAST_MODEL = os.environ.get("AI_FAST_MODEL", "meta/llama-3.1-70b-instruct")
+THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "meta/llama-3.1-70b-instruct")
 
 def _call_fast_model(
     system_prompt: str,
