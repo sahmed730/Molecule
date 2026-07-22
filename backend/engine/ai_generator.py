@@ -54,8 +54,8 @@ def _async_get_client() -> AsyncOpenAI:
         max_retries=0,
     )
 
-FAST_MODEL = os.environ.get("AI_FAST_MODEL", "poolside/laguna-xs-2.1")
-THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "poolside/laguna-xs-2.1")
+FAST_MODEL = os.environ.get("AI_FAST_MODEL", "thinkingmachines/inkling")
+THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "thinkingmachines/inkling")
 
 def _call_fast_model(
     system_prompt: str,
