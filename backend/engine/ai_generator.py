@@ -28,7 +28,7 @@ from .cache import get_cached_response, set_cached_response
 
 def _get_client() -> OpenAI:
     """Returns an OpenAI client pointed at the NVIDIA API."""
-    api_key = os.environ.get("NVIDIA_API_KEY", "")
+    api_key = os.environ.get("NVIDIA_API_KEY", "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")
     base_url = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
     if not base_url.endswith("/v1") and not base_url.endswith("/v1beta/openai"):
         base_url = f"{base_url}/v1"
@@ -42,7 +42,7 @@ def _get_client() -> OpenAI:
 
 def _async_get_client() -> AsyncOpenAI:
     """Returns an AsyncOpenAI client pointed at the NVIDIA API."""
-    api_key = os.environ.get("NVIDIA_API_KEY", "")
+    api_key = os.environ.get("NVIDIA_API_KEY", "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")
     base_url = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
     if not base_url.endswith("/v1") and not base_url.endswith("/v1beta/openai"):
         base_url = f"{base_url}/v1"
@@ -54,8 +54,8 @@ def _async_get_client() -> AsyncOpenAI:
         max_retries=0,
     )
 
-FAST_MODEL = os.environ.get("AI_FAST_MODEL", "meta/llama-3.1-70b-instruct")
-THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "meta/llama-3.1-70b-instruct")
+FAST_MODEL = os.environ.get("AI_FAST_MODEL", "poolside/laguna-xs-2.1")
+THINKING_MODEL = os.environ.get("AI_THINKING_MODEL", "poolside/laguna-xs-2.1")
 
 def _call_fast_model(
     system_prompt: str,
