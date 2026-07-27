@@ -50,6 +50,7 @@ app.add_middleware(
 class ClarifyRequest(BaseModel):
     prompt: str
     graphify_context: Optional[str] = None
+    answers: Optional[dict] = None
 
 class ArchitectureRequest(BaseModel):
     prompt: str
