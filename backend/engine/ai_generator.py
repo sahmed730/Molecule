@@ -356,6 +356,26 @@ Output format:
         answer_text = "\n".join(f"  Q: {k}\n  A: {v}" for k, v in answers.items())
         user_msg += f"\n\nUser's Answers to Previous Questions:\n{answer_text}"
 
+    mandatory_questions = {
+        "confidence_high": False,
+        "questions": [
+            {
+                "id": "q_mandatory_1",
+                "question": "What is the primary target environment and deployment scale for this system?",
+                "type": "open_text",
+                "options": [],
+                "recommended_default": "Cloud-native targeting medium scale."
+            },
+            {
+                "id": "q_mandatory_2",
+                "question": "Are there any strict non-functional constraints (e.g., latency, compliance, or memory) we need to design around?",
+                "type": "open_text",
+                "options": [],
+                "recommended_default": "Standard security, no hard real-time latency or memory constraints."
+            }
+        ]
+    }
+
     try:
         raw = _call_fast_model(system_prompt, user_msg, json_mode=True)
         data = _extract_json(raw)
@@ -363,27 +383,14 @@ Output format:
         # MANDATORY QnA ENFORCEMENT
         # If it's the first turn, we MUST return questions.
         if not answers and (data.get("confidence_high") or not data.get("questions")):
-            data["confidence_high"] = False
-            data["questions"] = [
-                {
-                    "id": "q_mandatory_1",
-                    "question": "What is the primary target environment and deployment scale for this system?",
-                    "type": "open_text",
-                    "options": [],
-                    "recommended_default": "Cloud-native targeting medium scale."
-                },
-                {
-                    "id": "q_mandatory_2",
-                    "question": "Are there any strict non-functional constraints (e.g., latency, compliance, or memory) we need to design around?",
-                    "type": "open_text",
-                    "options": [],
-                    "recommended_default": "Standard security, no hard real-time latency or memory constraints."
-                }
-            ]
+            data = mandatory_questions
             
         return data
     except Exception as e:
         print(f"Clarification generation failed: {e}")
+        # Enforce mandatory QnA even if the AI fails, so the user doesn't skip straight to generate and crash on turn 1
+        if not answers:
+            return mandatory_questions
         return {"confidence_high": False, "questions": []}
 
 # ═══════════════════════════════════════════════════════════════
