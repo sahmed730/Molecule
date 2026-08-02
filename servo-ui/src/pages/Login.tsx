@@ -39,7 +39,7 @@ const Login = () => {
       <div className="w-full max-w-md bg-neutral-primary-soft rounded-[12px] shadow-xl border border-default transform transition-all">
         <div className="p-8 text-center border-b border-default relative overflow-hidden">
           <div className="w-16 h-16 bg-neutral-primary-strong rounded-[12px] flex items-center justify-center mx-auto mb-5 border border-default-medium">
-            <LogIn className="w-8 h-8 text-fg-brand" />
+            <img src="/logo.png" alt="EasePr Logo" className="w-10 h-10 object-contain" />
           </div>
           <h2 className="text-2xl font-semibold text-heading relative z-10 tracking-tight">Welcome Back</h2>
           <p className="text-body mt-2 text-sm relative z-10">Sign in to EasePr Architecture</p>
