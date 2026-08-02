@@ -242,7 +242,9 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       });
       const reviewJson = await reviewResponse.json();
       if (reviewJson.status === 'success') setReviewData(reviewJson.review);
-    } catch (_) {}
+    } catch (e) {
+      console.error('Review extraction failed:', e);
+    }
   };
 
   const onConnect = useCallback(
@@ -715,13 +717,10 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     let finalPrompt = expandPrompt;
     if (expandQuestions.length > 0) {
         const answersText = expandQuestions.map(q => {
-          let ansStr = '';
           const ans = expandAnswers[q.id];
-          if (Array.isArray(ans)) {
-            ansStr = ans.length > 0 ? ans.join(', ') : 'None specified';
-          } else {
-            ansStr = ans || 'Not specified';
-          }
+          const ansStr = Array.isArray(ans) 
+            ? (ans.length > 0 ? ans.join(', ') : 'None specified') 
+            : (ans || 'Not specified');
           return `Q: ${q.question}\nA: ${ansStr}`;
         }).join('\n\n');
         finalPrompt = `${expandPrompt}\n\nAdditional Requirements:\n${answersText}`;

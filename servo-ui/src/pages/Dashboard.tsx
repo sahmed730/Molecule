@@ -248,7 +248,7 @@ ${attachedContext}
     finalPromptOverride?: string,
     providedAnswers?: Record<string, string>
   ) => {
-    let basePrompt = finalPromptOverride || prompt;
+    const basePrompt = finalPromptOverride || prompt;
     const finalPrompt = attachedContext 
       ? `${basePrompt}\n\n--- Context from ${attachedDocName} ---\n${attachedContext}\n-------------------------\n` 
       : basePrompt;
