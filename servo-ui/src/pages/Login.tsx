@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { Key, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -36,7 +37,12 @@ const Login = () => {
       {/* Brand radial glow effect */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-softer rounded-full blur-[120px] opacity-50 -z-10 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
       
-      <div className="w-full max-w-md bg-neutral-primary-soft rounded-[12px] shadow-xl border border-default transform transition-all">
+      <motion.div 
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300, mass: 0.5 }}
+        className="w-full max-w-md bg-neutral-primary-soft rounded-[12px] shadow-xl border border-default transform transition-all"
+      >
         <div className="p-8 text-center border-b border-default relative overflow-hidden flex flex-col items-center">
           <img src="/logo-login.png" alt="EasePr Login Logo" className="h-14 object-contain mb-6" />
           <h2 className="text-2xl font-semibold text-heading relative z-10 tracking-tight">Welcome Back</h2>
@@ -102,7 +108,7 @@ const Login = () => {
             </Link>
           </p>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };
