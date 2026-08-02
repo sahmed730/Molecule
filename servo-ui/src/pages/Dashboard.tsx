@@ -390,13 +390,8 @@ ${attachedContext}
     <div className="flex w-full h-screen bg-neutral-primary text-body overflow-hidden">
       {/* Top Header */}
       <header className="fixed top-6 left-1/2 -translate-x-1/2 w-full max-w-[1280px] h-16 bg-neutral-primary-soft/80 backdrop-blur-[16px] border border-default rounded-[12px] flex items-center justify-between px-6 z-50 shadow-md">
-        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setAppState('home')}>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform overflow-hidden shadow-glow">
-            <img src="/logo.png" alt="EasePr Logo" className="w-full h-full object-cover" />
-          </div>
-          <span className="font-bold text-xl tracking-tight text-heading group-hover:text-white transition-colors">
-            EASEPR
-          </span>
+        <div className="flex items-center cursor-pointer group h-full py-3" onClick={() => setAppState('home')}>
+          <img src="/logo-full.png" alt="EasePr Full Logo" className="h-full object-contain transform group-hover:scale-105 transition-transform" />
         </div>
         
         <div className="flex items-center gap-4">
