@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="servo-ui/public/logo-login.png" alt="EasePr Logo" width="350"/>
+  <img src="servo-ui/public/logo-dark.png" alt="EasePr Logo" width="350"/>
 
   <h1>EasePr (Molecule Engine)</h1>
   
