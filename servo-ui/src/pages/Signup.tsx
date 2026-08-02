@@ -45,6 +45,7 @@ const Signup = () => {
 
       <div className="w-full max-w-md bg-neutral-primary-soft rounded-[12px] shadow-xl border border-default transform transition-all">
         <div className="p-8 text-center border-b border-default relative overflow-hidden flex flex-col items-center">
+          <img src="/logo-login.png" alt="EasePr Login Logo" className="h-14 object-contain mb-6" />
           <h2 className="text-2xl font-semibold text-heading relative z-10 tracking-tight">Create Account</h2>
           <p className="text-body mt-2 text-sm relative z-10">Start building your architectures</p>
         </div>
