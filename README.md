@@ -1,18 +1,31 @@
----
-title: Molecule Engine (EasePr)
-emoji: 🚀
-colorFrom: blue
-colorTo: purple
-sdk: docker
-app_port: 7860
-pinned: false
----
+<div align="center">
+  <img src="servo-ui/public/logo-login.png" alt="EasePr Logo" width="350"/>
 
-# EasePr (Molecule Engine)
+  <h1>EasePr (Molecule Engine)</h1>
+  
+  <p><strong>An AI-powered software architecture visualizer and builder.</strong></p>
 
-An AI-powered software architecture visualizer and builder. It allows developers to input a high-level product goal, automatically generating a visual node-based dependency graph of the required system modules, data contracts, and implementation plans.
+  <p>
+    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+    <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge" alt="License" />
+  </p>
+</div>
 
-## Quick Start
+<hr/>
+
+EasePr allows developers to input a high-level product goal and automatically generates a visual, node-based dependency graph of the required system modules, data contracts, and implementation plans. It utilizes state-of-the-art LLMs to plan architectures safely and correctly before a single line of code is written.
+
+## ✨ Features
+
+- 🧠 **AI Architecture Generation:** Leverages advanced AI models to turn natural language into structured architectures.
+- 🎨 **Interactive Node Canvas:** A beautiful, draggable, and auto-layout graph visualizing dependencies between modules.
+- 📦 **Mega Prompt Export:** Compiles the entire architecture into markdown specifications for Cursor, Claude, or standard developer handoff.
+- 🧪 **Test-Driven Architecture:** Outputs strict testing requirements and error-handling specs for each generated module.
+
+## 🚀 Quick Start
 
 ```bash
 # Clone the repository
@@ -33,23 +46,23 @@ npm install
 npm run dev
 ```
 
-## Installation
+## ⚙️ Configuration
 
 ### Prerequisites
 - Node.js v18+
 - Python 3.10+
-- Firebase Project (for Authentication & Firestore)
+- Firebase Project (Authentication & Firestore)
 - API Keys for AI Inference (OpenRouter, GLM, etc.)
 
-### Backend Configuration
-The backend requires environment variables to function correctly. Create a `.env` file in the `/backend/` directory:
+### Environment Variables
+
+**Backend (`/backend/.env`)**
 ```env
 OPENROUTER_API_KEY=your_key_here
 FIREBASE_CREDENTIALS_PATH=./path/to/firebase-adminsdk.json
 ```
 
-### Frontend Configuration
-The frontend requires Firebase setup for user sessions and saving architecture projects. Create a `.env` file in `/servo-ui/`:
+**Frontend (`/servo-ui/.env`)**
 ```env
 VITE_FIREBASE_API_KEY=your_key
 VITE_FIREBASE_AUTH_DOMAIN=your_domain
@@ -57,19 +70,19 @@ VITE_FIREBASE_PROJECT_ID=your_id
 VITE_API_URL=http://127.0.0.1:8000
 ```
 
-## Usage
+## 📖 Usage
 
 ### Generating an Architecture
 1. Navigate to the **AI Architect** tab in the dashboard.
-2. Provide a prompt (e.g., "Build an E-commerce platform with payments & inventory").
+2. Provide a prompt (e.g., *"Build an E-commerce platform with payments & inventory"*).
 3. Optionally upload a context file.
 4. The system will ask clarifying questions. Answer them to refine the architecture.
 5. The system generates a visual React Flow graph.
 
 ### Exporting to Cursor / Claude
-You can select a node and click "Compile Mega Prompt" to generate an LLM-ready markdown specification for that specific module, which includes standard contracts, test cases, and dependency context.
+You can select a node and click **Compile Mega Prompt** to generate an LLM-ready markdown specification for that specific module, which includes standard contracts, test cases, and dependency context.
 
-## API Reference
+## 🔌 API Reference
 
 ### `POST /api/clarify-architecture`
 Generates clarifying questions based on a user's initial prompt to refine system requirements.
@@ -80,20 +93,6 @@ interface ClarifyRequest {
   prompt: string;
   graphify_context?: string;
   answers?: Record<string, string>;
-}
-```
-
-**Returns:**
-```json
-{
-  "confidence_high": false,
-  "questions": [
-    {
-      "id": "q1",
-      "question": "Will this system require real-time WebSocket connections?",
-      "options": ["Yes", "No", "Only for notifications"]
-    }
-  ]
 }
 ```
 
@@ -109,39 +108,19 @@ interface ArchitectureRequest {
 }
 ```
 
-**Returns:**
-Returns a JSON object containing `nodes` (with full markdown contracts) and `edges`.
-
-## Architecture Documentation
+## 🏗️ Architecture Documentation
 
 ### ADR-001: Separation of Frontend and Backend AI Engine
-**Status:** Accepted
+- **Status:** Accepted
+- **Context:** Architecture generation requires long-running AI inference loops, while visualization requires an interactive UI.
+- **Decision:** Separated the stack into a Vite + React SPA (`/servo-ui`) and a FastAPI Python backend (`/backend`).
+- **Rationale:** React + React Flow provides the best ecosystem for graph visualization, while Python + FastAPI manages asynchronous LLM streams efficiently without timeout restrictions.
 
-**Context:** The architecture visualization is heavily interactive, while the generation requires long-running AI inference loops and Python-native LLM orchestration.
+### Core Components
+- **Authentication Flow:** Managed by Firebase Auth. API calls to the backend include the Firebase Bearer token in the `Authorization` header, validated by FastAPI dependency injection.
+- **CanvasEditor:** The interactive workspace using `reactflow` for rendering and `dagre` for automated hierarchical layout.
 
-**Decision:** We separated the stack into a Vite + React SPA (`/servo-ui`) and a FastAPI Python backend (`/backend`).
-
-**Rationale:**
-- React + React Flow provides the best ecosystem for graph visualization.
-- Python provides the best ecosystem for LLM orchestration and data validation (Pydantic).
-- FastAPI handles async workloads natively, preventing timeout issues on long AI generations.
-
-### Component Documentation
-
-#### Authentication Flow
-Handles user authentication using Firebase Auth.
-1. User submits credentials to Firebase from the frontend (`Login.tsx` / `Signup.tsx`).
-2. Firebase SDK handles token issuance and persistent local storage.
-3. API calls to the backend include the Firebase Bearer token in the Authorization header.
-4. FastAPI dependency validates the JWT via Firebase Admin SDK.
-
-#### Module Workspace (`CanvasEditor.tsx`)
-The core interactive visualizer.
-- Uses `reactflow` for rendering the dependency graph.
-- Implements `dagre` for automatic hierarchical layout of modules.
-- Allows users to drag and drop blank modules, or dynamically expand existing modules by querying the AI backend for sub-architectures.
-
-## Contributing
+## 🤝 Contributing
 
 1. Create a feature branch (`git checkout -b feature/amazing-feature`)
 2. Make your changes and write inline comments explaining *why* complex decisions were made.
@@ -149,6 +128,6 @@ The core interactive visualizer.
 4. Commit your changes (`git commit -m 'Add amazing feature'`)
 5. Push to the branch and open a Pull Request.
 
-## License
+## 📜 License
 
-Apache License 2.0
+This project is licensed under the **Apache License 2.0**.
